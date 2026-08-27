@@ -18,7 +18,12 @@ root script surface the other packages plug into.
   `verbatimModuleSyntax`, `noUncheckedIndexedAccess`, `isolatedModules`.
 - `eslint.config.js` — flat config: `@eslint/js` + `typescript-eslint` +
   `eslint-plugin-react-hooks` / `react-refresh` (web only), `consistent-type-imports`.
-- `.prettierrc.json` + `.prettierignore` (ignores generated migrations).
+- `.prettierrc.json` + `.prettierignore` (ignores generated migrations), with
+  semicolon-free JavaScript / TypeScript formatting.
+- `stylelint.config.mjs` enforces one blank line between CSS / SCSS rule blocks;
+  `pnpm lint` runs Stylelint after ESLint.
+- `.vscode/settings.json` makes Cursor / VS Code format on save with the
+  workspace Prettier configuration and apply Stylelint fixes.
 - `.gitignore`; Node pin `22` in both `.nvmrc` (nvm) and `.node-version`
   (fnm / nodenv / asdf / CI `node-version-file`).
 

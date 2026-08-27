@@ -146,6 +146,8 @@ gh stack view
    Steel) · `#B3001B` danger (Mahogany Red). Dark-only.
 7. App shell (`.app-stage`, keyframes `tileFlip` / `joinIn` / `toastIn`) lives in
    `apps/web/src/styles/animations.css` — tokens only, same rules.
+8. Separate CSS / SCSS rule blocks with one blank line. Stylelint enforces this;
+   Prettier remains the formatter.
 
 ---
 

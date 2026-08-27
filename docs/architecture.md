@@ -114,7 +114,7 @@ independently-scoped packages that can depend on each other.
 ```
 wordle-clash/
   pnpm-workspace.yaml   — workspace globs: apps/*, packages/*, e2e
-  package.json          — root: shared tooling (eslint, prettier, tsc) + fan-out scripts
+  package.json          — root: shared tooling (eslint, stylelint, prettier, tsc) + fan-out scripts
   tsconfig.base.json    — the strict config every package extends
   apps/
     web/       @wordle-clash/web     — DEPLOYABLE: Vite + React 19 SPA

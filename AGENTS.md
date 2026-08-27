@@ -58,7 +58,8 @@ When the user assigns a story, **before writing any code**:
    branch unless the user asks to stack (operating rule 2), in which case branch
    from the parent story's branch instead of `main`.
 4. Creating this branch is the **only** git action taken automatically. Commits,
-   pushes, rebases, and merges stay with the user (see Workflow).
+   pushes, and pull-request creation require the user's explicit authorization;
+   rebases and merges stay with the user (see Workflow).
 
 ---
 
@@ -203,8 +204,11 @@ gh stack view
 
 - **`pnpm dev`** runs web (`:5173`) + Worker (`:8787`) in parallel;
   `pnpm dev:web` / `pnpm dev:server` for one side. Vite proxies `/api` + `/ws`.
-- **Do not commit, or run `git reset` / `restore` / `revert`, on the user's
-  behalf.** The user handles all git operations.
+- **Do not commit, push, or create/update pull requests unless the user explicitly
+  authorizes those actions.** Authorization may cover a named branch or stack;
+  do not extend it beyond the scope the user approved.
+- **Do not merge, or run `git reset` / `restore` / `revert`, on the user's
+  behalf.** Those operations stay with the user.
 - **Do not run build / lint / test / typecheck commands unless the user asks.**
 - Keep [`docs/architecture.md`](./docs/architecture.md),
   [`docs/verification.md`](./docs/verification.md), and the relevant

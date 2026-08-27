@@ -1,6 +1,7 @@
 import { routePartykitRequest } from 'partyserver'
 
 import { createAuth } from './auth'
+import { handleFavorites } from './favorites/routes'
 import {
   authorizeWebSocketRequest,
   handleRealtimeTicket,
@@ -32,6 +33,10 @@ export default {
 
     if (url.pathname === '/api/rt/ticket') {
       return handleRealtimeTicket(request, env)
+    }
+
+    if (url.pathname === '/api/favorites') {
+      return handleFavorites(request, env)
     }
 
     if (url.pathname.startsWith('/ws/')) {

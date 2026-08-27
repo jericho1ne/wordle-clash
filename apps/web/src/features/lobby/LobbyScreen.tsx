@@ -1,7 +1,12 @@
 import { useParams } from 'react-router'
 
-import { normalizeRoomCode } from '@wordle-clash/shared'
+import {
+  isValidRoomCode,
+  normalizeRoomCode,
+} from '@wordle-clash/shared'
 
+import { useFavorites } from '../../identity'
+import { Button } from '../../ui'
 import styles from './LobbyScreen.module.scss'
 
 /**
@@ -12,6 +17,17 @@ import styles from './LobbyScreen.module.scss'
 export function LobbyScreen() {
   const { code } = useParams()
   const roomCode = normalizeRoomCode(code ?? '')
+  const {
+    error,
+    isFavorite,
+    toggle,
+  } = useFavorites()
+  const validRoomCode = isValidRoomCode(roomCode)
+  const favorite = isFavorite(roomCode)
+
+  const toggleFavorite = () => {
+    void toggle(roomCode).catch(() => undefined)
+  }
 
   return (
     <div className={`app-stage ${styles.lobbyScreen}`}>
@@ -19,7 +35,21 @@ export function LobbyScreen() {
         <div className="card elev-md">
           <div className="card-kicker">Room code</div>
           <div className={`card-title ${styles.code}`}>{roomCode || '—'}</div>
-          <div className="card-meta">Scaffold placeholder — see docs/stories/06-lobby-screen.</div>
+          <Button
+            variant={favorite ? 'secondary' : 'ghost'}
+            disabled={!validRoomCode}
+            aria-pressed={favorite}
+            onClick={toggleFavorite}
+          >
+            {favorite ? 'Favorited' : 'Favorite room'}
+          </Button>
+          <div className="card-meta">
+            {error
+              ? error.message
+              : favorite
+                ? 'Saved to your favorites.'
+                : 'Scaffold placeholder — favorites slice is live.'}
+          </div>
         </div>
       </div>
     </div>

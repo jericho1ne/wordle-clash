@@ -1,6 +1,15 @@
 import { useState } from 'react'
 
-import { Button, Card, Field, IconButton, Input, RadioGroup, SegmentedControl, Tag } from '../../ui'
+import {
+  Button,
+  Card,
+  Field,
+  IconButton,
+  Input,
+  RadioGroup,
+  SegmentedControl,
+  Tag,
+} from '../../ui'
 import styles from './DesignSystem.module.scss'
 
 const BASE = [

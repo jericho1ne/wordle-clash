@@ -13,7 +13,7 @@ Nothing here is a separate epic — verification is a gate on each one.
 pnpm install                 # clean resolve
 pnpm -r typecheck            # tsc --noEmit across web, server, shared
 pnpm lint                    # eslint + Stylelint (including CSS/SCSS block spacing)
-pnpm format:check            # prettier
+pnpm format:check            # ESLint Stylistic (JS/TS) + Prettier (other files)
 pnpm -r test                 # vitest across all packages
 pnpm --filter @wordle-clash/web build   # tsc + vite build -> apps/web/dist
 ```

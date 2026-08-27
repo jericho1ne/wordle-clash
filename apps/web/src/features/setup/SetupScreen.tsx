@@ -1,4 +1,7 @@
-import { useNavigate, useSearchParams } from 'react-router'
+import {
+  useNavigate,
+  useSearchParams,
+} from 'react-router'
 
 import { IconButton } from '../../ui'
 import styles from './SetupScreen.module.scss'

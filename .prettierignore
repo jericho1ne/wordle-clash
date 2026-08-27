@@ -7,6 +7,15 @@ playwright-report/
 pnpm-lock.yaml
 apps/server/migrations/
 
+# JavaScript / TypeScript is formatted by ESLint Stylistic so Anthony Fu's
+# import/export list rules remain authoritative instead of fighting Prettier.
+**/*.js
+**/*.jsx
+**/*.cjs
+**/*.mjs
+**/*.ts
+**/*.tsx
+
 # Hand-maintained docs — Prettier's markdown table alignment pads columns to the
 # widest cell, which mangles the wide planning tables. Keep them as authored.
 docs/

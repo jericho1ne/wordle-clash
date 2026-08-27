@@ -148,6 +148,9 @@ gh stack view
    `apps/web/src/styles/animations.css` — tokens only, same rules.
 8. Separate CSS / SCSS rule blocks with one blank line. Stylelint enforces this;
    Prettier remains the formatter.
+9. Named imports and exports with two or more specifiers use one specifier per
+   line. ESLint Stylistic + `eslint-plugin-antfu` enforce and format JS / TS;
+   Prettier formats the remaining file types.
 
 ---
 

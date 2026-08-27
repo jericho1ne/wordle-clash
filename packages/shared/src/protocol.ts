@@ -7,7 +7,10 @@
  * compile against in the meantime.
  */
 import type { GameMode } from './game-modes.js'
-import type { Player, RoomState } from './room.js'
+import type {
+  Player,
+  RoomState,
+} from './room.js'
 
 export const PROTOCOL_VERSION = 1
 

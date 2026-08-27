@@ -1,4 +1,7 @@
-import { createBrowserRouter, Navigate } from 'react-router'
+import {
+  createBrowserRouter,
+  Navigate,
+} from 'react-router'
 
 import { TitleScreen } from './features/title/TitleScreen'
 import { SetupScreen } from './features/setup/SetupScreen'

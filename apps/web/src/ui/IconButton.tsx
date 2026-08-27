@@ -9,8 +9,10 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
   danger: 'btn-danger',
 };
 
-export interface IconButtonProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label'> {
+export interface IconButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'aria-label'
+> {
   variant?: ButtonVariant;
   /** Required — an icon-only control needs an accessible name. */
   'aria-label': string;

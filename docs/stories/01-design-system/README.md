@@ -37,8 +37,8 @@ btn-primary`) needs no module; any custom CSS gets one. All CSS uses only
 | 01 | Inter `<link>` + `animations.css` keyframes + reduced-motion guard | done (epic 00) |
 | 02 | `<AppShell>` / route layout with `.nav` + `.nav-brand` (setup/lobby only) | deferred — screens keep inline `app-stage` for now |
 | [03](./03-button.md) | `<Button variant={primary\|secondary\|ghost\|danger} block?>` + `<IconButton>` (primary = accent outline, not fill) | done, in review |
-| 04 | `<Field>` + `<Input>` | next |
-| 05 | `<SegmentedControl>` (`.seg`/`.seg-opt` over native radios) + `<RadioGroup>` | |
+| [04](./04-field-input.md) | `<Field label htmlFor hint? error?>` + `<Input>` | done, in review |
+| 05 | `<SegmentedControl>` (`.seg`/`.seg-opt` over native radios) + `<RadioGroup>` | next |
 | 06 | `<Card elevation>` + `Card.Kicker/.Title/.Body/.Meta` + `<Tag tone={accent\|accent-2\|neutral\|danger\|outline}>` | |
 | 07 | `<Dialog open onClose title>` (backdrop, focus trap, ESC, backdrop click) | |
 | 08 | `<ToastProvider>` + `useToast().show(text)` — one top-center pill, `toastIn`, ~2200ms, single-toast queue | |

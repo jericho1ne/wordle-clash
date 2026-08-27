@@ -426,6 +426,17 @@ textarea.input {
 .seg-opt + .seg-opt {
   border-left: 1px solid var(--color-divider);
 }
+/* End segments round to match the container, so the checked inset ring isn't clipped. */
+
+.seg-opt:first-child {
+  border-top-left-radius: var(--radius-md);
+  border-bottom-left-radius: var(--radius-md);
+}
+
+.seg-opt:last-child {
+  border-top-right-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+}
 
 .seg-opt:has(input:checked) {
   color: var(--color-accent);

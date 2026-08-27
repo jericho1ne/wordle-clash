@@ -8,7 +8,6 @@ export interface RadioOption<T extends string> {
 }
 
 export interface RadioGroupProps<T extends string> {
-  /** Radio-group name — must be unique per control on the page. */
   name: string
   options: RadioOption<T>[]
   value: T
@@ -17,10 +16,6 @@ export interface RadioGroupProps<T extends string> {
   'aria-labelledby'?: string
 }
 
-/**
- * Stacked radio list over the Ember `.radio` / `.dot` classes (native radios
- * under `<label>`s). The module only handles vertical spacing.
- */
 export function RadioGroup<T extends string>({
   name,
   options,

@@ -3,12 +3,10 @@ import type { ReactNode } from 'react'
 export interface SegmentedOption<T extends string> {
   value: T
   label: ReactNode
-  /** Optional leading icon. */
   icon?: ReactNode
 }
 
 export interface SegmentedControlProps<T extends string> {
-  /** Radio-group name — must be unique per control on the page. */
   name: string
   options: SegmentedOption<T>[]
   value: T
@@ -17,10 +15,6 @@ export interface SegmentedControlProps<T extends string> {
   'aria-labelledby'?: string
 }
 
-/**
- * Segmented control over the Ember `.seg` / `.seg-opt` classes — native radios
- * under `<label>`s, so keyboard and form semantics come for free. No module.
- */
 export function SegmentedControl<T extends string>({
   name,
   options,

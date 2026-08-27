@@ -34,7 +34,7 @@ a clean, contained change to `apps/web/vite.config.ts` and is noted there.
 
 - `wrangler login`
 - `wrangler d1 create wordle-clash` → `database_id` into `wrangler.jsonc`
-- `wrangler secret put AUTH_SECRET` / `RT_TICKET_SECRET` (epic 03)
+- `wrangler secret put BETTER_AUTH_SECRET` / `RT_TICKET_SECRET` (epic 03)
 
 ## Acceptance
 

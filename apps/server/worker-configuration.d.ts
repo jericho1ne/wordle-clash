@@ -11,8 +11,8 @@ declare namespace Cloudflare {
     ROOM: DurableObjectNamespace
     /** D1: accounts, favorites, (inert) match history. */
     DB: D1Database
-    /** Set via `wrangler secret put` / .dev.vars. Added in epic 03. */
-    AUTH_SECRET?: string
+    /** Set via `wrangler secret put` / .dev.vars. */
+    BETTER_AUTH_SECRET: string
     RT_TICKET_SECRET?: string
   }
 }

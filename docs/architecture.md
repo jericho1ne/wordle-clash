@@ -247,10 +247,11 @@ after every epic; verification is a gate on each epic, not a separate one.
 
 ## Known risks / watch items
 
-- **better-auth on Workers** is not yet verified against our exact versions +
-  custom fields in `workerd`. Mitigation: timebox the integration; fallback is a
-  small HMAC-signed-cookie guest identity using the **same table names**, so
-  better-auth drops in later with no data migration.
+- **better-auth on Workers:** stable 1.7.2 with the anonymous plugin, Drizzle D1
+  adapter, and custom profile fields is verified locally in `workerd`. Production
+  deployment remains a gate. If a production-only incompatibility appears, the
+  fallback remains a small HMAC-signed-cookie guest identity using the **same
+  table names**.
 - **Room lifecycle edge cases:** reserved-but-never-joined rooms (short alarm
   cleanup), empty-room grace period, multiple tabs = one player, host
   reassignment on host disconnect, joiner arriving after `phase === 'starting'`.

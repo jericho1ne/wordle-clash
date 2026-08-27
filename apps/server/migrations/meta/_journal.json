@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1787864754891,
+      "tag": "0000_story_03_01__create__auth_favorites_matches",
+      "breakpoints": true
+    }
+  ]
+}

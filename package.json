@@ -18,6 +18,8 @@
     "format:check": "prettier --check .",
     "test": "pnpm -r test",
     "check": "pnpm run typecheck && pnpm run lint && pnpm run format:check && pnpm run test && pnpm run build",
+    "clean": "find . -name node_modules -type d -prune -exec rm -rf '{}' + ; find . -name dist -type d -prune -exec rm -rf '{}' + ; rm -rf apps/server/.wrangler apps/web/dist",
+    "reinstall": "pnpm run clean && pnpm install",
     "db:generate": "pnpm --filter @wordle-clash/server db:generate",
     "db:migrate:local": "pnpm --filter @wordle-clash/server db:migrate:local",
     "db:migrate:remote": "pnpm --filter @wordle-clash/server db:migrate:remote",

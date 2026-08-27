@@ -30,3 +30,4 @@ blob-report/
 .vscode/*
 !.vscode/extensions.json
 *.log
+node_modules

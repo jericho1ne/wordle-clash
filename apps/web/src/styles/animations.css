@@ -1,7 +1,8 @@
 /* ============================================================================
- * App-specific CSS — keyframes and the app shell. Everything here is authored
- * from Ember tokens only (see ember.css); no raw hex / px / font names.
- * Keyframes are ported verbatim from the "Wordle Royale" design prototype.
+ * App-wide CSS — keyframes + document-level base. Authored from Ember tokens
+ * only (see ember.css); no raw hex / px / font names. Keyframes are ported
+ * verbatim from the "Wordle Royale" design prototype. The page shell/layout
+ * lives in the <AppShell> component (src/ui/AppShell), not here.
  * ============================================================================ */
 
 @keyframes tileFlip {
@@ -41,7 +42,7 @@
   }
 }
 
-/* — app shell — */
+/* — document base — */
 body {
   margin: 0;
   min-height: 100vh;
@@ -60,28 +61,6 @@ a:hover {
 
 #root {
   min-height: 100vh;
-}
-
-/* The centered single-column stage every screen sits on. */
-.app-stage {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-6);
-  background:
-    radial-gradient(
-      circle at 15% -10%,
-      color-mix(in oklch, var(--color-accent-900) 55%, transparent),
-      transparent 55%
-    ),
-    var(--color-bg);
-}
-
-.app-stage__inner {
-  width: 100%;
-  max-width: 480px;
 }
 
 @media (prefers-reduced-motion: reduce) {

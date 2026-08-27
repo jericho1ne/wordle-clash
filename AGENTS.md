@@ -58,8 +58,9 @@ Rationale and detail: [`docs/architecture.md`](./docs/architecture.md).
    ```
    ```tsx
    // localsConvention is 'camelCaseOnly' (vite.config.ts)
-   <div className={`app-stage ${styles.titleScreen}`}>
-     <div className={styles.kicker}>…</div>
+   <AppShell>
+     <div className={styles.titleScreen}>
+       <div className={styles.kicker}>…</div>
    ```
 4. **Ember design-system classes stay global.** `.btn`, `.card`, `.tag`, `.seg`,
    `.field`, `.dialog`, … come from `apps/web/src/styles/ember.css` and are
@@ -73,8 +74,10 @@ Rationale and detail: [`docs/architecture.md`](./docs/architecture.md).
    Palette: `#171219` bg · `#84DCC6` accent (Pearl Aqua, = "correct" tile) ·
    `#F0803C` accent-2 (Pumpkin Spice, = "present") · `#95A3B3` neutral (Cool
    Steel) · `#B3001B` danger (Mahogany Red). Dark-only.
-7. App shell (`.app-stage`, keyframes `tileFlip` / `joinIn` / `toastIn`) lives in
-   `apps/web/src/styles/animations.css` — tokens only, same rules.
+7. Page layout is the `<AppShell>` component (`apps/web/src/ui/AppShell`), not a
+   global class — screens render `<AppShell nav?>` and put their root-class
+   element inside it. Keyframes (`tileFlip` / `joinIn` / `toastIn`) + document
+   base live in `apps/web/src/styles/animations.css` — tokens only, same rules.
 
 ---
 
@@ -120,6 +123,24 @@ Rationale and detail: [`docs/architecture.md`](./docs/architecture.md).
 - Keep the generated `.sql` filename **≤ 55 chars** (drizzle's `NNNN_` prefix +
   name + `.sql`). Use exact table names when they fit; otherwise a concise domain
   group (e.g. `auth_core`).
+
+---
+
+## Secrets & env
+
+Never commit secrets. Three buckets (detail + table in
+[`docs/architecture.md`](./docs/architecture.md) → Secrets & environment):
+
+- **Wrangler auth** (deploy) — `wrangler login` locally, or
+  `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` in `apps/server/.env` (CI: repo
+  secrets). Example: `apps/server/.env.example`.
+- **Worker runtime secrets** (`AUTH_SECRET`, `RT_TICKET_SECRET`, …) —
+  `apps/server/.dev.vars` locally, `wrangler secret put` in prod. Example:
+  `apps/server/.dev.vars.example`.
+- **Client** — no secrets; `import.meta.env.VITE_*` only, build-time.
+
+`.gitignore` blocks `.env*` / `.dev.vars*` and keeps the `*.example` files.
+`wrangler.jsonc` (bindings, IDs, flags — incl. the D1 `database_id`) is committed.
 
 ---
 

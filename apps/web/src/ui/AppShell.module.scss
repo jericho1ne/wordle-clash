@@ -1,0 +1,30 @@
+// The page shell every routed screen sits in. Ember utility classes (`.nav`,
+// `.nav-brand`) stay global; layout nests under the single root `.app-shell`.
+
+.app-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: var(--space-6);
+  background:
+    radial-gradient(
+      circle at 15% -10%,
+      color-mix(in oklch, var(--color-accent-900) 55%, transparent),
+      transparent 55%
+    ),
+    var(--color-bg);
+
+  // Centres the content column in whatever height is left after the nav.
+  .stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .inner {
+    width: 100%;
+    max-width: 480px;
+  }
+}

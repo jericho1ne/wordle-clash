@@ -89,6 +89,11 @@ For guests, favorites and match history stay device-local (`localStorage`) and
 only sync to D1 once an account exists. "Link an email / OAuth provider" is a
 later optional upsell surface (e.g. after a match), not part of Phase 1.
 
+`/api/favorites` is account-only at the Worker boundary: `GET` lists codes,
+`PUT` / `DELETE` toggle one code, and `POST` performs the one-time merge of guest
+codes during account linking. Anonymous clients use `wc.favorites` and never call
+that API.
+
 ### Single Worker serves the SPA
 Cloudflare's current guidance is "Workers, not Pages". One Worker with an
 `assets` binding (`not_found_handling: "single-page-application"`) serves the

@@ -5,6 +5,7 @@ import { RouterProvider } from 'react-router'
 import './styles/ember.css'
 import './styles/animations.css'
 import {
+  FavoritesProvider,
   IdentityProvider,
   ProfileProvider,
 } from './identity'
@@ -17,7 +18,9 @@ createRoot(container).render(
   <StrictMode>
     <IdentityProvider>
       <ProfileProvider>
-        <RouterProvider router={router} />
+        <FavoritesProvider>
+          <RouterProvider router={router} />
+        </FavoritesProvider>
       </ProfileProvider>
     </IdentityProvider>
   </StrictMode>,

@@ -1,5 +1,7 @@
 # Copy to `.dev.vars` (gitignored) for local `wrangler dev`.
 # In production set these with `wrangler secret put <NAME>`.
+# Keeping this file separate also prevents Wrangler 4 from exposing Wrangler
+# authentication credentials from `.env` to local Worker code.
 
 # Session signing secret for better-auth (epic 03).
 AUTH_SECRET="dev-only-change-me"

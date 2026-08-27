@@ -131,9 +131,11 @@ Rationale and detail: [`docs/architecture.md`](./docs/architecture.md).
 Never commit secrets. Three buckets (detail + table in
 [`docs/architecture.md`](./docs/architecture.md) → Secrets & environment):
 
-- **Wrangler auth** (deploy) — `wrangler login` locally, or
-  `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` in `apps/server/.env` (CI: repo
-  secrets). Example: `apps/server/.env.example`.
+- **Wrangler auth** (deploy) — prefer `wrangler login` locally. For
+  non-interactive scripts, put `CLOUDFLARE_API_TOKEN` /
+  `CLOUDFLARE_ACCOUNT_ID` in `apps/server/.env` **and ensure
+  `apps/server/.dev.vars` exists** so Wrangler 4 does not expose `.env` values
+  to local Worker code (CI: repo secrets). Example: `apps/server/.env.example`.
 - **Worker runtime secrets** (`AUTH_SECRET`, `RT_TICKET_SECRET`, …) —
   `apps/server/.dev.vars` locally, `wrangler secret put` in prod. Example:
   `apps/server/.dev.vars.example`.

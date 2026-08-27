@@ -1,6 +1,10 @@
 import { routePartykitRequest } from 'partyserver'
 
 import { createAuth } from './auth'
+import {
+  authorizeWebSocketRequest,
+  handleRealtimeTicket,
+} from './rt/routes'
 
 export { Room } from './rooms/Room'
 
@@ -26,10 +30,15 @@ export default {
       return createAuth(request, env).handler(request)
     }
 
+    if (url.pathname === '/api/rt/ticket') {
+      return handleRealtimeTicket(request, env)
+    }
+
     if (url.pathname.startsWith('/ws/')) {
-      // epic 03 adds ticket verification + x-user-* header injection via the
-      // `onBeforeConnect` hook here.
-      const res = await routePartykitRequest(request, env, { prefix: 'ws' })
+      const res = await routePartykitRequest(request, env, {
+        prefix: 'ws',
+        onBeforeConnect: (socketRequest) => authorizeWebSocketRequest(socketRequest, env),
+      })
       return res ?? new Response('room route not found', { status: 404 })
     }
 

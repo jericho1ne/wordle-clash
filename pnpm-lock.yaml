@@ -56,6 +56,9 @@ importers:
       hono:
         specifier: ^4.13.5
         version: 4.13.5
+      jose:
+        specifier: ^6.2.10
+        version: 6.2.10
       partyserver:
         specifier: ^0.5.10
         version: 0.5.10(@cloudflare/workers-types@5.20260827.1)

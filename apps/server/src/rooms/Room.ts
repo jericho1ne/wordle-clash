@@ -44,7 +44,9 @@ export class Room extends Server<Env> {
     this.#ensureState();
     await this.#save();
     // epic 02: register the player, send a full roomState snapshot, broadcast join.
-    connection.send(JSON.stringify({ t: 'error', code: 'BAD_MESSAGE', message: 'not implemented' }));
+    connection.send(
+      JSON.stringify({ t: 'error', code: 'BAD_MESSAGE', message: 'not implemented' }),
+    );
   }
 
   override async onMessage(_connection: Connection, _message: WSMessage): Promise<void> {

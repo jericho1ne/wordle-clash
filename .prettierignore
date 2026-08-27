@@ -6,3 +6,8 @@ coverage/
 playwright-report/
 pnpm-lock.yaml
 apps/server/migrations/
+
+# Hand-maintained docs — Prettier's markdown table alignment pads columns to the
+# widest cell, which mangles the wide planning tables. Keep them as authored.
+docs/
+README.md

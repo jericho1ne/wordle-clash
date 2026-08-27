@@ -31,19 +31,19 @@ btn-primary`) needs no module; any custom CSS gets one. All CSS uses only
 
 ## Stories
 
-| # | Story |
-|---|---|
-| 00 | `ember.css` (theme tokens + component layer) in `apps/web/src/styles/` (done in epic 00) |
-| 01 | Inter `<link>` + `animations.css` keyframes `tileFlip` / `joinIn` / `toastIn` + app shell (done in epic 00); reduced-motion guard |
-| 02 | `<AppShell>` / route layout with `.nav` + `.nav-brand` (setup/lobby only) |
-| 03 | `<Button variant primary\|secondary\|ghost\|danger block?>` + `<IconButton>` (primary = accent outline, not fill) |
-| 04 | `<Field>` + `<Input>` |
-| 05 | `<SegmentedControl>` (`.seg`/`.seg-opt` over native radios) + `<RadioGroup>` |
-| 06 | `<Card elevation>` + `Card.Kicker/.Title/.Body/.Meta` + `<Tag tone={accent\|accent-2\|neutral\|danger\|outline}>` |
-| 07 | `<Dialog open onClose title>` (backdrop, focus trap, ESC, backdrop click) |
-| 08 | `<ToastProvider>` + `useToast().show(text)` — one top-center pill, `toastIn`, ~2200ms, single-toast queue |
-| 09 | `@phosphor-icons/react` set: ArrowRight, ArrowLeft/ArrowUUpLeft, Plus/DoorOpen, SignIn, Star (+ `weight="fill"`), Copy, Check |
-| 10 | dev-only `/dev/kitchen-sink` route rendering every primitive |
+| # | Story | Status |
+|---|---|---|
+| 00 | `ember.css` (theme tokens + component layer) in `apps/web/src/styles/` | done (epic 00) |
+| 01 | Inter `<link>` + `animations.css` keyframes `tileFlip` / `joinIn` / `toastIn` + reduced-motion guard | done (epic 00) |
+| [02](./02-app-shell.md) | `<AppShell nav?>` — page ground, padding, optional `.nav` + `.nav-brand` (setup/lobby), centred 480px column | **done** |
+| 03 | `<Button variant primary\|secondary\|ghost\|danger block?>` + `<IconButton>` (primary = accent outline, not fill) | next |
+| 04 | `<Field>` + `<Input>` | |
+| 05 | `<SegmentedControl>` (`.seg`/`.seg-opt` over native radios) + `<RadioGroup>` | |
+| 06 | `<Card elevation>` + `Card.Kicker/.Title/.Body/.Meta` + `<Tag tone={accent\|accent-2\|neutral\|danger\|outline}>` | |
+| 07 | `<Dialog open onClose title>` (backdrop, focus trap, ESC, backdrop click) | |
+| 08 | `<ToastProvider>` + `useToast().show(text)` — one top-center pill, `toastIn`, ~2200ms, single-toast queue | |
+| 09 | icon set (ArrowRight, ArrowLeft, Plus/DoorOpen, SignIn, Star, Copy, Check) — **approach TBD**: `@phosphor-icons/react` vs public SVG + CSS mask per AGENTS.md rule 3 | |
+| 10 | dev-only `/dev/kitchen-sink` route rendering every primitive | |
 
 ## Verification
 

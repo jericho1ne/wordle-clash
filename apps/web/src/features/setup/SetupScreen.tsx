@@ -1,5 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router';
 
+import { AppShell } from '../../ui/AppShell';
 import styles from './SetupScreen.module.scss';
 
 /**
@@ -12,8 +13,8 @@ export function SetupScreen() {
   const join = params.get('join');
 
   return (
-    <div className={`app-stage ${styles.setupScreen}`}>
-      <div className="app-stage__inner">
+    <AppShell nav>
+      <div className={styles.setupScreen}>
         <button
           type="button"
           className={`btn btn-ghost btn-icon ${styles.back}`}
@@ -28,6 +29,6 @@ export function SetupScreen() {
           {join ? ` Deep-link join code: ${join}` : ''}
         </p>
       </div>
-    </div>
+    </AppShell>
   );
 }

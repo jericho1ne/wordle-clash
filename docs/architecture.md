@@ -174,9 +174,10 @@ dark, higher-contrast, multi-hue palette that suits a word-race game.
   from Nocturne and retuned onto the Ember tokens. Edit the `:root` block to
   retune the theme — unlike the original vendored Nocturne file, this one is ours.
 - **Two styling layers, no Tailwind.**
-  1. **Global** — the Ember utility classes above (`.btn`, `.card`, `.tag`, …)
-     and the app shell (`animations.css`: the `tileFlip` / `joinIn` / `toastIn`
-     keyframes + `.app-stage`). Composed via `className` strings.
+  1. **Global** — the Ember utility classes above (`.btn`, `.card`, `.tag`, …),
+     composed via `className` strings, plus `animations.css` (the `tileFlip` /
+     `joinIn` / `toastIn` keyframes + document base). Page layout is the
+     `<AppShell>` component (`src/ui/AppShell`), not a global class.
   2. **Per-component** — every `.tsx` that needs its own layout / spacing /
      typography imports an **adjacent `Name.module.scss`** (CSS Modules, scoped)
      and references `styles.x`. No inline `style={{}}` objects, no ad-hoc CSS.
@@ -242,6 +243,31 @@ Production: `pnpm build` then `pnpm --filter @wordle-clash/server deploy`.
 The full checklist — baseline commands, the two-client realtime test, per-suite
 commands, deploy check — is [`verification.md`](./verification.md). It is run
 after every epic; verification is a gate on each epic, not a separate one.
+
+---
+
+## Secrets & environment
+
+Nothing secret is committed. There are three separate buckets:
+
+| What | Where (local) | Where (prod / CI) | Example file |
+|---|---|---|---|
+| **Wrangler auth** — deploy as your Cloudflare account | Prefer `wrangler login` (interactive, stored in the OS keychain). For non-interactive scripts, use `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` in `apps/server/.env` **and ensure `apps/server/.dev.vars` exists** | GitHub Actions repo secrets (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`) | `apps/server/.env.example` |
+| **Worker runtime secrets** — `AUTH_SECRET`, `RT_TICKET_SECRET` (from epic 03) | `apps/server/.dev.vars` (loaded by `wrangler dev`; also isolates the Worker from Wrangler credentials in `.env`) | `wrangler secret put <NAME>` | `apps/server/.dev.vars.example` |
+| **Client env** — none needed yet | `import.meta.env.VITE_*` from `apps/web/.env` if ever required | build-time only, never secret | — |
+
+`.gitignore` blocks `.env`, `.env.*`, `.dev.vars`, `.dev.vars.*` and un-ignores
+the `*.example` files. Non-secret Worker config (bindings, IDs, flags) lives in
+`apps/server/wrangler.jsonc` and is committed — including the D1 `database_id`,
+which is an identifier, not a credential.
+
+Wrangler 4 uses `.env` both for its own system variables and, during local
+development, as a fallback source for Worker runtime variables. Defining
+`apps/server/.dev.vars` disables that fallback, so deploy-auth credentials in
+`.env` are not readable through the local Worker's `env` object. Values from
+`.env` are not automatically published as production Worker bindings. Never put
+Wrangler credentials in `.dev.vars`; prefer `wrangler login` when automation is
+not required.
 
 ---
 

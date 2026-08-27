@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router';
 
+import { AppShell } from '../../ui/AppShell';
 import styles from './TitleScreen.module.scss';
 
 /**
@@ -10,8 +11,8 @@ export function TitleScreen() {
   const navigate = useNavigate();
 
   return (
-    <div className={`app-stage ${styles.titleScreen}`}>
-      <div className="app-stage__inner">
+    <AppShell>
+      <div className={styles.titleScreen}>
         <div className={styles.kicker}>GET READY FOR...</div>
         <div className={styles.wordmark}>Wordle Clash</div>
         <p className={styles.tagline}>
@@ -26,6 +27,6 @@ export function TitleScreen() {
         </button>
         <p className={styles.note}>Scaffold placeholder — see docs/stories/04-title-screen.</p>
       </div>
-    </div>
+    </AppShell>
   );
 }

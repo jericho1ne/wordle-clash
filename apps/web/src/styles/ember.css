@@ -1,11 +1,5 @@
 /* ============================================================================
- * Ember — the Wordle Clash design system. OURS to edit (unlike the design's
- * original vendored "Nocturne" theme, which this replaces).
- *
- * A warm, dark, high-contrast scheme: a near-black coffee ground, Pearl Aqua as
- * the accent (and the "correct" tile), Pumpkin Spice as the warm secondary (and
- * the "present" tile), Cool Steel neutrals, Mahogany Red for danger/elimination.
- * Inter at medium weight, compact 0.7x spacing, soft 8px radii.
+ * Wordle Clash design system
  *
  * The component layer (`.btn`, `.field`, `.seg`, `.card`, `.tag`, `.dialog`, …)
  * is inherited from Nocturne and retuned to these tokens. Retune the theme by
@@ -15,16 +9,20 @@
  * Base palette (from the brief):
  *   #171219 Coffee Bean · #84DCC6 Pearl Aqua · #F0803C Pumpkin Spice
  *   #95A3B3 Cool Steel · #B3001B Mahogany Red
+ *   https://coolors.co/171219-b3001b-84dcc6-f0803c-95a3b3
  * ============================================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --color-bg: #171219; /* Coffee Bean */
+  --color-bg: #171219;
+  /* Coffee Bean */
   --color-surface: #221c24;
   --color-text: #f2ece9;
-  --color-accent: #84dcc6; /* Pearl Aqua — accent = the colour of solving */
-  --color-accent-2: #f0803c; /* Pumpkin Spice — warm secondary / "present" */
+  --color-accent: #84dcc6;
+  /* Pearl Aqua — accent = the colour of solving */
+  --color-accent-2: #f0803c;
+  /* Pumpkin Spice — warm secondary / "present" */
   --color-divider: color-mix(in srgb, #f2ece9 15%, transparent);
 
   /* Tonal ramps — 100 (lightest) … 900 (darkest), one shared lightness scale so
@@ -75,7 +73,8 @@
   --color-danger-300: #f5999d;
   --color-danger-400: #e35a61;
   --color-danger-500: #d21d2c;
-  --color-danger-600: #b3001b; /* Mahogany Red */
+  --color-danger-600: #b3001b;
+  /* Mahogany Red */
   --color-danger-700: #8b0016;
   --color-danger-800: #5f0010;
   --color-danger-900: #3a020b;
@@ -119,6 +118,7 @@ body {
   color: var(--color-text);
   font-family: var(--font-body);
 }
+
 h1,
 h2,
 h3,
@@ -142,12 +142,14 @@ h4 {
 *::after {
   box-sizing: border-box;
 }
+
 body {
   margin: 0;
   font-size: 15px;
   line-height: 1.55;
   font-weight: 400;
 }
+
 h1,
 h2,
 h3,
@@ -160,55 +162,70 @@ h6 {
   letter-spacing: -0.015em;
   margin: 0 0 var(--space-2);
 }
+
 h1 {
   font-size: 42px;
 }
+
 h2 {
   font-size: 32px;
 }
+
 h3 {
   font-size: 25px;
 }
+
 h4 {
   font-size: 20px;
 }
+
 h5 {
   font-size: 16px;
 }
+
 h6 {
   font-size: 13px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
 p {
   margin: 0 0 var(--space-3);
 }
+
 a {
   color: var(--color-accent);
   text-underline-offset: 3px;
 }
+
 img {
   display: block;
   max-width: 100%;
 }
+
 figure {
   margin: 0;
 }
+
 figcaption {
   font-size: 11px;
   margin-top: var(--space-1);
   color: color-mix(in srgb, var(--color-text) 55%, transparent);
 }
+
 .text-muted {
   color: color-mix(in srgb, var(--color-text) 55%, transparent);
 }
+
 :focus {
   outline: none;
 }
+
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
+
 ::selection {
   background: color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
@@ -218,13 +235,11 @@ figcaption {
   height: 1px;
   border: 0;
   margin: var(--space-4) 0;
-  background: linear-gradient(
-    to right,
-    transparent,
-    var(--color-divider) 48px,
-    var(--color-divider) calc(100% - 48px),
-    transparent
-  );
+  background: linear-gradient(to right,
+      transparent,
+      var(--color-divider) 48px,
+      var(--color-divider) calc(100% - 48px),
+      transparent);
 }
 
 /* — buttons — outlined, never flood-filled — */
@@ -245,42 +260,54 @@ figcaption {
   padding: var(--space-2) calc(var(--space-3) * 1.2);
   border-radius: var(--radius-md);
 }
+
 .btn svg {
   display: block;
 }
+
 .btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
+
 .btn-primary {
   color: var(--color-accent);
   border-color: var(--color-accent);
 }
+
 .btn-primary:hover {
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
 }
+
 .btn-primary:active {
   background: color-mix(in srgb, var(--color-accent) 22%, transparent);
 }
+
 .btn-secondary {
   border-color: var(--color-divider);
 }
+
 .btn-secondary:hover {
   background: color-mix(in srgb, var(--color-text) 7%, transparent);
 }
+
 .btn-secondary:active {
   background: color-mix(in srgb, var(--color-text) 14%, transparent);
 }
+
 .btn-ghost {
   color: var(--color-accent);
   padding-inline: var(--space-1);
 }
+
 .btn-ghost:hover {
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
+
 .btn-ghost:active {
   background: color-mix(in srgb, var(--color-accent) 18%, transparent);
 }
+
 /* Destructive — leave room, elimination confirmations, etc. Mahogany fill with
    light text (the mid ramp is too dark to read as an outline on the ground). */
 .btn-danger {
@@ -288,31 +315,36 @@ figcaption {
   background: var(--color-danger-600);
   border-color: var(--color-danger-600);
 }
+
 .btn-danger:hover {
   background: var(--color-danger-500);
   border-color: var(--color-danger-500);
 }
+
 .btn-danger:active {
   background: var(--color-danger-700);
   border-color: var(--color-danger-700);
 }
+
 .btn-icon {
   width: 36px;
   height: 36px;
   padding: 0;
 }
+
 .btn-block {
   width: 100%;
   margin-top: var(--space-2);
 }
 
 /* — forms — */
-.field > label {
+.field>label {
   display: block;
   font-size: 12px;
   margin-bottom: 5px;
   color: color-mix(in srgb, var(--color-text) 70%, transparent);
 }
+
 .input {
   width: 100%;
   min-height: 36px;
@@ -325,17 +357,21 @@ figcaption {
   border: 1px solid var(--color-divider);
   border-radius: var(--radius-md);
 }
+
 .input:hover {
   border-color: color-mix(in srgb, var(--color-text) 45%, transparent);
 }
+
 .input:focus-visible {
   border-color: var(--color-accent);
   outline-offset: 0;
 }
+
 textarea.input {
   min-height: 90px;
   resize: vertical;
 }
+
 .radio {
   display: inline-flex;
   align-items: center;
@@ -343,6 +379,7 @@ textarea.input {
   cursor: pointer;
   font-size: 14px;
 }
+
 .radio input,
 .seg-opt input {
   position: absolute;
@@ -351,6 +388,7 @@ textarea.input {
   height: 0;
   pointer-events: none;
 }
+
 .radio .dot {
   width: 16px;
   height: 16px;
@@ -358,24 +396,29 @@ textarea.input {
   border-radius: 50%;
   border: 1.5px solid var(--color-divider);
 }
+
 .radio:hover .dot {
   border-color: var(--color-accent);
 }
-.radio input:checked + .dot {
+
+.radio input:checked+.dot {
   border-color: var(--color-accent);
   background: var(--color-accent);
   box-shadow: inset 0 0 0 4px var(--color-bg);
 }
-.radio input:focus-visible + .dot {
+
+.radio input:focus-visible+.dot {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
+
 .seg {
   display: inline-flex;
   overflow: hidden;
   border: 1px solid var(--color-divider);
   border-radius: var(--radius-md);
 }
+
 .seg-opt {
   display: inline-flex;
   align-items: center;
@@ -384,16 +427,20 @@ textarea.input {
   font-size: 13px;
   cursor: pointer;
 }
-.seg-opt + .seg-opt {
+
+.seg-opt+.seg-opt {
   border-left: 1px solid var(--color-divider);
 }
+
 .seg-opt:has(input:checked) {
   color: var(--color-accent);
   box-shadow: inset 0 0 0 1px var(--color-accent);
 }
+
 .seg-opt:not(:has(input:checked)):hover {
   background: color-mix(in srgb, var(--color-text) 7%, transparent);
 }
+
 .seg-opt:has(input:focus-visible) {
   outline: 2px solid var(--color-accent);
   outline-offset: -2px;
@@ -408,24 +455,28 @@ textarea.input {
   border-radius: var(--radius-md);
   background: var(--color-surface);
 }
+
 .card-kicker {
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-accent);
 }
+
 .card-title {
   font-family: var(--font-heading);
   font-weight: var(--font-heading-weight);
   font-size: 17px;
   line-height: 1.2;
 }
+
 .card-body {
   margin: 0;
   font-size: 13px;
   opacity: 0.8;
   flex: 1;
 }
+
 .card-meta {
   display: flex;
   align-items: center;
@@ -433,12 +484,15 @@ textarea.input {
   font-size: 11px;
   color: color-mix(in srgb, var(--color-text) 50%, transparent);
 }
+
 .elev-sm {
   box-shadow: var(--shadow-sm);
 }
+
 .elev-md {
   box-shadow: var(--shadow-md);
 }
+
 .elev-lg {
   box-shadow: var(--shadow-lg);
 }
@@ -452,22 +506,27 @@ textarea.input {
   padding: 3px 10px;
   border-radius: calc(var(--radius-md) * 0.75);
 }
+
 .tag-accent {
   background: var(--color-accent-800);
   color: var(--color-accent-100);
 }
+
 .tag-accent-2 {
   background: var(--color-accent-2-800);
   color: var(--color-accent-2-100);
 }
+
 .tag-neutral {
   background: var(--color-neutral-800);
   color: var(--color-neutral-100);
 }
+
 .tag-danger {
   background: var(--color-danger-700);
   color: var(--color-danger-100);
 }
+
 .tag-outline {
   border: 1px solid var(--color-accent);
   color: var(--color-accent);
@@ -481,17 +540,20 @@ textarea.input {
   padding: var(--space-3) var(--space-4);
   border-bottom: none;
 }
+
 .nav-brand {
   font-family: var(--font-heading);
   font-weight: var(--font-heading-weight);
   font-size: 18px;
   margin-right: auto;
 }
+
 .nav a {
   color: inherit;
   text-decoration: none;
   font-size: 14px;
 }
+
 .nav a:hover,
 .nav a[aria-current='page'] {
   color: var(--color-accent);
@@ -503,6 +565,7 @@ textarea.input {
   border-collapse: collapse;
   font-size: 14px;
 }
+
 .table th {
   text-align: left;
   font-size: 11px;
@@ -512,45 +575,37 @@ textarea.input {
   padding: var(--space-2);
   border-bottom: 1px solid transparent;
 }
+
 .table td {
   padding: var(--space-2);
   border-bottom: 1px solid transparent;
 }
+
 .table thead tr {
-  background: linear-gradient(
-      to right,
+  background: linear-gradient(to right,
       transparent,
       var(--color-divider) 48px,
       var(--color-divider) calc(100% - 48px),
-      transparent
-    )
-    no-repeat bottom / 100% 1px;
+      transparent) no-repeat bottom / 100% 1px;
 }
+
 .table tbody tr {
-  background: linear-gradient(
-      to right,
+  background: linear-gradient(to right,
       transparent,
       color-mix(in srgb, var(--color-text) 8%, transparent) 48px,
       color-mix(in srgb, var(--color-text) 8%, transparent) calc(100% - 48px),
-      transparent
-    )
-    no-repeat bottom / 100% 1px;
+      transparent) no-repeat bottom / 100% 1px;
 }
+
 .table tbody tr:hover {
   background:
-    linear-gradient(
-        color-mix(in srgb, var(--color-text) 4%, transparent),
-        color-mix(in srgb, var(--color-text) 4%, transparent)
-      )
-      no-repeat 0 0 / 100% 100%,
-    linear-gradient(
-        to right,
-        transparent,
-        color-mix(in srgb, var(--color-text) 8%, transparent) 48px,
-        color-mix(in srgb, var(--color-text) 8%, transparent) calc(100% - 48px),
-        transparent
-      )
-      no-repeat bottom / 100% 1px;
+    linear-gradient(color-mix(in srgb, var(--color-text) 4%, transparent),
+      color-mix(in srgb, var(--color-text) 4%, transparent)) no-repeat 0 0 / 100% 100%,
+    linear-gradient(to right,
+      transparent,
+      color-mix(in srgb, var(--color-text) 8%, transparent) 48px,
+      color-mix(in srgb, var(--color-text) 8%, transparent) calc(100% - 48px),
+      transparent) no-repeat bottom / 100% 1px;
 }
 
 /* — dialog — */
@@ -562,6 +617,7 @@ textarea.input {
   padding: var(--space-4);
   background: color-mix(in srgb, var(--color-neutral-900) 50%, transparent);
 }
+
 .dialog {
   width: min(440px, 100%);
   display: flex;
@@ -572,15 +628,18 @@ textarea.input {
   background: var(--color-surface);
   box-shadow: var(--shadow-lg);
 }
+
 .dialog-title {
   font-family: var(--font-heading);
   font-weight: var(--font-heading-weight);
   font-size: 20px;
 }
+
 .dialog-body {
   font-size: 14px;
   opacity: 0.85;
 }
+
 .dialog-actions {
   display: flex;
   justify-content: flex-end;

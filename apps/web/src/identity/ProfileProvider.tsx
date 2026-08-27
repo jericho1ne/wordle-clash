@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -20,11 +21,13 @@ import {
 export function ProfileProvider({ children }: { children: ReactNode }) {
   const [localProfile] = useState(readStoredProfile)
   const [profile, setProfileState] = useState(localProfile ?? EMPTY_PROFILE)
+  const reconciliationPromise = useRef<Promise<Profile | null> | null>(null)
 
   useEffect(() => {
     let active = true
+    reconciliationPromise.current ??= reconcileProfile(localProfile)
 
-    void reconcileProfile(localProfile).then(
+    void reconciliationPromise.current.then(
       (remoteProfile) => {
         if (active && remoteProfile && !readStoredProfile()) {
           writeStoredProfile(remoteProfile)

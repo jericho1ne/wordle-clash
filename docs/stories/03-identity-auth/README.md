@@ -1,6 +1,6 @@
 # Epic 03 — Identity & auth (guest-first, invisible, additive)
 
-**Status:** in progress (03-00 through 03-05 done, pending review).
+**Status:** complete (03-00 through 03-05 done, pending review; 03-06 deferred).
 
 Constraints: no route/action ever requires an account; the anonymous identity is
 invisible plumbing (no "log in" step, never shown as an account); an account is
@@ -18,7 +18,7 @@ email/OAuth" is a later post-match upsell.
 | [03](./03-ws-ticket-auth.md) | WS ticket auth: `POST /api/rt/ticket` → ~60s signed JWT → `partysocket` `query` → Worker verifies, strips, injects `x-user-*` headers → DO. | done, in review |
 | [04](./04-profile-persistence.md) | Profile `{ name, avatarId }`: `localStorage["wc.profile"]` source of truth + mirror to the user row via `updateUser` for every user (anon included). `useProfile()`. | done, in review |
 | [05](./05-favorites-abstraction.md) | Favorites abstraction: `useFavorites()` — anon → `localStorage["wc.favorites"]`; account → `/api/favorites` on `favorite_rooms`; one-time merge on future account link. | done, in review |
-| 06 | Inert match-history: document the tables, no-op `recordMatchResult()` with `// TODO(gameplay-epic)`, leaderboard filters `isAnonymous = false`. | next |
+| 06 | Inert match-history placeholder | deferred to [Epic 07 Stories 07–08](../07-gameplay-leaderboard/README.md) so persistence and leaderboard queries are implemented against real gameplay state rather than a no-op API |
 
 ## Verification
 

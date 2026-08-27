@@ -273,10 +273,13 @@ tie-break, the `/room/:code/play` route (which will replace the "Match starting"
 dialog), the server-side answer list, `recordMatchResult()`, and the leaderboard
 UI.
 
-The gameplay rules are captured in [`game-rules.md`](./game-rules.md) (the
-dance-off tap/rhythm minigame rules are still forthcoming). These become their
-own epics. The Phase 1 architecture is deliberately shaped so they only add game
-logic on top of a proven realtime + identity substrate — notably: the `Room`
+The gameplay rules are captured in [`game-rules.md`](./game-rules.md); the
+implementation stack is planned in
+[`docs/stories/07-gameplay-leaderboard`](./docs/stories/07-gameplay-leaderboard/).
+The dance-off tap/rhythm minigame rules are still forthcoming, so Epic 07 owns
+only its state/protocol integration boundary. The Phase 1 architecture is
+deliberately shaped so gameplay adds logic on top of a proven realtime + identity
+substrate — notably: the `Room`
 Durable Object already owns authoritative state and will additionally hold the
 secret word / guesses / scores / round + timer state; the `matchStarting` event
 has a marked handoff point; the message protocol is a versioned discriminated

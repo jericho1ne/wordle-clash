@@ -11,8 +11,9 @@
   `isAnon`, signed with the independent `RT_TICKET_SECRET`.
 - Added strict signature, issuer, audience, algorithm, expiration, and claim
   validation at the Worker WebSocket boundary.
-- Removes the ticket query parameter before forwarding and injects trusted
-  `x-user-id`, `x-user-name`, `x-user-avatar`, and `x-user-is-anonymous` headers.
+- Removes the ticket query parameter and browser cookies before forwarding, then
+  injects trusted `x-user-id`, `x-user-name`, `x-user-avatar`, and
+  `x-user-is-anonymous` headers.
 - Added `getRealtimeTicketQuery()` for the later PartySocket wrapper to request a
   fresh ticket for every connection and reconnect.
 - Added focused JWT round-trip, tampering, and expiration tests.

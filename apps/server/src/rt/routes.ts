@@ -74,6 +74,7 @@ export async function authorizeWebSocketRequest(request: Request, env: Env): Pro
     const headers = new Headers(request.headers)
 
     url.searchParams.delete('ticket')
+    headers.delete('cookie')
     headers.set('x-user-id', identity.userId)
     headers.set('x-user-name', identity.name)
     headers.set('x-user-avatar', String(identity.avatarId))

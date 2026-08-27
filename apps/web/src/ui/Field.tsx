@@ -1,17 +1,17 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from 'react'
 
-import styles from './Field.module.scss';
+import styles from './Field.module.scss'
 
 export interface FieldProps {
-  label: ReactNode;
+  label: ReactNode
   /** `id` of the control this field labels. */
-  htmlFor: string;
+  htmlFor: string
   /** Muted helper text below the control. */
-  hint?: ReactNode;
+  hint?: ReactNode
   /** Error text below the control — takes precedence over `hint`. */
-  error?: ReactNode;
-  children: ReactNode;
-  className?: string;
+  error?: ReactNode
+  children: ReactNode
+  className?: string
 }
 
 /**
@@ -20,9 +20,9 @@ export interface FieldProps {
  * give it `id={htmlFor}` so the label associates.
  */
 export function Field({ label, htmlFor, hint, error, children, className }: FieldProps) {
-  const message = error ?? hint;
-  const messageClass = error != null ? styles.error : styles.hint;
-  const messageId = message != null ? `${htmlFor}-${error != null ? 'error' : 'hint'}` : undefined;
+  const message = error ?? hint
+  const messageClass = error != null ? styles.error : styles.hint
+  const messageId = message != null ? `${htmlFor}-${error != null ? 'error' : 'hint'}` : undefined
 
   return (
     <div className={['field', styles.field, className].filter(Boolean).join(' ')}>
@@ -34,5 +34,5 @@ export function Field({ label, htmlFor, hint, error, children, className }: Fiel
         </p>
       )}
     </div>
-  );
+  )
 }

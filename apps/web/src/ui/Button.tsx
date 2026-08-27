@@ -1,23 +1,23 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
   primary: 'btn-primary',
   secondary: 'btn-secondary',
   ghost: 'btn-ghost',
   danger: 'btn-danger',
-};
+}
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Visual style — maps to the Ember `.btn-*` classes. Default `primary`. */
-  variant?: ButtonVariant;
+  variant?: ButtonVariant
   /** Full-width (`.btn-block`). */
-  block?: boolean;
+  block?: boolean
   /** Icon rendered before the label. */
-  leadingIcon?: ReactNode;
+  leadingIcon?: ReactNode
   /** Icon rendered after the label. */
-  trailingIcon?: ReactNode;
+  trailingIcon?: ReactNode
 }
 
 /**
@@ -35,9 +35,9 @@ export function Button({
   children,
   ...rest
 }: ButtonProps) {
-  const classes = ['btn', VARIANT_CLASS[variant]];
-  if (block) classes.push('btn-block');
-  if (className) classes.push(className);
+  const classes = ['btn', VARIANT_CLASS[variant]]
+  if (block) classes.push('btn-block')
+  if (className) classes.push(className)
 
   return (
     <button type={type} className={classes.join(' ')} {...rest}>
@@ -45,5 +45,5 @@ export function Button({
       {children}
       {trailingIcon}
     </button>
-  );
+  )
 }

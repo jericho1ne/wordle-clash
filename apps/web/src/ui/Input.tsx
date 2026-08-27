@@ -1,6 +1,6 @@
-import type { InputHTMLAttributes } from 'react';
+import type { InputHTMLAttributes } from 'react'
 
-export type InputProps = InputHTMLAttributes<HTMLInputElement>;
+export type InputProps = InputHTMLAttributes<HTMLInputElement>
 
 /**
  * Text input over the Ember `.input` class — no styling of its own. Defaults
@@ -8,5 +8,5 @@ export type InputProps = InputHTMLAttributes<HTMLInputElement>;
  * `autoCapitalize`, `disabled`, `aria-*`, … all pass straight through.
  */
 export function Input({ className, type = 'text', ...rest }: InputProps) {
-  return <input type={type} className={className ? `input ${className}` : 'input'} {...rest} />;
+  return <input type={type} className={className ? `input ${className}` : 'input'} {...rest} />
 }

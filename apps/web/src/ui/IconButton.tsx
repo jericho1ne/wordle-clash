@@ -1,23 +1,23 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
-import type { ButtonVariant } from './Button';
+import type { ButtonVariant } from './Button'
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
   primary: 'btn-primary',
   secondary: 'btn-secondary',
   ghost: 'btn-ghost',
   danger: 'btn-danger',
-};
+}
 
 export interface IconButtonProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   'aria-label'
 > {
-  variant?: ButtonVariant;
+  variant?: ButtonVariant
   /** Required — an icon-only control needs an accessible name. */
-  'aria-label': string;
+  'aria-label': string
   /** The icon element. */
-  children: ReactNode;
+  children: ReactNode
 }
 
 /**
@@ -31,12 +31,12 @@ export function IconButton({
   children,
   ...rest
 }: IconButtonProps) {
-  const classes = ['btn', 'btn-icon', VARIANT_CLASS[variant]];
-  if (className) classes.push(className);
+  const classes = ['btn', 'btn-icon', VARIANT_CLASS[variant]]
+  if (className) classes.push(className)
 
   return (
     <button type={type} className={classes.join(' ')} {...rest}>
       {children}
     </button>
-  );
+  )
 }

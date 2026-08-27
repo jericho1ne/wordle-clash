@@ -3,16 +3,16 @@
  * prototype. Gameplay for these modes is NOT implemented in Phase 1; only the
  * lobby selector and the "Match starting" dialog consume this.
  */
-export type GameMode = 'sync' | 'realtime';
+export type GameMode = 'sync' | 'realtime'
 
 export interface GameModeInfo {
-  readonly id: GameMode;
+  readonly id: GameMode
   /** Segmented-control label. */
-  readonly label: string;
+  readonly label: string
   /** Guess attempts allowed in this mode. */
-  readonly tries: number;
+  readonly tries: number
   /** Lobby description paragraph (exact prototype text, tries prefix included). */
-  readonly description: string;
+  readonly description: string
 }
 
 export const GAME_MODES: Record<GameMode, GameModeInfo> = {
@@ -30,12 +30,12 @@ export const GAME_MODES: Record<GameMode, GameModeInfo> = {
     description:
       '10 tries. Guess as fast as you like — first player to nail the word wins the round.',
   },
-};
+}
 
-export const GAME_MODE_IDS = Object.keys(GAME_MODES) as GameMode[];
+export const GAME_MODE_IDS = Object.keys(GAME_MODES) as GameMode[]
 
-export const DEFAULT_GAME_MODE: GameMode = 'sync';
+export const DEFAULT_GAME_MODE: GameMode = 'sync'
 
 export function isGameMode(value: unknown): value is GameMode {
-  return value === 'sync' || value === 'realtime';
+  return value === 'sync' || value === 'realtime'
 }

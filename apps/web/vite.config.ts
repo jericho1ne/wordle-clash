@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 // NOTE: never set `base` — keep the app mounted at `/`. The Worker serves the
 // built assets in production with SPA fallback (see apps/server/wrangler.jsonc).
@@ -9,7 +9,7 @@ import react from '@vitejs/plugin-react';
 // browser only ever talks to one origin. Adopting @cloudflare/vite-plugin for a
 // single-process dev server is a later optimization (see
 // docs/stories/00-app-scaffold/06-dev-server-and-deploy.md).
-const WORKER_ORIGIN = process.env.WORKER_ORIGIN ?? 'http://localhost:8787';
+const WORKER_ORIGIN = process.env.WORKER_ORIGIN ?? 'http://localhost:8787'
 
 export default defineConfig({
   plugins: [react()],
@@ -28,4 +28,4 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
   },
-});
+})

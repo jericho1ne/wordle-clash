@@ -1,6 +1,6 @@
-import { routePartykitRequest } from 'partyserver';
+import { routePartykitRequest } from 'partyserver'
 
-export { Room } from './rooms/Room';
+export { Room } from './rooms/Room'
 
 /**
  * Worker entry. Route table (see docs/stories/00-app-scaffold/02):
@@ -14,23 +14,23 @@ export { Room } from './rooms/Room';
  */
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
+    const url = new URL(request.url)
 
     if (url.pathname === '/api/health') {
-      return Response.json({ ok: true, service: 'wordle-clash', ts: Date.now() });
+      return Response.json({ ok: true, service: 'wordle-clash', ts: Date.now() })
     }
 
     if (url.pathname.startsWith('/ws/')) {
       // epic 03 adds ticket verification + x-user-* header injection via the
       // `onBeforeConnect` hook here.
-      const res = await routePartykitRequest(request, env, { prefix: 'ws' });
-      return res ?? new Response('room route not found', { status: 404 });
+      const res = await routePartykitRequest(request, env, { prefix: 'ws' })
+      return res ?? new Response('room route not found', { status: 404 })
     }
 
     if (url.pathname.startsWith('/api/')) {
-      return new Response('not implemented', { status: 501 });
+      return new Response('not implemented', { status: 501 })
     }
 
-    return env.ASSETS.fetch(request);
+    return env.ASSETS.fetch(request)
   },
-} satisfies ExportedHandler<Env>;
+} satisfies ExportedHandler<Env>

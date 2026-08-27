@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState } from 'react'
 
-import { Button, Field, IconButton, Input, RadioGroup, SegmentedControl } from '../../ui';
-import styles from './DesignSystem.module.scss';
+import { Button, Field, IconButton, Input, RadioGroup, SegmentedControl } from '../../ui'
+import styles from './DesignSystem.module.scss'
 
 const BASE = [
   { key: 'bg', token: '--color-bg', name: 'Coffee Bean', ink: 'light' },
@@ -11,24 +11,24 @@ const BASE = [
   { key: 'accent-2', token: '--color-accent-2', name: 'Pumpkin Spice', ink: 'dark' },
   { key: 'neutral', token: '--color-neutral-500', name: 'Cool Steel', ink: 'dark' },
   { key: 'danger', token: '--color-danger-600', name: 'Mahogany Red', ink: 'light' },
-] as const;
+] as const
 
 const RAMPS = [
   { key: 'accent', label: 'accent · Pearl Aqua' },
   { key: 'accent-2', label: 'accent-2 · Pumpkin Spice' },
   { key: 'neutral', label: 'neutral · Cool Steel' },
   { key: 'danger', label: 'danger · Mahogany Red' },
-] as const;
+] as const
 
-const STEPS = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const;
+const STEPS = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const
 
 /**
  * Dev-only design-system showcase (route `/design-system`, DEV builds only).
  * A new section is added by each design-system story.
  */
 export function DesignSystem() {
-  const [mode, setMode] = useState<'sync' | 'realtime'>('sync');
-  const [room, setRoom] = useState<'create' | 'join'>('create');
+  const [mode, setMode] = useState<'sync' | 'realtime'>('sync')
+  const [room, setRoom] = useState<'create' | 'join'>('create')
 
   return (
     <div className={styles.designSystem}>
@@ -170,5 +170,5 @@ export function DesignSystem() {
         <p className={styles.note}>selected: {room}</p>
       </section>
     </div>
-  );
+  )
 }

@@ -1,16 +1,16 @@
-import { useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router'
 
-import { IconButton } from '../../ui';
-import styles from './SetupScreen.module.scss';
+import { IconButton } from '../../ui'
+import styles from './SetupScreen.module.scss'
 
 /**
  * SCAFFOLD PLACEHOLDER. Name field, avatar picker, create/join segmented
  * control, and conditional room-code field land in epic 05-setup-screen.
  */
 export function SetupScreen() {
-  const navigate = useNavigate();
-  const [params] = useSearchParams();
-  const join = params.get('join');
+  const navigate = useNavigate()
+  const [params] = useSearchParams()
+  const join = params.get('join')
 
   return (
     <div className={`app-stage ${styles.setupScreen}`}>
@@ -25,5 +25,5 @@ export function SetupScreen() {
         </p>
       </div>
     </div>
-  );
+  )
 }

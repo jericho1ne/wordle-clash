@@ -1,20 +1,20 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from 'react'
 
 export interface SegmentedOption<T extends string> {
-  value: T;
-  label: ReactNode;
+  value: T
+  label: ReactNode
   /** Optional leading icon. */
-  icon?: ReactNode;
+  icon?: ReactNode
 }
 
 export interface SegmentedControlProps<T extends string> {
   /** Radio-group name — must be unique per control on the page. */
-  name: string;
-  options: SegmentedOption<T>[];
-  value: T;
-  onChange: (value: T) => void;
-  'aria-label'?: string;
-  'aria-labelledby'?: string;
+  name: string
+  options: SegmentedOption<T>[]
+  value: T
+  onChange: (value: T) => void
+  'aria-label'?: string
+  'aria-labelledby'?: string
 }
 
 /**
@@ -44,5 +44,5 @@ export function SegmentedControl<T extends string>({
         </label>
       ))}
     </div>
-  );
+  )
 }

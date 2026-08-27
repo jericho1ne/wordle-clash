@@ -1,14 +1,14 @@
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router'
 
-import { Button } from '../../ui';
-import styles from './TitleScreen.module.scss';
+import { Button } from '../../ui'
+import styles from './TitleScreen.module.scss'
 
 /**
  * SCAFFOLD PLACEHOLDER. The faithful port (animated CLASH tiles, wordmark,
  * tagline, Play CTA) lands in epic 04-title-screen.
  */
 export function TitleScreen() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
     <div className={`app-stage ${styles.titleScreen}`}>
@@ -24,5 +24,5 @@ export function TitleScreen() {
         <p className={styles.note}>Scaffold placeholder — see docs/stories/04-title-screen.</p>
       </div>
     </div>
-  );
+  )
 }

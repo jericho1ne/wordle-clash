@@ -1,8 +1,8 @@
-import { useParams } from 'react-router';
+import { useParams } from 'react-router'
 
-import { normalizeRoomCode } from '@wordle-clash/shared';
+import { normalizeRoomCode } from '@wordle-clash/shared'
 
-import styles from './LobbyScreen.module.scss';
+import styles from './LobbyScreen.module.scss'
 
 /**
  * SCAFFOLD PLACEHOLDER. The RoomServer-backed lobby (player list, ready states,
@@ -10,8 +10,8 @@ import styles from './LobbyScreen.module.scss';
  * on top of the realtime foundation (epic 02).
  */
 export function LobbyScreen() {
-  const { code } = useParams();
-  const roomCode = normalizeRoomCode(code ?? '');
+  const { code } = useParams()
+  const roomCode = normalizeRoomCode(code ?? '')
 
   return (
     <div className={`app-stage ${styles.lobbyScreen}`}>
@@ -23,5 +23,5 @@ export function LobbyScreen() {
         </div>
       </div>
     </div>
-  );
+  )
 }

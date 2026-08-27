@@ -6,14 +6,14 @@
 declare namespace Cloudflare {
   interface Env {
     /** Built SPA assets, with SPA fallback (see wrangler.jsonc). */
-    ASSETS: Fetcher;
+    ASSETS: Fetcher
     /** One Durable Object per room, addressed by room code. */
-    ROOM: DurableObjectNamespace;
+    ROOM: DurableObjectNamespace
     /** D1: accounts, favorites, (inert) match history. */
-    DB: D1Database;
+    DB: D1Database
     /** Set via `wrangler secret put` / .dev.vars. Added in epic 03. */
-    AUTH_SECRET?: string;
-    RT_TICKET_SECRET?: string;
+    AUTH_SECRET?: string
+    RT_TICKET_SECRET?: string
   }
 }
 

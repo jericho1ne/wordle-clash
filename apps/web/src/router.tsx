@@ -1,9 +1,9 @@
-import { createBrowserRouter, Navigate } from 'react-router';
+import { createBrowserRouter, Navigate } from 'react-router'
 
-import { TitleScreen } from './features/title/TitleScreen';
-import { SetupScreen } from './features/setup/SetupScreen';
-import { LobbyScreen } from './features/lobby/LobbyScreen';
-import { DesignSystem } from './features/dev/DesignSystem';
+import { TitleScreen } from './features/title/TitleScreen'
+import { SetupScreen } from './features/setup/SetupScreen'
+import { LobbyScreen } from './features/lobby/LobbyScreen'
+import { DesignSystem } from './features/dev/DesignSystem'
 
 /**
  * Routes (see docs/stories/00-app-scaffold/08-routing-react-router.md):
@@ -21,4 +21,4 @@ export const router = createBrowserRouter([
   { path: '/room/:code', element: <LobbyScreen /> },
   ...(import.meta.env.DEV ? [{ path: '/design-system', element: <DesignSystem /> }] : []),
   { path: '*', element: <Navigate to="/" replace /> },
-]);
+])

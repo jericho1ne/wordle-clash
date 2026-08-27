@@ -9,4 +9,4 @@
  *
  * Do not run `db:generate` until that story adds the tables.
  */
-export {};
+export {}

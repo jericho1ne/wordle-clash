@@ -1,20 +1,20 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from 'react'
 
-import styles from './RadioGroup.module.scss';
+import styles from './RadioGroup.module.scss'
 
 export interface RadioOption<T extends string> {
-  value: T;
-  label: ReactNode;
+  value: T
+  label: ReactNode
 }
 
 export interface RadioGroupProps<T extends string> {
   /** Radio-group name — must be unique per control on the page. */
-  name: string;
-  options: RadioOption<T>[];
-  value: T;
-  onChange: (value: T) => void;
-  'aria-label'?: string;
-  'aria-labelledby'?: string;
+  name: string
+  options: RadioOption<T>[]
+  value: T
+  onChange: (value: T) => void
+  'aria-label'?: string
+  'aria-labelledby'?: string
 }
 
 /**
@@ -44,5 +44,5 @@ export function RadioGroup<T extends string>({
         </label>
       ))}
     </div>
-  );
+  )
 }

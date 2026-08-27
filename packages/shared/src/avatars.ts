@@ -10,11 +10,11 @@
  */
 export interface AvatarStep {
   /** Human label for the colour (not shown in UI; aids debugging). */
-  readonly name: string;
+  readonly name: string
   /** CSS value for the avatar circle background. */
-  readonly bg: string;
+  readonly bg: string
   /** CSS value for the initial/text on that background. */
-  readonly text: string;
+  readonly text: string
 }
 
 export const AVATAR_STEPS: readonly AvatarStep[] = [
@@ -23,16 +23,16 @@ export const AVATAR_STEPS: readonly AvatarStep[] = [
   { name: 'steel', bg: 'var(--color-neutral-400)', text: 'var(--color-neutral-900)' },
   { name: 'mahogany', bg: 'var(--color-danger-600)', text: 'var(--color-danger-100)' },
   { name: 'mist', bg: 'var(--color-accent-300)', text: 'var(--color-accent-900)' },
-] as const;
+] as const
 
-export const AVATAR_COUNT = AVATAR_STEPS.length;
+export const AVATAR_COUNT = AVATAR_STEPS.length
 
 /** Clamp an arbitrary number to a valid avatar index. */
 export function clampAvatarId(id: number): number {
-  if (!Number.isFinite(id)) return 0;
-  return Math.min(AVATAR_COUNT - 1, Math.max(0, Math.trunc(id)));
+  if (!Number.isFinite(id)) return 0
+  return Math.min(AVATAR_COUNT - 1, Math.max(0, Math.trunc(id)))
 }
 
 export function getAvatarStep(id: number): AvatarStep {
-  return AVATAR_STEPS[clampAvatarId(id)]!;
+  return AVATAR_STEPS[clampAvatarId(id)]!
 }

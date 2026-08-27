@@ -16,6 +16,7 @@
     margin-bottom: calc(var(--space-8) * 3);
 
     // Every label — section heads and ramp names alike — uses one style.
+
     h2,
     h3 {
       font-size: 11px;
@@ -35,6 +36,7 @@
   }
 
   // — palette —
+
   .pills {
     display: flex;
     flex-wrap: wrap;
@@ -60,6 +62,7 @@
     &[data-ink='light'] {
       color: var(--color-neutral-100);
     }
+
     &[data-ink='dark'] {
       color: var(--color-neutral-900);
     }
@@ -88,24 +91,31 @@
   }
 
   // colour assignment
+
   [data-swatch='bg'] {
     background: var(--color-bg);
   }
+
   [data-swatch='surface'] {
     background: var(--color-surface);
   }
+
   [data-swatch='text'] {
     background: var(--color-text);
   }
+
   [data-swatch='accent'] {
     background: var(--color-accent);
   }
+
   [data-swatch='accent-2'] {
     background: var(--color-accent-2);
   }
+
   [data-swatch='neutral'] {
     background: var(--color-neutral-500);
   }
+
   [data-swatch='danger'] {
     background: var(--color-danger-600);
   }
@@ -119,6 +129,7 @@
   }
 
   // — buttons —
+
   .row {
     display: flex;
     flex-wrap: wrap;
@@ -139,6 +150,7 @@
   }
 
   // — forms —
+
   .stack {
     display: flex;
     flex-direction: column;

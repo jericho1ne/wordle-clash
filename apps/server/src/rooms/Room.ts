@@ -1,7 +1,7 @@
-import { Server, type Connection, type ConnectionContext, type WSMessage } from 'partyserver';
+import { Server, type Connection, type ConnectionContext, type WSMessage } from 'partyserver'
 
-import type { RoomState } from '@wordle-clash/shared';
-import { DEFAULT_GAME_MODE } from '@wordle-clash/shared';
+import type { RoomState } from '@wordle-clash/shared'
+import { DEFAULT_GAME_MODE } from '@wordle-clash/shared'
 
 /**
  * SCAFFOLD STUB. One Durable Object instance per room, addressed by room code
@@ -14,17 +14,17 @@ import { DEFAULT_GAME_MODE } from '@wordle-clash/shared';
  * rehydrated from storage in `onStart()` and re-persisted on every mutation.
  */
 export class Room extends Server<Env> {
-  static override options = { hibernate: true };
+  static override options = { hibernate: true }
 
   /** Authoritative room state. Mirror of the `state` storage key. */
-  state: RoomState | null = null;
+  state: RoomState | null = null
 
   override async onStart(): Promise<void> {
-    this.state = (await this.ctx.storage.get<RoomState>('state')) ?? null;
+    this.state = (await this.ctx.storage.get<RoomState>('state')) ?? null
   }
 
   async #save(): Promise<void> {
-    if (this.state) await this.ctx.storage.put('state', this.state);
+    if (this.state) await this.ctx.storage.put('state', this.state)
   }
 
   /** Ensure a state object exists (created lazily on first connect for now). */
@@ -36,17 +36,15 @@ export class Room extends Server<Env> {
       gameMode: DEFAULT_GAME_MODE,
       players: [],
       createdAt: Date.now(),
-    };
-    return this.state;
+    }
+    return this.state
   }
 
   override async onConnect(connection: Connection, _ctx: ConnectionContext): Promise<void> {
-    this.#ensureState();
-    await this.#save();
+    this.#ensureState()
+    await this.#save()
     // epic 02: register the player, send a full roomState snapshot, broadcast join.
-    connection.send(
-      JSON.stringify({ t: 'error', code: 'BAD_MESSAGE', message: 'not implemented' }),
-    );
+    connection.send(JSON.stringify({ t: 'error', code: 'BAD_MESSAGE', message: 'not implemented' }))
   }
 
   override async onMessage(_connection: Connection, _message: WSMessage): Promise<void> {

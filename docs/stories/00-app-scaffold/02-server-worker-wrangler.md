@@ -22,7 +22,7 @@
   everything else → `env.ASSETS.fetch(request)`. Re-exports `Room`.
 - `worker-configuration.d.ts` — hand-written `Cloudflare.Env` stub; regenerate
   with `pnpm --filter @wordle-clash/server cf-typegen`.
-- `.dev.vars.example` — `AUTH_SECRET`, `RT_TICKET_SECRET`.
+- `.dev.vars.example` — `BETTER_AUTH_SECRET`, `RT_TICKET_SECRET`.
 - `tsconfig.json` — `@cloudflare/workers-types`, shared path alias.
 
 ## Follow-ups

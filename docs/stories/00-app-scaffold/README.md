@@ -12,7 +12,7 @@ the right shapes.
 | 01 | [web: Vite + React 19 + TS](./01-web-vite-react19.md) | done |
 | 02 | [server: Worker + wrangler](./02-server-worker-wrangler.md) | done |
 | 03 | [Durable Object via partyserver](./03-durable-object-partyserver.md) | done (stub) |
-| 04 | [D1 + Drizzle setup](./04-d1-drizzle-setup.md) | partial — config only |
+| 04 | [D1 + Drizzle setup](./04-d1-drizzle-setup.md) | done (schema in epic 03) |
 | 05 | [shared package](./05-shared-package.md) | done |
 | 06 | [dev server + deploy](./06-dev-server-and-deploy.md) | done |
 | 07 | [CI](./07-ci.md) | done |

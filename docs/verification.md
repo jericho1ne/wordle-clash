@@ -98,4 +98,4 @@ pnpm --filter @wordle-clash/server deploy      # wrangler deploy: assets + Worke
 
 Prerequisites (one-time, need Cloudflare login): `wrangler login`,
 `wrangler d1 create wordle-clash` (paste `database_id` into `wrangler.jsonc`),
-`wrangler secret put AUTH_SECRET` / `RT_TICKET_SECRET` (epic 03).
+`wrangler secret put BETTER_AUTH_SECRET` / `RT_TICKET_SECRET` (epic 03).

@@ -1,5 +1,7 @@
 import { routePartykitRequest } from 'partyserver'
 
+import { createAuth } from './auth'
+
 export { Room } from './rooms/Room'
 
 /**
@@ -18,6 +20,10 @@ export default {
 
     if (url.pathname === '/api/health') {
       return Response.json({ ok: true, service: 'wordle-clash', ts: Date.now() })
+    }
+
+    if (url.pathname === '/api/auth' || url.pathname.startsWith('/api/auth/')) {
+      return createAuth(request, env).handler(request)
     }
 
     if (url.pathname.startsWith('/ws/')) {

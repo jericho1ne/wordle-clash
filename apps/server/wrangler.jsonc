@@ -22,12 +22,11 @@
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
 
   // Accounts / favorites / (inert) match history.
-  // Run `wrangler d1 create wordle-clash` and paste the real database_id here.
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "wordle-clash",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "b67f0627-315b-4b7d-b7cc-40ee7864f68f",
       "migrations_dir": "migrations",
     },
   ],

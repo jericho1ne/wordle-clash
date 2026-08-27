@@ -1,6 +1,6 @@
 # 04 · D1 + Drizzle setup
 
-**Status:** partial — config only
+**Status:** done (schema and first migration completed in epic 03)
 
 ## Done
 
@@ -18,12 +18,8 @@
 
 ## Follow-ups (epic 03-identity-auth/01)
 
-- `wrangler d1 create wordle-clash` → real `database_id` into `wrangler.jsonc`.
-- Real schema: better-auth core tables (+ `isAnonymous`, `displayName`,
-  `avatarId`), `favorite_rooms`, inert `matches` / `match_players`.
-- `pnpm db:generate --name=story_<epic>_<story>__<action>__<group>` then
-  `pnpm db:migrate:local` (see AGENTS.md → Database migrations).
-- `src/db/client.ts` — `drizzle(env.DB, { schema })`.
+- Completed by [`03-identity-auth/01`](../03-identity-auth/01-d1-schema.md): real
+  database binding, schema, named migration, local application, and D1 client.
 
 ## Acceptance (this story)
 

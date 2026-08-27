@@ -1,0 +1,140 @@
+// Dev-only design-system showcase. Grows one section per design-system story.
+// Colours are assigned via `data-swatch` attributes + generated rules (no inline
+// styles), all scoped under the root class.
+
+.design-system {
+  min-height: 100vh;
+  padding: var(--space-8);
+  background: var(--color-bg);
+  color: var(--color-text);
+
+  h1 {
+    margin-bottom: var(--space-8);
+  }
+
+  .section {
+    margin-bottom: calc(var(--space-8) * 3);
+
+    // Every label — section heads and ramp names alike — uses one style.
+    h2,
+    h3 {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-neutral-500);
+    }
+
+    h2 {
+      margin-bottom: var(--space-4);
+    }
+
+    h3 {
+      margin: var(--space-8) 0 var(--space-3);
+    }
+  }
+
+  // — palette —
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: 999px;
+    border: 1px solid var(--color-divider);
+    font-size: 12px;
+    font-weight: 500;
+
+    code {
+      font-size: 10px;
+      font-weight: 400;
+      opacity: 0.75;
+    }
+
+    &[data-ink='light'] {
+      color: var(--color-neutral-100);
+    }
+    &[data-ink='dark'] {
+      color: var(--color-neutral-900);
+    }
+  }
+
+  .ramp-strip {
+    display: flex;
+    max-width: 640px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .step {
+    flex: 1;
+    height: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 3px;
+    font-size: 9px;
+    color: var(--color-neutral-900);
+
+    &[data-dark='true'] {
+      color: var(--color-neutral-100);
+    }
+  }
+
+  // colour assignment
+  [data-swatch='bg'] {
+    background: var(--color-bg);
+  }
+  [data-swatch='surface'] {
+    background: var(--color-surface);
+  }
+  [data-swatch='text'] {
+    background: var(--color-text);
+  }
+  [data-swatch='accent'] {
+    background: var(--color-accent);
+  }
+  [data-swatch='accent-2'] {
+    background: var(--color-accent-2);
+  }
+  [data-swatch='neutral'] {
+    background: var(--color-neutral-500);
+  }
+  [data-swatch='danger'] {
+    background: var(--color-danger-600);
+  }
+
+  @each $ramp in 'accent', 'accent-2', 'neutral', 'danger' {
+    @each $step in 100, 200, 300, 400, 500, 600, 700, 800, 900 {
+      [data-swatch='#{$ramp}-#{$step}'] {
+        background: var(--color-#{$ramp}-#{$step});
+      }
+    }
+  }
+
+  // — buttons —
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: center;
+    margin-bottom: var(--space-4);
+  }
+
+  .row-label {
+    width: 96px;
+    flex: none;
+    font-size: 12px;
+    color: var(--color-neutral-500);
+  }
+
+  .block {
+    max-width: 320px;
+  }
+}

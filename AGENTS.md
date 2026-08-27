@@ -39,6 +39,31 @@ Rationale and detail: [`docs/architecture.md`](./docs/architecture.md).
 
 ---
 
+## Starting a story
+
+When the user assigns a story, **before writing any code**:
+
+1. Check the current branch — `git branch --show-current`.
+2. **If on `main`**, create and switch to a new branch named with a Conventional
+   Commit type prefix plus the epic/story numbers and the kebab-cased story name:
+   ```
+   git checkout -b <type>/<epic>-<story>-<story-name-kebab>
+   ```
+   - `<type>` — Conventional Commit type chosen from the story's nature:
+     `feat` (default for a story), `fix`, `refactor`, `chore`, `docs`, `test`.
+   - `<epic>` / `<story>` — the two-digit numbers from `docs/stories/`.
+   - `<story-name-kebab>` — the story title, lower-case, hyphen-separated, no
+     punctuation.
+   - Example — Epic 01 / story 03 "Button / IconButton" →
+     `feat/01-03-button-iconbutton`.
+3. **If already on a story/feature branch**, stay on it — do not branch from a
+   branch unless the user asks to stack (operating rule 2), in which case branch
+   from the parent story's branch instead of `main`.
+4. Creating this branch is the **only** git action taken automatically. Commits,
+   pushes, rebases, and merges stay with the user (see Workflow).
+
+---
+
 ## Styling — React + CSS
 
 1. **SCSS Modules, always.** Every `.tsx` that has its own layout / spacing /

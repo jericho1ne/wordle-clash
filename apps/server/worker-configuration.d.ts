@@ -13,7 +13,7 @@ declare namespace Cloudflare {
     DB: D1Database
     /** Set via `wrangler secret put` / .dev.vars. */
     BETTER_AUTH_SECRET: string
-    RT_TICKET_SECRET?: string
+    RT_TICKET_SECRET: string
   }
 }
 

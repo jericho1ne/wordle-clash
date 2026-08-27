@@ -1,4 +1,4 @@
-import { Button, IconButton } from '../../ui';
+import { Button, Field, IconButton, Input } from '../../ui';
 import styles from './DesignSystem.module.scss';
 
 const BASE = [
@@ -114,6 +114,24 @@ export function DesignSystem() {
           <IconButton aria-label="Disabled" disabled>
             ‹
           </IconButton>
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <h2>Field / Input</h2>
+        <div className={styles.stack}>
+          <Field label="Your name" htmlFor="ds-name">
+            <Input id="ds-name" placeholder="e.g. Nova" maxLength={14} />
+          </Field>
+          <Field label="Room code" htmlFor="ds-code" hint="4 letters, a dash, 4 digits">
+            <Input id="ds-code" placeholder="PLUM-742" autoCapitalize="characters" />
+          </Field>
+          <Field label="Email" htmlFor="ds-email" error="That doesn’t look like an email">
+            <Input id="ds-email" type="email" defaultValue="nope" />
+          </Field>
+          <Field label="Disabled" htmlFor="ds-disabled">
+            <Input id="ds-disabled" placeholder="can’t touch this" disabled />
+          </Field>
         </div>
       </section>
     </div>

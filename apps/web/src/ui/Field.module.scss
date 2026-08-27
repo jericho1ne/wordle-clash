@@ -1,0 +1,18 @@
+// Field owns only the hint / error line below the control; the label styling
+// comes from the global Ember `.field` class. Root class matches the file name.
+
+.field {
+  .hint,
+  .error {
+    margin: var(--space-1) 0 0;
+    font-size: 11px;
+  }
+
+  .hint {
+    color: var(--color-neutral-500);
+  }
+
+  .error {
+    color: var(--color-danger-300);
+  }
+}

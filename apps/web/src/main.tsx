@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router';
 
-import './styles/nocturne.css';
+import './styles/ember.css';
 import './styles/animations.css';
 import { router } from './router';
 

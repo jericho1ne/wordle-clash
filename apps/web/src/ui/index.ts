@@ -6,3 +6,7 @@ export { Field } from './Field';
 export type { FieldProps } from './Field';
 export { Input } from './Input';
 export type { InputProps } from './Input';
+export { SegmentedControl } from './SegmentedControl';
+export type { SegmentedControlProps, SegmentedOption } from './SegmentedControl';
+export { RadioGroup } from './RadioGroup';
+export type { RadioGroupProps, RadioOption } from './RadioGroup';

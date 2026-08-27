@@ -163,4 +163,16 @@
     font-size: 12px;
     color: var(--color-neutral-500);
   }
+
+  // — cards —
+  .card-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    align-items: flex-start;
+
+    > * {
+      flex: 0 0 220px;
+    }
+  }
 }

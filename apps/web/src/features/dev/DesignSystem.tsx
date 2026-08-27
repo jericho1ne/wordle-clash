@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Button, Field, IconButton, Input, RadioGroup, SegmentedControl } from '../../ui'
+import { Button, Card, Field, IconButton, Input, RadioGroup, SegmentedControl, Tag } from '../../ui'
 import styles from './DesignSystem.module.scss'
 
 const BASE = [
@@ -168,6 +168,31 @@ export function DesignSystem() {
           ]}
         />
         <p className={styles.note}>selected: {room}</p>
+      </section>
+
+      <section className={styles.section}>
+        <h2>Card</h2>
+        <div className={styles.cardRow}>
+          {(['sm', 'md', 'lg'] as const).map((elev) => (
+            <Card key={elev} elevation={elev}>
+              <Card.Kicker>Room code</Card.Kicker>
+              <Card.Title>PLUM-742</Card.Title>
+              <Card.Body>Share this code so friends can join.</Card.Body>
+              <Card.Meta>elevation {elev}</Card.Meta>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <h2>Tag</h2>
+        <div className={styles.row}>
+          <Tag tone="accent">Accent</Tag>
+          <Tag tone="accent-2">Accent 2</Tag>
+          <Tag tone="neutral">Neutral</Tag>
+          <Tag tone="danger">Danger</Tag>
+          <Tag tone="outline">Outline</Tag>
+        </div>
       </section>
     </div>
   )

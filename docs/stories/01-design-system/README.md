@@ -17,8 +17,13 @@ Each role carries a 100–900 ramp. The stylesheet
 (`apps/web/src/styles/ember.css`) is **ours to edit** — retune the theme in its
 `:root` block. The component layer (`.btn`, `.field`, `.seg`, `.card`, `.tag`,
 `.dialog`, …) is inherited from Nocturne and retuned onto the Ember tokens.
-Approach: build thin React primitives over the class names — no CSS modules, no
-Tailwind. New CSS uses only `--color-*` / `--space-*` / `--radius-*` /
+
+**Styling model** (no Tailwind): the Ember utility classes are **global** and
+composed via `className`; anything component-specific (layout, spacing,
+typography) goes in an **adjacent `Name.module.scss`** (scoped CSS Module,
+`sass-embedded`) referenced as `styles.x` — no inline `style={{}}`. A primitive
+that is a pure class-mapper (`<Button>` → `btn btn-primary`) needs no module; any
+custom CSS gets one. All CSS uses only `--color-*` / `--space-*` / `--radius-*` /
 `--shadow-*`.
 
 ## Stories

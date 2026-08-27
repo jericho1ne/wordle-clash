@@ -23,9 +23,9 @@ the right shapes.
 Baseline: [`../../verification.md`](../../verification.md) §0. Epic-specific:
 
 - `pnpm install` resolves all four workspace packages.
-- `pnpm --filter @wordle-clash/web dev` serves the three placeholder screens and
-  routes between `/`, `/setup`, `/room/:code`; unknown paths redirect to `/`.
-- `pnpm --filter @wordle-clash/server dev` boots `wrangler dev`; `GET /api/health`
-  returns `{ ok: true }`; a raw WS connect to `/ws/room/<code>` reaches the `Room`
-  DO (currently replies with a not-implemented error frame).
+- `pnpm dev` brings up both sides: the web app serves the three placeholder
+  screens and routes between `/`, `/setup`, `/room/:code` (unknown paths → `/`);
+  `curl localhost:5173/api/health` returns `{ ok: true }` through the proxy; a
+  raw WS connect to `/ws/room/<code>` reaches the `Room` DO (currently replies
+  with a not-implemented error frame).
 - `pnpm --filter @wordle-clash/web build` produces `apps/web/dist`.

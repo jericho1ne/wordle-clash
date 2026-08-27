@@ -24,15 +24,15 @@ All six must pass. CI (`.github/workflows/ci.yml`) runs the same set.
 
 ## 1. Run it locally
 
-Two processes:
-
 ```sh
-# terminal 1 — Worker (+ local Durable Object + local D1)
-pnpm --filter @wordle-clash/server dev        # wrangler dev -> http://localhost:8787
-
-# terminal 2 — web app
-pnpm --filter @wordle-clash/web dev           # vite -> http://localhost:5173
+pnpm dev        # web + Worker in parallel (vite :5173, wrangler dev :8787)
 ```
+
+`pnpm dev` runs `pnpm --filter "./apps/*" --parallel --no-bail run dev`, with
+each side's output prefixed (`apps/web dev:` / `apps/server dev:`). Run one side
+alone with `pnpm dev:web` or `pnpm dev:server`. The server `dev` script
+pre-creates `apps/web/dist` so `wrangler dev` doesn't choke on the (deploy-only)
+`assets` binding before a build has run.
 
 Open **http://localhost:5173**. Vite proxies `/api` and `/ws` to the Worker, so
 the browser only ever talks to `:5173`.

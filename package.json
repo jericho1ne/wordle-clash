@@ -8,7 +8,9 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "pnpm --filter @wordle-clash/web dev",
+    "dev": "pnpm --filter \"./apps/*\" --parallel --no-bail run dev",
+    "dev:web": "pnpm --filter @wordle-clash/web dev",
+    "dev:server": "pnpm --filter @wordle-clash/server dev",
     "build": "pnpm --filter @wordle-clash/shared build && pnpm --filter @wordle-clash/web build",
     "typecheck": "pnpm -r typecheck",
     "lint": "eslint .",

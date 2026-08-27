@@ -14,14 +14,16 @@
 - `src/main.tsx` — `createRoot` + `StrictMode` + `<RouterProvider>`; imports
   `styles/ember.css` then `styles/animations.css`.
 - **Styling convention:** each `.tsx` with its own layout/spacing/typography
-  imports an adjacent `Name.module.scss` (scoped CSS Module) as `styles.x`; the
-  Ember utility classes (`.btn`, `.card`, …) stay global via `className`; no
-  inline `style={{}}`. `*.module.scss` types come from `vite/client`. The three
-  placeholder screens follow this.
+  imports an adjacent `Name.module.scss` (scoped CSS Module) as `styles.x`, with
+  a single kebab-case root class named after the component (`.title-screen`) on
+  the outer element and all other rules nested under it (→ `styles.titleScreen`
+  via `camelCaseOnly`). Ember utility classes (`.btn`, `.card`, …) stay global
+  via `className`; no inline `style={{}}`. `*.module.scss` types come from
+  `vite/client`. The three placeholder screens follow this.
 - `tsconfig.json` — extends base, DOM libs, `jsx: react-jsx`, path alias for
   `@wordle-clash/shared` → its `src/index.ts`.
-- `vite.config.ts` — `react()` only; **no `base`**; `/api` + `/ws` proxy to the
-  Worker (see story 06).
+- `vite.config.ts` — `react()`; **no `base`**; `css.modules.localsConvention:
+  'camelCaseOnly'`; `/api` + `/ws` proxy to the Worker (see story 06).
 
 ## Acceptance
 

@@ -13,6 +13,10 @@ const WORKER_ORIGIN = process.env.WORKER_ORIGIN ?? 'http://localhost:8787';
 
 export default defineConfig({
   plugins: [react()],
+  css: {
+    // `.title-screen` in a *.module.scss is referenced as `styles.titleScreen`.
+    modules: { localsConvention: 'camelCaseOnly' },
+  },
   server: {
     port: 5173,
     proxy: {

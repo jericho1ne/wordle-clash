@@ -3,6 +3,7 @@
 A multiplayer (2–8 player) Wordle race. Create or join a room by code, pick a
 mode in the lobby, and race friends to the word.
 
+- **Conventions (non-negotiable):** [`AGENTS.md`](./AGENTS.md)
 - **Architecture & all technical decisions:** [`docs/architecture.md`](./docs/architecture.md)
 - **Epic / story breakdown:** [`docs/stories/`](./docs/stories/) — a numbered
   folder is an Epic, a numbered file inside it is a Story/Task.

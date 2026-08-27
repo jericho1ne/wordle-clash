@@ -21,10 +21,13 @@ Each role carries a 100–900 ramp. The stylesheet
 **Styling model** (no Tailwind): the Ember utility classes are **global** and
 composed via `className`; anything component-specific (layout, spacing,
 typography) goes in an **adjacent `Name.module.scss`** (scoped CSS Module,
-`sass-embedded`) referenced as `styles.x` — no inline `style={{}}`. A primitive
-that is a pure class-mapper (`<Button>` → `btn btn-primary`) needs no module; any
-custom CSS gets one. All CSS uses only `--color-*` / `--space-*` / `--radius-*` /
-`--shadow-*`.
+`sass-embedded`) referenced as `styles.x` — no inline `style={{}}`. Each module
+has **one kebab-case root class named after the component** (`.title-screen`) on
+the outermost element, with every other rule **nested under it**;
+`localsConvention: 'camelCaseOnly'` (in `vite.config.ts`) makes that
+`styles.titleScreen`. A primitive that is a pure class-mapper (`<Button>` → `btn
+btn-primary`) needs no module; any custom CSS gets one. All CSS uses only
+`--color-*` / `--space-*` / `--radius-*` / `--shadow-*`.
 
 ## Stories
 

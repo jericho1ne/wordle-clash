@@ -1,0 +1,9 @@
+// LobbyScreen-specific styling. Ember utility classes (.card, .card-kicker, …)
+// stay global; everything here nests under the single root class `.lobby-screen`.
+
+.lobby-screen {
+  .code {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 22px;
+  }
+}

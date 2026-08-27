@@ -180,11 +180,17 @@ dark, higher-contrast, multi-hue palette that suits a word-race game.
   2. **Per-component** — every `.tsx` that needs its own layout / spacing /
      typography imports an **adjacent `Name.module.scss`** (CSS Modules, scoped)
      and references `styles.x`. No inline `style={{}}` objects, no ad-hoc CSS.
-     `src/ui/` primitives that are pure class-mappers (a `<Button>` that only
-     picks `btn btn-primary`) may skip the module; any custom CSS goes in one.
+     Each module has **one kebab-case root class matching the component**
+     (`.title-screen`, `.lobby-screen`), applied to the component's outermost
+     element, and **every other rule nests under it** — so the module is
+     self-namespacing and greppable. `src/ui/` primitives that are pure
+     class-mappers (a `<Button>` that only picks `btn btn-primary`) may skip the
+     module; any custom CSS goes in one.
   All CSS — global or module — uses only `--color-*` / `--space-*` /
   `--radius-*` / `--shadow-*`, never raw hex/px/font. SCSS via `sass-embedded`
-  (Vite built-in); `*.module.scss` typing comes from `vite/client`.
+  (Vite built-in); `vite.config.ts` sets `css.modules.localsConvention:
+  'camelCaseOnly'` so `.title-screen` is referenced as `styles.titleScreen`;
+  `*.module.scss` typing comes from `vite/client`.
 - **Dark only.** No light theme. Each role carries a 100–900 ramp on one shared
   lightness scale; dark steps (700–900) for fills/hovers/borders, 500 as the
   base, light steps (100–300) for text on tints.

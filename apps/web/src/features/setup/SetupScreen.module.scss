@@ -1,0 +1,20 @@
+// SetupScreen-specific styling. Ember utility classes stay global; everything
+// here nests under the single root class `.setup-screen`.
+
+.setup-screen {
+  .back {
+    margin-bottom: var(--space-4);
+  }
+
+  .heading {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  .note {
+    font-size: 12px;
+    opacity: 0.45;
+    margin-top: var(--space-6);
+  }
+}

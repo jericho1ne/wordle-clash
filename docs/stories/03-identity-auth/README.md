@@ -13,7 +13,7 @@ email/OAuth" is a later post-match upsell.
 | # | Story |
 |---|---|
 | 00 | better-auth in the Worker: `drizzleAdapter(db, { provider: 'sqlite' })`, `anonymous()` plugin, `/api/auth/*`, user `additionalFields` `displayName` + `avatarId`. **Timebox ~1 day; fallback = HMAC-signed-cookie guest identity with the same table names.** |
-| 01 | D1 schema (Drizzle) + first migration: better-auth core (+ `isAnonymous`, `displayName`, `avatarId`), `favorite_rooms` (`unique(userId, roomCode)`), **inert** `matches` + `match_players` (`match_players.userId` nullable). `wrangler d1 create` + real `database_id`. |
+| 01 | D1 schema (Drizzle) + first migration: better-auth core (+ `isAnonymous`, `displayName`, `avatarId`), `favorite_rooms` (`unique(userId, roomCode)`), **inert** `matches` + `match_players` (`match_players.userId` nullable). `wrangler d1 create` + real `database_id`. Generate with `--name=story_03_01__create__auth_favorites_matches` (see AGENTS.md → Database migrations). |
 | 02 | Guest identity minting on client boot (`getSession()` → `signIn.anonymous()`), `useIdentity()`; never blocks render. |
 | 03 | WS ticket auth: `POST /api/rt/ticket` → ~60s signed JWT → `partysocket` `query` → Worker verifies, strips, injects `x-user-*` headers → DO. |
 | 04 | Profile `{ name, avatarId }`: `localStorage["wc.profile"]` source of truth + mirror to the user row via `updateUser` for every user (anon included). `useProfile()`. |

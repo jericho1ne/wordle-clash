@@ -21,7 +21,8 @@
 - `wrangler d1 create wordle-clash` → real `database_id` into `wrangler.jsonc`.
 - Real schema: better-auth core tables (+ `isAnonymous`, `displayName`,
   `avatarId`), `favorite_rooms`, inert `matches` / `match_players`.
-- `pnpm db:generate` then `pnpm db:migrate:local`.
+- `pnpm db:generate --name=story_<epic>_<story>__<action>__<group>` then
+  `pnpm db:migrate:local` (see AGENTS.md → Database migrations).
 - `src/db/client.ts` — `drizzle(env.DB, { schema })`.
 
 ## Acceptance (this story)

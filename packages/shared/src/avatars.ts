@@ -1,13 +1,16 @@
 /**
- * Avatar palette — ported verbatim from the "Wordle Royale" design prototype
- * (`AVATAR_STEPS`). Each entry maps to Nocturne CSS custom properties; the UI
- * never hard-codes these colors, it reads `bg` / `text` straight through.
+ * Avatar palette. One entry per player colour; `avatarId` throughout the app is
+ * an index into this array (0..4). Each entry maps to Ember CSS custom
+ * properties (see `apps/web/src/styles/ember.css`); the UI reads `bg` / `text`
+ * straight through and never hard-codes a colour.
  *
- * `avatarId` throughout the app is an index into this array (0..4).
+ * The five slots deliberately span the five palette families (Pearl Aqua,
+ * Pumpkin Spice, Cool Steel, Mahogany Red, plus a light aqua) so players in a
+ * lobby are easy to tell apart at a glance.
  */
 export interface AvatarStep {
-  /** Nocturne ramp step the ground is derived from (documentation only). */
-  readonly step: number;
+  /** Human label for the colour (not shown in UI; aids debugging). */
+  readonly name: string;
   /** CSS value for the avatar circle background. */
   readonly bg: string;
   /** CSS value for the initial/text on that background. */
@@ -15,11 +18,11 @@ export interface AvatarStep {
 }
 
 export const AVATAR_STEPS: readonly AvatarStep[] = [
-  { step: 500, bg: 'var(--color-accent-500)', text: 'var(--color-accent-100)' },
-  { step: 700, bg: 'var(--color-accent-700)', text: 'var(--color-accent-100)' },
-  { step: 300, bg: 'var(--color-accent-300)', text: 'var(--color-neutral-900)' },
-  { step: 800, bg: 'var(--color-neutral-800)', text: 'var(--color-accent-200)' },
-  { step: 600, bg: 'var(--color-neutral-600)', text: 'var(--color-neutral-100)' },
+  { name: 'aqua', bg: 'var(--color-accent-500)', text: 'var(--color-accent-900)' },
+  { name: 'pumpkin', bg: 'var(--color-accent-2-500)', text: 'var(--color-accent-2-900)' },
+  { name: 'steel', bg: 'var(--color-neutral-400)', text: 'var(--color-neutral-900)' },
+  { name: 'mahogany', bg: 'var(--color-danger-600)', text: 'var(--color-danger-100)' },
+  { name: 'mist', bg: 'var(--color-accent-300)', text: 'var(--color-accent-900)' },
 ] as const;
 
 export const AVATAR_COUNT = AVATAR_STEPS.length;

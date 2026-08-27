@@ -5,5 +5,4 @@ build/
 coverage/
 playwright-report/
 pnpm-lock.yaml
-apps/web/src/styles/nocturne.css
 apps/server/migrations/

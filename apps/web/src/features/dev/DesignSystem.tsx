@@ -1,4 +1,6 @@
-import { Button, Field, IconButton, Input } from '../../ui';
+import { useState } from 'react';
+
+import { Button, Field, IconButton, Input, RadioGroup, SegmentedControl } from '../../ui';
 import styles from './DesignSystem.module.scss';
 
 const BASE = [
@@ -25,6 +27,9 @@ const STEPS = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const;
  * A new section is added by each design-system story.
  */
 export function DesignSystem() {
+  const [mode, setMode] = useState<'sync' | 'realtime'>('sync');
+  const [room, setRoom] = useState<'create' | 'join'>('create');
+
   return (
     <div className={styles.designSystem}>
       <h1>Design System</h1>
@@ -133,6 +138,36 @@ export function DesignSystem() {
             <Input id="ds-disabled" placeholder="can’t touch this" disabled />
           </Field>
         </div>
+      </section>
+
+      <section className={styles.section}>
+        <h2>SegmentedControl</h2>
+        <SegmentedControl
+          name="ds-mode"
+          aria-label="Game mode"
+          value={mode}
+          onChange={setMode}
+          options={[
+            { value: 'sync', label: 'Synchronous' },
+            { value: 'realtime', label: 'Real-time' },
+          ]}
+        />
+        <p className={styles.note}>selected: {mode}</p>
+      </section>
+
+      <section className={styles.section}>
+        <h2>RadioGroup</h2>
+        <RadioGroup
+          name="ds-room"
+          aria-label="Room mode"
+          value={room}
+          onChange={setRoom}
+          options={[
+            { value: 'create', label: 'Create room' },
+            { value: 'join', label: 'Join room' },
+          ]}
+        />
+        <p className={styles.note}>selected: {room}</p>
       </section>
     </div>
   );

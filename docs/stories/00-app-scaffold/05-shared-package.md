@@ -12,7 +12,7 @@ Modules (`src/`):
 
 | File | Contents |
 |---|---|
-| `avatars.ts` | `AVATAR_STEPS` (5 entries, `bg`/`text` as Nocturne CSS vars, ported verbatim from the prototype), `AVATAR_COUNT`, `clampAvatarId`, `getAvatarStep` |
+| `avatars.ts` | `AVATAR_STEPS` (5 entries, `bg`/`text` as Ember CSS vars — one per palette family), `AVATAR_COUNT`, `clampAvatarId`, `getAvatarStep` |
 | `game-modes.ts` | `GameMode`, `GAME_MODES` (`sync` / `realtime` with `label`, `tries`, exact prototype `description`), `DEFAULT_GAME_MODE`, `isGameMode` |
 | `room-code.ts` | `ROOM_CODE_REGEX` (`LLLL-DDDD`, no I/O), `generateRoomCode(rng?)`, `normalizeRoomCode`, `isValidRoomCode` |
 | `room.ts` | `RoomPhase`, `Profile`, `Player`, `RoomState`, `MAX_PLAYERS` (8), `MIN_PLAYERS_TO_START` (2), `MAX_NAME_LENGTH` (14), `canStartMatch` |

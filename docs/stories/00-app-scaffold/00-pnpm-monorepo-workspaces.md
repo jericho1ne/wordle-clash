@@ -18,8 +18,7 @@ root script surface the other packages plug into.
   `verbatimModuleSyntax`, `noUncheckedIndexedAccess`, `isolatedModules`.
 - `eslint.config.js` — flat config: `@eslint/js` + `typescript-eslint` +
   `eslint-plugin-react-hooks` / `react-refresh` (web only), `consistent-type-imports`.
-- `.prettierrc.json` + `.prettierignore` (ignores the vendored `nocturne.css`
-  and generated migrations).
+- `.prettierrc.json` + `.prettierignore` (ignores generated migrations).
 - `.gitignore`; Node pin `22` in both `.nvmrc` (nvm) and `.node-version`
   (fnm / nodenv / asdf / CI `node-version-file`).
 

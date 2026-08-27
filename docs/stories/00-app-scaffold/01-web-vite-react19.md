@@ -11,7 +11,7 @@
 - `index.html` — `#root`, Inter via Google Fonts (`preconnect` + `display=swap`),
   `<title>Wordle Clash</title>`, `color-scheme: dark`.
 - `src/main.tsx` — `createRoot` + `StrictMode` + `<RouterProvider>`; imports
-  `styles/nocturne.css` then `styles/animations.css`.
+  `styles/ember.css` then `styles/animations.css`.
 - `tsconfig.json` — extends base, DOM libs, `jsx: react-jsx`, path alias for
   `@wordle-clash/shared` → its `src/index.ts`.
 - `vite.config.ts` — `react()` only; **no `base`**; `/api` + `/ws` proxy to the

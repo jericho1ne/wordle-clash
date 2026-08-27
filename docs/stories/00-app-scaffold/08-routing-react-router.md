@@ -18,7 +18,7 @@ by the Worker's `single-page-application` asset fallback, no SSR to reconcile.
   - `*` → `<Navigate to="/" replace />`
 - Placeholder screen components under `src/features/{title,setup,lobby}/`, each
   rendering the `.app-stage` shell with a "scaffold placeholder" note and the
-  Nocturne classes they'll build on.
+  Ember classes they'll build on.
 - `LobbyScreen` normalizes `:code` via `normalizeRoomCode` from the shared
   package (smoke test that the workspace dep resolves at runtime).
 
@@ -27,7 +27,7 @@ by the Worker's `single-page-application` asset fallback, no SSR to reconcile.
 - The `/room/:code` deep-link guard (redirect to `/setup?join=<code>` when no
   profile) → epic 06-lobby-screen/00.
 - Canonical-form redirect for non-normalized codes → epic 06.
-- `<AppShell>` with `.nav` for setup/lobby → epic 01-nocturne-design-system/02.
+- `<AppShell>` with `.nav` for setup/lobby → epic 01-design-system/02.
 
 ## Acceptance
 

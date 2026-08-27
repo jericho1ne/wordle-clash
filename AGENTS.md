@@ -9,12 +9,10 @@ Rationale and detail: [`docs/architecture.md`](./docs/architecture.md).
 
 1. If practical, keep each work item (Story) at 1,000–2,000 changed lines of
    implementation code or less.
-2. **Use the official `github/gh-stack` extension for stacked pull requests.**
-   When adopting existing branches, initialize them bottom-to-top with
-   `gh stack init`, then use `gh stack submit` to create or update the GitHub
-   stack. If `gh stack` is unavailable, prompt the user to install it with
-   `gh extension install github/gh-stack`; do not install it without explicit
-   authorization.
+2. **Use the official `github/gh-stack` extension for stacked pull requests** —
+   see [PR stacks](#pr-stacks) for the procedure. If `gh stack` is unavailable,
+   prompt the user to install it with `gh extension install github/gh-stack`;
+   do not install it without explicit authorization.
 3. **Never embed raw SVG markup inline in JSX templates, HTML, or TypeScript.**
    Store SVG files under `apps/web/public/` and reference them by URL. When an
    icon must inherit the surrounding text color, reference the public SVG as a
@@ -61,6 +59,54 @@ When the user assigns a story, **before writing any code**:
    from the parent story's branch instead of `main`.
 4. Creating this branch is the **only** git action taken automatically. Commits,
    pushes, rebases, and merges stay with the user (see Workflow).
+
+---
+
+## PR stacks
+
+When the user asks for **several dependent stories in one go**, ship them as a
+stack of PRs with `gh stack` (github/gh-stack). Each layer is one story, named
+per [Starting a story](#starting-a-story) (`feat/01-04-field-input`, …); the
+bottom targets `main`, each layer above targets the one below.
+
+**Prereqs**
+
+- `gh stack --version` works; `gh auth status` is logged in.
+- Local `main` is synced (`git checkout main && git pull --ff-only`).
+- `git symbolic-ref refs/remotes/origin/HEAD` points at `refs/remotes/origin/main`.
+  If not: `git remote set-head origin main` (gh-stack bases the first branch on
+  this and fails if it's stale).
+
+**Build it**
+
+```sh
+# 1. from a synced main — create the whole chain (bottom → top)
+gh stack init feat/01-04-field-input feat/01-05-... feat/01-06-...
+
+# 2. bottom layer
+gh stack checkout feat/01-04-field-input
+#    …implement the story…
+pnpm check                       # keep every PR green — never commit a red layer
+git add -A && git commit -m "feat(design-system): <story 04 summary>"
+
+# 3. next layer up (repeat for each)
+gh stack checkout feat/01-05-...
+#    …implement, pnpm check, commit…
+
+# 4. push every branch, then open/refresh the PR chain
+gh stack push
+gh stack submit
+gh stack view
+```
+
+- Conventional Commit messages (`feat(scope): …`, `refactor: …`). One commit per
+  layer is fine; keep the layer within operating-rule-1's size.
+- `gh stack add <branch>` adds another layer on top of the current tip later.
+- After the base or a lower layer changes: `gh stack sync` then `gh stack rebase`.
+
+**Merging** (user does this): merge the **bottom** PR first, then
+`gh stack sync && gh stack rebase` and merge the next, and so on — or
+`gh stack merge` to merge the whole chain. Delete merged branches after.
 
 ---
 

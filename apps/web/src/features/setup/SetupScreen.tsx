@@ -1,5 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router';
 
+import { IconButton } from '../../ui';
 import styles from './SetupScreen.module.scss';
 
 /**
@@ -14,14 +15,9 @@ export function SetupScreen() {
   return (
     <div className={`app-stage ${styles.setupScreen}`}>
       <div className="app-stage__inner">
-        <button
-          type="button"
-          className={`btn btn-ghost btn-icon ${styles.back}`}
-          aria-label="Back"
-          onClick={() => navigate('/')}
-        >
+        <IconButton aria-label="Back" className={styles.back} onClick={() => navigate('/')}>
           ‹
-        </button>
+        </IconButton>
         <div className={styles.heading}>Set up your player</div>
         <p className={styles.note}>
           Scaffold placeholder — see docs/stories/05-setup-screen.

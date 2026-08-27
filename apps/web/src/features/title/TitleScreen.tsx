@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router';
 
+import { Button } from '../../ui';
 import styles from './TitleScreen.module.scss';
 
 /**
@@ -17,13 +18,9 @@ export function TitleScreen() {
         <p className={styles.tagline}>
           Your fave civilized game is now a chaotic multiplayer experience.
         </p>
-        <button
-          type="button"
-          className="btn btn-primary btn-block"
-          onClick={() => navigate('/setup')}
-        >
+        <Button block onClick={() => navigate('/setup')}>
           Play
-        </button>
+        </Button>
         <p className={styles.note}>Scaffold placeholder — see docs/stories/04-title-screen.</p>
       </div>
     </div>

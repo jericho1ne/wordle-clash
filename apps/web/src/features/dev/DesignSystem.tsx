@@ -1,0 +1,121 @@
+import { Button, IconButton } from '../../ui';
+import styles from './DesignSystem.module.scss';
+
+const BASE = [
+  { key: 'bg', token: '--color-bg', name: 'Coffee Bean', ink: 'light' },
+  { key: 'surface', token: '--color-surface', name: 'Surface', ink: 'light' },
+  { key: 'text', token: '--color-text', name: 'Text', ink: 'dark' },
+  { key: 'accent', token: '--color-accent', name: 'Pearl Aqua', ink: 'dark' },
+  { key: 'accent-2', token: '--color-accent-2', name: 'Pumpkin Spice', ink: 'dark' },
+  { key: 'neutral', token: '--color-neutral-500', name: 'Cool Steel', ink: 'dark' },
+  { key: 'danger', token: '--color-danger-600', name: 'Mahogany Red', ink: 'light' },
+] as const;
+
+const RAMPS = [
+  { key: 'accent', label: 'accent · Pearl Aqua' },
+  { key: 'accent-2', label: 'accent-2 · Pumpkin Spice' },
+  { key: 'neutral', label: 'neutral · Cool Steel' },
+  { key: 'danger', label: 'danger · Mahogany Red' },
+] as const;
+
+const STEPS = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const;
+
+/**
+ * Dev-only design-system showcase (route `/design-system`, DEV builds only).
+ * A new section is added by each design-system story.
+ */
+export function DesignSystem() {
+  return (
+    <div className={styles.designSystem}>
+      <h1>Design System</h1>
+
+      <section className={styles.section}>
+        <h2>Palette</h2>
+
+        <h3>Base</h3>
+        <div className={styles.pills}>
+          {BASE.map((c) => (
+            <span key={c.key} className={styles.pill} data-swatch={c.key} data-ink={c.ink}>
+              {c.name} <code>{c.token}</code>
+            </span>
+          ))}
+        </div>
+
+        {RAMPS.map((ramp) => (
+          <div key={ramp.key}>
+            <h3>{ramp.label}</h3>
+            <div className={styles.rampStrip}>
+              {STEPS.map((step) => (
+                <div
+                  key={step}
+                  className={styles.step}
+                  data-swatch={`${ramp.key}-${step}`}
+                  data-dark={step >= 500 ? 'true' : 'false'}
+                >
+                  {step}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section className={styles.section}>
+        <h2>Button</h2>
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>default</span>
+          <Button>Primary</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="danger">Danger</Button>
+        </div>
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>disabled</span>
+          <Button disabled>Primary</Button>
+          <Button variant="secondary" disabled>
+            Secondary
+          </Button>
+          <Button variant="ghost" disabled>
+            Ghost
+          </Button>
+          <Button variant="danger" disabled>
+            Danger
+          </Button>
+        </div>
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>icons</span>
+          <Button leadingIcon={<span aria-hidden>+</span>}>New room</Button>
+          <Button variant="secondary" trailingIcon={<span aria-hidden>→</span>}>
+            Continue
+          </Button>
+        </div>
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>block</span>
+          <div className={styles.block}>
+            <Button block>Play</Button>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <h2>IconButton</h2>
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>default</span>
+          <IconButton aria-label="Back">‹</IconButton>
+          <IconButton variant="secondary" aria-label="Copy">
+            ⧉
+          </IconButton>
+          <IconButton variant="primary" aria-label="Favorite">
+            ★
+          </IconButton>
+          <IconButton variant="danger" aria-label="Delete">
+            ✕
+          </IconButton>
+          <IconButton aria-label="Disabled" disabled>
+            ‹
+          </IconButton>
+        </div>
+      </section>
+    </div>
+  );
+}

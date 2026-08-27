@@ -4,6 +4,7 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.stylelint": "explicit"
   },
+  "eslint.format.enable": true,
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -11,10 +12,10 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[javascript][javascriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
   "[typescript][typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
   "prettier.requireConfig": true,
   "stylelint.validate": ["css", "scss"]

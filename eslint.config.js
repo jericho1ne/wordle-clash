@@ -1,6 +1,8 @@
 // @ts-check
 import js from '@eslint/js'
+import stylistic from '@stylistic/eslint-plugin'
 import tseslint from 'typescript-eslint'
+import antfu from 'eslint-plugin-antfu'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
@@ -18,6 +20,36 @@ export default tseslint.config(
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  stylistic.configs.customize({
+    pluginName: 'style',
+    indent: 2,
+    quotes: 'single',
+    semi: false,
+    jsx: true,
+    arrowParens: true,
+    braceStyle: '1tbs',
+    commaDangle: 'always-multiline',
+  }),
+  {
+    plugins: { antfu },
+    rules: {
+      'antfu/consistent-list-newline': 'error',
+      'style/jsx-one-expression-per-line': 'off',
+      'style/object-curly-newline': [
+        'error',
+        {
+          ImportDeclaration: { minProperties: 2 },
+          ExportDeclaration: { minProperties: 2 },
+        },
+      ],
+      'style/operator-linebreak': [
+        'error',
+        'after',
+        { overrides: { '|': 'before', '&': 'before', '?': 'before', ':': 'before' } },
+      ],
+      'style/quote-props': ['error', 'as-needed'],
+    },
+  },
   {
     files: ['apps/web/**/*.{ts,tsx}'],
     plugins: {

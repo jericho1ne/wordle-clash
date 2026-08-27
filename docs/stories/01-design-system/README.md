@@ -39,7 +39,7 @@ btn-primary`) needs no module; any custom CSS gets one. All CSS uses only
 | [03](./03-button.md) | `<Button variant={primary\|secondary\|ghost\|danger} block?>` + `<IconButton>` (primary = accent outline, not fill) | done, in review |
 | [04](./04-field-input.md) | `<Field label htmlFor hint? error?>` + `<Input>` | done, in review |
 | [05](./05-segmented-control.md) | `<SegmentedControl>` (`.seg`/`.seg-opt` over native radios) + `<RadioGroup>` | done, in review |
-| 06 | `<Card elevation>` + `Card.Kicker/.Title/.Body/.Meta` + `<Tag tone={accent\|accent-2\|neutral\|danger\|outline}>` | next |
+| [06](./06-card-tag.md) | `<Card elevation>` + `Card.Kicker/.Title/.Body/.Meta` + `<Tag tone={accent\|accent-2\|neutral\|danger\|outline}>` | done, in review |
 | 07 | `<Dialog open onClose title>` (backdrop, focus trap, ESC, backdrop click) | |
 | 08 | `<ToastProvider>` + `useToast().show(text)` — one top-center pill, `toastIn`, ~2200ms, single-toast queue | |
 | 09 | icon set (ArrowRight, ArrowLeft, Plus/DoorOpen, SignIn, Star, Copy, Check) — **approach TBD**: `@phosphor-icons/react` vs public SVG + CSS mask (AGENTS.md rule 3) | |

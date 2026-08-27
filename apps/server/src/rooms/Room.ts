@@ -1,4 +1,9 @@
-import { Server, type Connection, type ConnectionContext, type WSMessage } from 'partyserver'
+import {
+  Server,
+  type Connection,
+  type ConnectionContext,
+  type WSMessage,
+} from 'partyserver'
 
 import type { RoomState } from '@wordle-clash/shared'
 import { DEFAULT_GAME_MODE } from '@wordle-clash/shared'

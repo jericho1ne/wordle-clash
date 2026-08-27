@@ -1,0 +1,95 @@
+/* ============================================================================
+ * App-specific CSS — keyframes and the app shell. Everything here is authored
+ * from Ember tokens only (see ember.css); no raw hex / px / font names.
+ * Keyframes are ported verbatim from the "Wordle Royale" design prototype.
+ * ============================================================================ */
+
+@keyframes tileFlip {
+  0% {
+    transform: rotateX(90deg);
+    opacity: 0;
+  }
+  60% {
+    transform: rotateX(-8deg);
+    opacity: 1;
+  }
+  100% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes joinIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* — app shell — */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+/* Links inside the app use the accent ramp, not the bare accent (prototype). */
+a {
+  color: var(--color-accent-300);
+}
+a:hover {
+  color: var(--color-accent-100);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* The centered single-column stage every screen sits on. */
+.app-stage {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background:
+    radial-gradient(
+      circle at 15% -10%,
+      color-mix(in oklch, var(--color-accent-900) 55%, transparent),
+      transparent 55%
+    ),
+    var(--color-bg);
+}
+
+.app-stage__inner {
+  width: 100%;
+  max-width: 480px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

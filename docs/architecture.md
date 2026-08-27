@@ -27,6 +27,7 @@ room codes.
 | Layer | Choice | Notes |
 |---|---|---|
 | Client | **React 19** SPA, **Vite**, **TypeScript** | All UI and animation in React. No SSR. |
+| Design system | **Ember** — hand-owned CSS (`apps/web/src/styles/ember.css`) | Warm dark theme; see [Design system](#design-system-ember). Global utility classes + per-component `*.module.scss`. No Tailwind. |
 | Routing | **React Router** (library/SPA mode) | `/`, `/setup`, `/room/:code`. Worker SPA fallback serves deep links. |
 | Client state | **Zustand** (thin) | One room store. Expand only if it earns its keep. |
 | Realtime transport | **WebSockets** | Full-duplex. Server pushes fully-formed domain events ("fat events"), not "something changed" pings. |
@@ -151,6 +152,57 @@ targets one; `pnpm build` builds `shared` then `web` in order.
 
 ---
 
+## Design system (Ember)
+
+**Ember** is the Wordle Clash theme. It replaces "Nocturne", the mono blurple
+theme that shipped with the imported design — a deliberate switch to a warm,
+dark, higher-contrast, multi-hue palette that suits a word-race game.
+
+| Token | Colour | Role |
+|---|---|---|
+| `--color-bg` | `#171219` Coffee Bean | near-black warm ground |
+| `--color-accent` | `#84DCC6` Pearl Aqua | buttons, links, focus, wordmark — **and the "correct" tile** |
+| `--color-accent-2` | `#F0803C` Pumpkin Spice | warm secondary — **and the "present" tile** |
+| `--color-neutral-*` | `#95A3B3` Cool Steel | surfaces, borders, muted text — **and the "absent" tile** |
+| `--color-danger-*` | `#B3001B` Mahogany Red | destructive actions, elimination, timer-low (fill only — too dark for a line) |
+| `--color-text` | `#F2ECE9` | warm off-white |
+
+- **One stylesheet, hand-owned.** `apps/web/src/styles/ember.css` holds the token
+  `:root` block plus the component layer (`.btn` incl. `.btn-danger`, `.field`,
+  `.input`, `.seg`, `.radio`, `.card`, `.tag`, `.nav`, `.table`, `.dialog`,
+  `.hr`). It is imported once in `main.tsx`. The component layer is inherited
+  from Nocturne and retuned onto the Ember tokens. Edit the `:root` block to
+  retune the theme — unlike the original vendored Nocturne file, this one is ours.
+- **Two styling layers, no Tailwind.**
+  1. **Global** — the Ember utility classes above (`.btn`, `.card`, `.tag`, …)
+     and the app shell (`animations.css`: the `tileFlip` / `joinIn` / `toastIn`
+     keyframes + `.app-stage`). Composed via `className` strings.
+  2. **Per-component** — every `.tsx` that needs its own layout / spacing /
+     typography imports an **adjacent `Name.module.scss`** (CSS Modules, scoped)
+     and references `styles.x`. No inline `style={{}}` objects, no ad-hoc CSS.
+     Each module has **one kebab-case root class matching the component**
+     (`.title-screen`, `.lobby-screen`), applied to the component's outermost
+     element, and **every other rule nests under it** — so the module is
+     self-namespacing and greppable. `src/ui/` primitives that are pure
+     class-mappers (a `<Button>` that only picks `btn btn-primary`) may skip the
+     module; any custom CSS goes in one.
+  All CSS — global or module — uses only `--color-*` / `--space-*` /
+  `--radius-*` / `--shadow-*`, never raw hex/px/font. SCSS via `sass-embedded`
+  (Vite built-in); `vite.config.ts` sets `css.modules.localsConvention:
+  'camelCaseOnly'` so `.title-screen` is referenced as `styles.titleScreen`;
+  `*.module.scss` typing comes from `vite/client`.
+- **Dark only.** No light theme. Each role carries a 100–900 ramp on one shared
+  lightness scale; dark steps (700–900) for fills/hovers/borders, 500 as the
+  base, light steps (100–300) for text on tints.
+- **Type & metrics** unchanged from the source: Inter (medium-weight headings),
+  compact 0.7× spacing scale, 4/8/14px radii, edge-plus-ambient shadows.
+- Icons: Phosphor (`@phosphor-icons/react`).
+
+Details and the primitive-by-primitive plan:
+[`stories/01-design-system/`](./stories/01-design-system/).
+
+---
+
 ## Client ⇄ server protocol (summary)
 
 WebSocket frames are `{ t: <type>, ... }`, zod-validated on receipt.
@@ -172,14 +224,17 @@ Optimistic client updates (e.g. ready toggle) are reconciled by the authoritativ
 ```
 pnpm install
 pnpm --filter @wordle-clash/server db:migrate:local   # once tables exist (epic 03)
-# terminal 1:
-pnpm --filter @wordle-clash/server dev                 # wrangler dev  -> :8787
-# terminal 2:
-pnpm --filter @wordle-clash/web dev                    # vite          -> :5173
+pnpm dev                                              # vite :5173 + wrangler dev :8787, in parallel
 ```
 
+`pnpm dev` = `pnpm --filter "./apps/*" --parallel --no-bail run dev`. Output is
+prefixed per package; `--no-bail` keeps one side alive if the other crashes. Run
+a single side with `pnpm dev:web` / `pnpm dev:server`. The server `dev` script
+pre-creates `apps/web/dist` so `wrangler dev` doesn't error on the deploy-only
+`assets` binding before a build has run.
+
 The Vite dev server proxies `/api` and `/ws` to the Worker, so the browser only
-talks to `http://localhost:5173`. Adopting `@cloudflare/vite-plugin` for a
+talks to `http://localhost:5173`. Adopting `@cloudflare/vite-plugin` for a true
 single-process dev server is a possible later optimization.
 
 Production: `pnpm build` then `pnpm --filter @wordle-clash/server deploy`.

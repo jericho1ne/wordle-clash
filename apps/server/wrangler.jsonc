@@ -1,0 +1,34 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "wordle-clash",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+
+  // The single Worker also serves the built SPA. `vite build` in apps/web
+  // produces ../web/dist; `wrangler deploy` from here ships assets + Worker +
+  // Durable Object + D1 in one shot. SPA fallback lets /room/:code deep-link.
+  "assets": {
+    "directory": "../web/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+  },
+
+  // One Durable Object instance per room (addressed by room code).
+  "durable_objects": {
+    "bindings": [{ "name": "ROOM", "class_name": "Room" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
+
+  // Accounts / favorites / (inert) match history.
+  // Run `wrangler d1 create wordle-clash` and paste the real database_id here.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wordle-clash",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations",
+    },
+  ],
+}

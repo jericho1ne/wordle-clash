@@ -1,0 +1,41 @@
+{
+  "name": "wordle-clash",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.25.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter \"./apps/*\" --parallel --no-bail run dev",
+    "dev:web": "pnpm --filter @wordle-clash/web dev",
+    "dev:server": "pnpm --filter @wordle-clash/server dev",
+    "build": "pnpm --filter @wordle-clash/shared build && pnpm --filter @wordle-clash/web build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "pnpm -r test",
+    "check": "pnpm run typecheck && pnpm run lint && pnpm run format:check && pnpm run test && pnpm run build",
+    "db:generate": "pnpm --filter @wordle-clash/server db:generate",
+    "db:migrate:local": "pnpm --filter @wordle-clash/server db:migrate:local",
+    "db:migrate:remote": "pnpm --filter @wordle-clash/server db:migrate:remote",
+    "deploy": "pnpm build && pnpm --filter @wordle-clash/server deploy"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.9.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.5",
+    "prettier": "^3.9.6",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.68.0"
+  }
+}

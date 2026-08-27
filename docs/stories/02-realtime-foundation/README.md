@@ -1,0 +1,37 @@
+# Epic 02 — Realtime foundation
+
+**Status:** not started (`Room` DO exists as an epic-00 stub).
+
+The `Room` Durable Object becomes the authoritative lobby: players, ready state,
+game mode, host, reconnection. Fat JSON events over the socket; full `roomState`
+snapshot on connect and every reconnect.
+
+## Stories
+
+| # | Story |
+|---|---|
+| 00 | Message protocol: zod schemas + `parseClientMessage` / `serializeServerMessage` + `assertNever`; unit tests in `packages/shared` |
+| 01 | `Room` state shape + storage layout; `onStart` hydration; `#save()`; `#snapshot(selfId)` |
+| 02 | `Room` connection lifecycle on the hibernation API: `onConnect` (identity from injected headers, capacity check → `ROOM_FULL`, add player, send snapshot, broadcast join), `onMessage` (hydrate → zod → dispatch), `onClose`/`onError` (drop socket, `connected:false`, grace-period removal), `setWebSocketAutoResponse` ping/pong, empty-room cleanup alarm |
+| 03 | Room-code generation module (already in `packages/shared/src/room-code.ts` from epic 00) + tests |
+| 04 | Create vs join: `POST /api/rooms` reserves a code via DO RPC `reserve(userId)` + 2-min alarm; join opens the socket; unknown room → `ROOM_NOT_FOUND` |
+| 05 | Host assignment / reassignment by `joinedAt`; `hostChanged` broadcast |
+| 06 | Broadcast + snapshot helpers; mutation → persist → broadcast ordering |
+| 07 | `partysocket` client wrapper: ticket in `query`, typed event emit, terminal-error detection |
+| 08 | Zustand room store: status machine, event reducers, optimistic `setReady`, `pendingActions` re-send on reconnect, selector hooks |
+| 09 | `Room` tests via `@cloudflare/vitest-pool-workers` |
+
+## Verification
+
+Baseline: [`../../verification.md`](../../verification.md) §0 + the
+**two-client realtime test** in §2 (steps 1–6, 9). Epic-specific:
+
+- `pnpm --filter @wordle-clash/shared test` — `protocol` round-trips and rejects
+  malformed frames; `room-code` covers no-I/O alphabet, dash placement,
+  case-insensitive `normalizeRoomCode`.
+- `pnpm --filter @wordle-clash/server test` — join → `roomState` snapshot; second
+  join → both connections see each other; host disconnect → reassignment by
+  `joinedAt`; ready gating on `startMatch`; malformed frame → `BAD_MESSAGE`;
+  9th player → `ROOM_FULL`.
+- Kill + restart the Worker mid-session: clients reconnect and re-sync from a
+  fresh snapshot; a pending optimistic `setReady` is re-applied.

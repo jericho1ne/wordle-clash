@@ -1,0 +1,8 @@
+# Copy to `.dev.vars` (gitignored) for local `wrangler dev`.
+# In production set these with `wrangler secret put <NAME>`.
+
+# Session signing secret for better-auth (epic 03).
+AUTH_SECRET="dev-only-change-me"
+
+# HMAC/JWT secret for short-lived WebSocket connect tickets (epic 03).
+RT_TICKET_SECRET="dev-only-change-me-too"

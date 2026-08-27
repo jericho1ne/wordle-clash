@@ -3,6 +3,7 @@
 A multiplayer (2–8 player) Wordle race. Create or join a room by code, pick a
 mode in the lobby, and race friends to the word.
 
+- **Conventions (non-negotiable):** [`AGENTS.md`](./AGENTS.md)
 - **Architecture & all technical decisions:** [`docs/architecture.md`](./docs/architecture.md)
 - **Epic / story breakdown:** [`docs/stories/`](./docs/stories/) — a numbered
   folder is an Epic, a numbered file inside it is a Story/Task.
@@ -27,20 +28,20 @@ later phase (see the architecture doc's "Out of scope" section).
 
 ```sh
 pnpm install
-
-# two terminals:
-pnpm --filter @wordle-clash/server dev   # wrangler dev -> http://localhost:8787
-pnpm --filter @wordle-clash/web dev      # vite         -> http://localhost:5173
+pnpm dev        # starts BOTH: vite (:5173) + wrangler dev (:8787), in parallel
 ```
 
-Open http://localhost:5173. See [`docs/architecture.md`](./docs/architecture.md)
-for the full dev and deploy runbook.
+Open http://localhost:5173 — Vite proxies `/api` and `/ws` to the Worker, so the
+browser only ever talks to `:5173`. Run one side alone with `pnpm dev:web` or
+`pnpm dev:server`. See [`docs/architecture.md`](./docs/architecture.md) for the
+full dev and deploy runbook.
 
 ## Scripts (root)
 
 | Script | Does |
 |---|---|
-| `pnpm dev` | Vite dev server for the web app |
+| `pnpm dev` | Web + Worker in parallel (`vite` :5173, `wrangler dev` :8787) |
+| `pnpm dev:web` / `pnpm dev:server` | One side only |
 | `pnpm build` | Build `shared` then `web` |
 | `pnpm typecheck` | `tsc --noEmit` across all packages |
 | `pnpm lint` | ESLint |

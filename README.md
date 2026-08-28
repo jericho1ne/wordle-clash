@@ -8,6 +8,7 @@ mode in the lobby, and race friends to the word.
 - **Epic / story breakdown:** [`docs/stories/`](./docs/stories/) — a numbered
   folder is an Epic, a numbered file inside it is a Story/Task.
 - **Verification checklist** (run after every epic): [`docs/verification.md`](./docs/verification.md)
+- **Deployment & custom domain:** [`docs/deployment.md`](./docs/deployment.md)
 - **Gameplay rules** (later phases): [`docs/game-rules.md`](./docs/game-rules.md)
 
 ## Status

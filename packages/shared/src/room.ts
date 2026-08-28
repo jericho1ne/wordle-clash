@@ -1,7 +1,7 @@
 import type { GameMode } from './game-modes.js'
 
 /** Lobby is pre-match; `starting` is the brief window after "Start game". */
-export type RoomPhase = 'lobby' | 'starting'
+export type RoomPhase = 'lobby' | 'starting' | 'playing' | 'finished'
 
 /** Player-editable identity. `name` <= 14 chars, `avatarId` is 0..4. */
 export interface Profile {

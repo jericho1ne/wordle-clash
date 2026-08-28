@@ -14,6 +14,8 @@ declare namespace Cloudflare {
     /** Set via `wrangler secret put` / .dev.vars. */
     BETTER_AUTH_SECRET: string
     RT_TICKET_SECRET: string
+    /** Optional local-only deterministic answer used for two-browser gameplay testing. */
+    GAMEPLAY_TEST_ANSWER?: string
   }
 }
 

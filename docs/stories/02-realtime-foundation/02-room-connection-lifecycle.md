@@ -19,7 +19,10 @@ for live lobby membership and mutations.
   leave, and ping messages.
 - Added 30-second disconnected-player grace deadlines in durable storage with a
   single rescheduled alarm and empty-room state cleanup.
-- Added exact JSON ping/pong auto-response for hibernating sockets.
+- Added exact JSON ping/pong auto-response for hibernating sockets. The client
+  sends a heartbeat every 15 seconds and when a hidden tab becomes visible.
+  Cloudflare records auto-response timestamps without waking the Durable Object;
+  a 90-second alarm sweep closes stale sockets and removes their players.
 
 Host reassignment after the grace deadline remains Story 02-05; until then a
 departed host leaves `hostId = null`.

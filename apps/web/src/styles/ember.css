@@ -111,12 +111,15 @@
   --size-animal-picker: 120px;
   --size-toggle-indicator: 8px;
   --size-lobby-avatar: 34px;
+  --size-game-tile: 34px;
   --inset-floating-control: var(--space-6);
   --measure-toast: 360px;
   --layer-toast: 20;
   --duration-toast-in: 180ms;
   --duration-player-join: 350ms;
   --measure-copy: 32ch;
+  --measure-gameplay: 960px;
+  --measure-player-board: 220px;
   --perspective-title-tiles: 600px;
   --duration-tile-flip: 500ms;
   --duration-stagger-1: 80ms;

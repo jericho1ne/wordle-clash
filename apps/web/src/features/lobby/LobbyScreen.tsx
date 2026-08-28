@@ -89,6 +89,19 @@ export function LobbyScreen() {
     return disconnect
   }, [connect, disconnect, roomCode, validRoomCode])
 
+  useEffect(() => {
+    if (!matchStarting) return
+    const delay = Math.max(0, matchStarting.startsAt - Date.now())
+    const timeout = window.setTimeout(() => navigate(`/room/${roomCode}/play`), delay)
+    return () => window.clearTimeout(timeout)
+  }, [matchStarting, navigate, roomCode])
+
+  useEffect(() => {
+    if (room?.phase === 'playing' || room?.phase === 'finished') {
+      navigate(`/room/${roomCode}/play`, { replace: true })
+    }
+  }, [navigate, room?.phase, roomCode])
+
   useEffect(() => () => {
     if (feedbackTimeout.current !== null) window.clearTimeout(feedbackTimeout.current)
   }, [])
@@ -274,9 +287,19 @@ export function LobbyScreen() {
         open={matchStarting !== null}
         title="Match starting"
         onOpenChange={(open) => {
-          if (!open) dismissMatchStarting()
+          if (!open) {
+            dismissMatchStarting()
+            navigate(`/room/${roomCode}/play`)
+          }
         }}
-        actions={<Button onClick={dismissMatchStarting}>Got it</Button>}
+        actions={(
+          <Button onClick={() => {
+            dismissMatchStarting()
+            navigate(`/room/${roomCode}/play`)
+          }}>
+            Enter game
+          </Button>
+        )}
       >
         {matchStarting && (
           <>

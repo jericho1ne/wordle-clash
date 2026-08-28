@@ -23,12 +23,18 @@ sequenceDiagram
     Room->>Room: Validate five-letter format
 
     alt Guess rejected
-        Room-->>UI: WebSocket: guessRejected
+        Room-->>UI: WebSocket: error
         UI->>UI: Unlock input and show error
     else Guess accepted
         Room->>Room: Compare guess with secret answer
         Room->>Room: Calculate five tile states
-        Room->>Room: Record guess and increment guesses used
+        alt Synchronous mode
+            Room->>Room: Lock private submission for current round
+            Room-->>UI: WebSocket: guessAccepted
+            Note over Room: Reveal after all active players submit,<br/>or deadline + 400ms network grace
+        else Real-time mode
+            Room->>Room: Record guess and increment guesses used
+        end
 
         alt Correct guess
             Room->>Room: Declare winner and end match
@@ -45,18 +51,18 @@ sequenceDiagram
         Room->>Storage: Persist authoritative match state
         Storage-->>Room: Persistence confirmed
 
-        Room-->>UI: WebSocket: guessResult
+        Room-->>UI: WebSocket: sanitized matchState
         UI->>UI: Render correct, present, and absent colors
 
         opt Opponent progress is visible
-            Room-->>Peers: WebSocket: opponent progress
+            Room-->>Peers: WebSocket: sanitized matchState
         end
 
         opt Match ended
-            Room-->>UI: WebSocket: matchEnded
-            Room-->>Peers: WebSocket: matchEnded
+            Room-->>UI: WebSocket: terminal matchState
+            Room-->>Peers: WebSocket: terminal matchState
             UI->>UI: Show winner or no-winner result
-            Room->>D1: Persist final account match history
+            Note over Room,D1: Account match-history persistence is deferred
         end
     end
 ```

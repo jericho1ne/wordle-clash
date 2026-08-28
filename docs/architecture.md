@@ -1,9 +1,9 @@
 # Wordle Clash — Architecture
 
 This is the single source of truth for the project's architectural choices. It
-covers the whole product; the current build (Phase 1) implements the foundation
-plus the title → setup → lobby screens. Gameplay is deferred (see
-[Out of scope](#out-of-scope-for-phase-1)).
+covers the whole product; the current build implements the foundation plus the
+title → setup → lobby → gameplay flow. Match history and the leaderboard remain
+deferred (see [Out of scope](#out-of-scope-for-phase-1)).
 
 The approved phase plan lives at `~/.claude/plans/hi-i-have-a-sunny-rossum.md`;
 per-epic/story breakdown is under [`docs/stories/`](./stories/).
@@ -35,7 +35,7 @@ room codes.
 | Backend | **Cloudflare Worker** (TypeScript), **Hono** router | The same Worker also serves the built SPA assets. |
 | Database | **Cloudflare D1** (SQLite) + **Drizzle ORM** | `drizzle-kit generate` → `wrangler d1 migrations apply`. Accounts, favorites, and (Phase 1: inert) match history. |
 | Auth | **better-auth** — `anonymous` plugin now, `emailOTP` / OAuth later | Guest-first and invisible. |
-| Hosting | **Cloudflare**, single `wrangler deploy` | Assets + Worker + Durable Object + D1 in one deploy. (Supersedes an earlier Netlify/Vercel idea.) |
+| Hosting | **Cloudflare**, single `wrangler deploy` | Assets + Worker + Durable Object + D1 in one deploy. (Supersedes an earlier Netlify/Vercel idea.) Runbook + custom domain: [`deployment.md`](./deployment.md). |
 | Package layout | **pnpm workspaces** monorepo, no Turborepo yet | `apps/web`, `apps/server`, `packages/shared`, `e2e`. |
 
 ---
@@ -242,7 +242,8 @@ The Vite dev server proxies `/api` and `/ws` to the Worker, so the browser only
 talks to `http://localhost:5173`. Adopting `@cloudflare/vite-plugin` for a true
 single-process dev server is a possible later optimization.
 
-Production: `pnpm build` then `pnpm --filter @wordle-clash/server deploy`.
+Production: `pnpm build` then `pnpm --filter @wordle-clash/server deploy`. Full
+runbook (one-time prereqs, `wordleclash.com` custom domain): [`deployment.md`](./deployment.md).
 
 The full checklist — baseline commands, the two-client realtime test, per-suite
 commands, deploy check — is [`verification.md`](./verification.md). It is run
@@ -262,25 +263,24 @@ after every epic; verification is a gate on each epic, not a separate one.
   reassignment on host disconnect, joiner arriving after `phase === 'starting'`.
 - **DO hibernation:** in-memory room state must always be rehydrated from storage
   on wake; every mutation persists before it broadcasts.
+- **Connection liveness:** clients send JSON heartbeats every 15 seconds.
+  Cloudflare answers and timestamps them without waking the hibernating Room;
+  the Room removes half-open connections after 90 seconds. Clean disconnects
+  retain the shorter 30-second reconnect grace.
 
 ---
 
 ## Out of scope for Phase 1
 
-Wordle gameplay itself: the guess board, the synchronous round (1-minute timer +
-simultaneous reveal), the real-time race, win/tie resolution, the bboy dance-off
-tie-break, the `/room/:code/play` route (which will replace the "Match starting"
-dialog), the server-side answer list, `recordMatchResult()`, and the leaderboard
-UI.
+Account-owned match-history persistence, the leaderboard API and UI, and the
+actual bboy dance-off minigame remain deferred. Gameplay implements only the
+authoritative transition to a tiebreak when a synchronous round has multiple
+correct players.
 
-The gameplay rules are captured in [`game-rules.md`](./game-rules.md); the
-implementation stack is planned in
+The gameplay rules are captured in [`game-rules.md`](./game-rules.md), with its
+implementation tracked in
 [`docs/stories/07-gameplay-leaderboard`](./docs/stories/07-gameplay-leaderboard/).
-The dance-off tap/rhythm minigame rules are still forthcoming, so Epic 07 owns
-only its state/protocol integration boundary. The Phase 1 architecture is
-deliberately shaped so gameplay adds logic on top of a proven realtime + identity
-substrate — notably: the `Room`
-Durable Object already owns authoritative state and will additionally hold the
-secret word / guesses / scores / round + timer state; the `matchStarting` event
-has a marked handoff point; the message protocol is a versioned discriminated
-union ready for `guess` / `guessResult` / `roundClosed` / `danceOff*` frames.
+The dance-off rules are still forthcoming, so Epic 07 owns only its persisted
+state and protocol boundary. The `Room` Durable Object now owns the secret word,
+guesses, round timer, winner selection, and terminal state. Its public snapshots
+contain only renderable guesses and never expose the answer during active play.

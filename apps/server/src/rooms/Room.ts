@@ -9,15 +9,27 @@ import {
   assertNever,
   canStartMatch,
   GAME_MODES,
+  isValidGuess,
   MAX_PLAYERS,
   parseClientMessage,
   serializeServerMessage,
+  SYNC_GRACE_MS,
   type ClientMessage,
   type Player,
   type RoomErrorCode,
   type RoomState,
   type ServerMessage,
 } from '@wordle-clash/shared'
+
+import { selectAnswer } from '../gameplay/answers'
+import {
+  createMatch,
+  createMatchSnapshot,
+  evaluateForMatch,
+  isCorrectGuess,
+  MATCH_STORAGE_KEY,
+  type AuthoritativeMatch,
+} from '../gameplay/match'
 
 import {
   getConnectionState,
@@ -40,16 +52,19 @@ import {
 
 const LIFECYCLE_STORAGE_KEY = 'lifecycle'
 const DISCONNECT_GRACE_MS = 30_000
+const HEARTBEAT_TIMEOUT_MS = 90_000
 const RESERVATION_TTL_MS = 2 * 60_000
 
 interface RoomLifecycle {
   disconnectDeadlines: Record<string, number>
+  heartbeatCheckAt: number | null
   reservationExpiresAt: number | null
 }
 
 function emptyLifecycle(): RoomLifecycle {
   return {
     disconnectDeadlines: {},
+    heartbeatCheckAt: null,
     reservationExpiresAt: null,
   }
 }
@@ -58,6 +73,7 @@ function parseLifecycle(value: unknown): RoomLifecycle {
   if (!value || typeof value !== 'object') return emptyLifecycle()
 
   const deadlines = (value as { disconnectDeadlines?: unknown }).disconnectDeadlines
+  const heartbeatCheckAt = (value as { heartbeatCheckAt?: unknown }).heartbeatCheckAt
   const reservationExpiresAt = (value as { reservationExpiresAt?: unknown })
     .reservationExpiresAt
   if (!deadlines || typeof deadlines !== 'object') return emptyLifecycle()
@@ -69,6 +85,10 @@ function parseLifecycle(value: unknown): RoomLifecycle {
           typeof entry[1] === 'number' && Number.isFinite(entry[1])
         )),
     ),
+    heartbeatCheckAt: typeof heartbeatCheckAt === 'number' &&
+      Number.isFinite(heartbeatCheckAt)
+      ? heartbeatCheckAt
+      : null,
     reservationExpiresAt: typeof reservationExpiresAt === 'number' &&
       Number.isFinite(reservationExpiresAt)
       ? reservationExpiresAt
@@ -82,18 +102,21 @@ export class Room extends Server<Env> {
   /** Authoritative room state. Mirror of the durable `state` value. */
   state: RoomState | null = null
   lifecycle: RoomLifecycle = emptyLifecycle()
+  match: AuthoritativeMatch | null = null
   #mutations = new MutationQueue()
 
   override async onStart(): Promise<void> {
-    const [storedState, storedLifecycle] = await Promise.all([
+    const [storedState, storedLifecycle, storedMatch] = await Promise.all([
       this.ctx.storage.get<unknown>(ROOM_STATE_STORAGE_KEY),
       this.ctx.storage.get<unknown>(LIFECYCLE_STORAGE_KEY),
+      this.ctx.storage.get<AuthoritativeMatch>(MATCH_STORAGE_KEY),
     ])
 
     this.state = storedState === undefined
       ? null
       : parseStoredRoomState(storedState)
     this.lifecycle = parseLifecycle(storedLifecycle)
+    this.match = storedMatch ?? null
     this.ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair(
       '{"t":"ping"}',
       '{"t":"pong"}',
@@ -157,6 +180,7 @@ export class Room extends Server<Env> {
       isAnonymous: identity.isAnonymous,
     } satisfies RoomConnectionState)
     delete this.lifecycle.disconnectDeadlines[identity.userId]
+    this.lifecycle.heartbeatCheckAt = Date.now() + HEARTBEAT_TIMEOUT_MS
     this.lifecycle.reservationExpiresAt = null
 
     if (existingPlayer) {
@@ -209,6 +233,15 @@ export class Room extends Server<Env> {
     let hostChanged = false
 
     if (
+      this.match?.mode === 'sync' &&
+      this.match.phase === 'active' &&
+      this.match.roundEndsAt !== null &&
+      this.match.roundEndsAt <= now
+    ) {
+      await this.#closeSyncRound()
+    }
+
+    if (
       this.lifecycle.reservationExpiresAt !== null &&
       this.lifecycle.reservationExpiresAt <= now &&
       this.state?.players.length === 0
@@ -232,6 +265,34 @@ export class Room extends Server<Env> {
       delete this.lifecycle.disconnectDeadlines[userId]
     }
 
+    if (this.lifecycle.heartbeatCheckAt !== null && this.lifecycle.heartbeatCheckAt <= now) {
+      let nextHeartbeatCheckAt: number | null = null
+      for (const player of [...(this.state?.players ?? [])]) {
+        const connections = [...this.getConnections(userConnectionTag(player.id))]
+        if (connections.length === 0) continue
+
+        const mostRecentHeartbeat = Math.max(...connections.map((connection) => (
+          this.ctx.getWebSocketAutoResponseTimestamp(connection)?.getTime() ?? 0
+        )))
+        if (mostRecentHeartbeat > now - HEARTBEAT_TIMEOUT_MS) {
+          const deadline = mostRecentHeartbeat + HEARTBEAT_TIMEOUT_MS
+          nextHeartbeatCheckAt = nextHeartbeatCheckAt === null
+            ? deadline
+            : Math.min(nextHeartbeatCheckAt, deadline)
+          continue
+        }
+
+        for (const connection of connections) connection.close(1001, 'Heartbeat timed out')
+        const result = this.#removePlayerFromState(player.id)
+        if (result.removed && !removedPlayerIds.includes(player.id)) {
+          removedPlayerIds.push(player.id)
+        }
+        hostChanged ||= result.hostChanged
+        delete this.lifecycle.disconnectDeadlines[player.id]
+      }
+      this.lifecycle.heartbeatCheckAt = nextHeartbeatCheckAt
+    }
+
     await this.#save()
     for (const playerId of removedPlayerIds) {
       this.#broadcast({
@@ -241,6 +302,18 @@ export class Room extends Server<Env> {
       })
     }
     if (hostChanged) this.#broadcastHostChanged()
+    if (
+      this.match?.mode === 'sync' &&
+      this.match.phase === 'active' &&
+      this.state?.players.length
+    ) {
+      const activeIds = this.state.players
+        .map(({ id }) => id)
+        .filter((id) => !this.match?.eliminatedPlayerIds.includes(id))
+      if (activeIds.every((id) => this.match?.pendingGuesses[id])) {
+        await this.#closeSyncRound()
+      }
+    }
     await this.#cleanupEmptyRoom()
     await this.#scheduleNextAlarm()
   }
@@ -248,7 +321,7 @@ export class Room extends Server<Env> {
   async #dispatch(connection: Connection, userId: string, message: ClientMessage): Promise<void> {
     switch (message.t) {
       case 'ping':
-        this.#send(connection, { t: 'pong' })
+        this.#heartbeat(connection, userId)
         return
 
       case 'leave':
@@ -271,6 +344,10 @@ export class Room extends Server<Env> {
         await this.#startMatch(connection, userId)
         return
 
+      case 'submitGuess':
+        await this.#submitGuess(connection, userId, message.guess)
+        return
+
       default:
         assertNever(message)
     }
@@ -282,11 +359,17 @@ export class Room extends Server<Env> {
     this.state = createInitialRoomState(this.name, now, userId)
     this.lifecycle = {
       disconnectDeadlines: {},
+      heartbeatCheckAt: null,
       reservationExpiresAt: now + RESERVATION_TTL_MS,
     }
     await this.#save()
     await this.#scheduleNextAlarm()
     return true
+  }
+
+  #heartbeat(connection: Connection, userId: string): void {
+    if (!this.state?.players.some(({ id }) => id === userId)) return
+    this.#send(connection, { t: 'pong' })
   }
 
   async #setReady(connection: Connection, userId: string, ready: boolean): Promise<void> {
@@ -372,6 +455,13 @@ export class Room extends Server<Env> {
 
     const startsAt = Date.now() + 1_000
     this.state.phase = 'starting'
+    this.match = createMatch(
+      this.state.gameMode,
+      selectAnswer(this.env.GAMEPLAY_TEST_ANSWER),
+      this.state.players,
+      startsAt,
+    )
+    this.state.phase = 'playing'
     await this.#save()
     this.#broadcast({
       t: 'matchStarting',
@@ -380,6 +470,111 @@ export class Room extends Server<Env> {
       playerCount: this.state.players.length,
       startsAt,
     })
+    this.#broadcastMatchState()
+    await this.#scheduleNextAlarm()
+  }
+
+  async #submitGuess(connection: Connection, userId: string, value: string): Promise<void> {
+    const match = this.match
+    if (!this.state || !match || match.phase !== 'active') {
+      this.#sendError(connection, 'MATCH_NOT_ACTIVE', 'The match is not active')
+      return
+    }
+
+    const guess = value.trim().toUpperCase()
+    if (!isValidGuess(guess)) {
+      this.#sendError(connection, 'INVALID_GUESS', 'Enter exactly five letters')
+      return
+    }
+    if (
+      match.mode === 'sync' &&
+      match.roundEndsAt !== null &&
+      Date.now() > match.roundEndsAt + SYNC_GRACE_MS
+    ) {
+      await this.#closeSyncRound()
+      this.#sendError(connection, 'GUESS_LOCKED', 'The round has closed')
+      return
+    }
+    if (match.eliminatedPlayerIds.includes(userId)) {
+      this.#sendError(connection, 'GUESS_LOCKED', 'You have no guesses remaining')
+      return
+    }
+
+    const evaluated = evaluateForMatch(match, guess)
+    if (match.mode === 'sync') {
+      if (match.pendingGuesses[userId]) {
+        this.#sendError(connection, 'GUESS_LOCKED', 'Your guess is locked for this round')
+        return
+      }
+      match.pendingGuesses[userId] = evaluated
+      this.#send(connection, { t: 'guessAccepted', guess })
+      await this.#save()
+      this.#broadcastMatchState()
+
+      const activeIds = this.state.players
+        .map(({ id }) => id)
+        .filter((id) => !match.eliminatedPlayerIds.includes(id))
+      if (activeIds.every((id) => match.pendingGuesses[id])) await this.#closeSyncRound()
+      return
+    }
+
+    const guesses = match.guesses[userId] ?? []
+    if (guesses.length >= GAME_MODES.realtime.tries) {
+      this.#sendError(connection, 'GUESS_LOCKED', 'You have no guesses remaining')
+      return
+    }
+    guesses.push(evaluated)
+    match.guesses[userId] = guesses
+
+    if (isCorrectGuess(evaluated)) {
+      match.winnerId = userId
+      match.phase = 'finished'
+    } else if (guesses.length >= GAME_MODES.realtime.tries) {
+      match.eliminatedPlayerIds.push(userId)
+      const allEliminated = this.state.players.every(({ id }) => (
+        match.eliminatedPlayerIds.includes(id)
+      ))
+      if (allEliminated) match.phase = 'finished'
+    }
+
+    if (match.phase === 'finished') this.state.phase = 'finished'
+    await this.#save()
+    this.#broadcastMatchState()
+  }
+
+  async #closeSyncRound(): Promise<void> {
+    if (!this.state || !this.match || this.match.mode !== 'sync') return
+    const match = this.match
+    const correctPlayerIds: string[] = []
+
+    for (const [playerId, guess] of Object.entries(match.pendingGuesses)) {
+      const guesses = match.guesses[playerId] ?? []
+      guesses.push(guess)
+      match.guesses[playerId] = guesses
+      if (isCorrectGuess(guess)) correctPlayerIds.push(playerId)
+    }
+    match.pendingGuesses = {}
+
+    if (correctPlayerIds.length === 1) {
+      match.winnerId = correctPlayerIds[0] ?? null
+      match.phase = 'finished'
+    } else if (correctPlayerIds.length > 1) {
+      match.tiebreakPlayerIds = correctPlayerIds
+      match.phase = 'tiebreak'
+    } else if (match.round >= GAME_MODES.sync.tries) {
+      match.phase = 'finished'
+    } else {
+      match.round += 1
+      match.roundEndsAt = Date.now() + 60_000
+    }
+
+    if (match.phase !== 'active') {
+      match.roundEndsAt = null
+      this.state.phase = 'finished'
+    }
+    await this.#save()
+    this.#broadcastMatchState()
+    await this.#scheduleNextAlarm()
   }
 
   async #leave(userId: string): Promise<void> {
@@ -511,6 +706,9 @@ export class Room extends Server<Env> {
         parseStoredRoomState(this.state),
       ))
     }
+    if (this.match) {
+      writes.push(this.ctx.storage.put(MATCH_STORAGE_KEY, this.match))
+    }
 
     await Promise.all(writes)
   }
@@ -519,17 +717,29 @@ export class Room extends Server<Env> {
     if (this.state?.players.length) return
 
     this.state = null
+    this.match = null
     this.lifecycle = emptyLifecycle()
     await Promise.all([
       this.ctx.storage.delete(ROOM_STATE_STORAGE_KEY),
       this.ctx.storage.delete(LIFECYCLE_STORAGE_KEY),
+      this.ctx.storage.delete(MATCH_STORAGE_KEY),
     ])
   }
 
   async #scheduleNextAlarm(): Promise<void> {
     const deadlines = Object.values(this.lifecycle.disconnectDeadlines)
+    if (this.lifecycle.heartbeatCheckAt !== null) {
+      deadlines.push(this.lifecycle.heartbeatCheckAt)
+    }
     if (this.lifecycle.reservationExpiresAt !== null) {
       deadlines.push(this.lifecycle.reservationExpiresAt)
+    }
+    if (
+      this.match?.mode === 'sync' &&
+      this.match.phase === 'active' &&
+      this.match.roundEndsAt !== null
+    ) {
+      deadlines.push(this.match.roundEndsAt + SYNC_GRACE_MS)
     }
     if (deadlines.length === 0) {
       await this.ctx.storage.deleteAlarm()
@@ -546,6 +756,24 @@ export class Room extends Server<Env> {
   #sendSnapshot(connection: Connection, selfId: string): void {
     if (!this.state) throw new Error('Cannot snapshot an unreserved room')
     this.#send(connection, createRoomSnapshot(this.state, selfId))
+    if (this.match) {
+      this.#send(connection, {
+        t: 'matchState',
+        match: createMatchSnapshot(this.match, this.state.players),
+      })
+    }
+  }
+
+  #broadcastMatchState(): void {
+    if (!this.state || !this.match) return
+    for (const connection of this.getConnections()) {
+      const connectionState = getConnectionState(connection)
+      if (!connectionState) continue
+      this.#send(connection, {
+        t: 'matchState',
+        match: createMatchSnapshot(this.match, this.state.players),
+      })
+    }
   }
 
   #broadcast(message: ServerMessage, without?: string[]): void {

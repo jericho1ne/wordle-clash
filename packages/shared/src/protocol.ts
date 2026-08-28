@@ -5,6 +5,7 @@ import {
   AVATAR_COUNT,
 } from './avatars.js'
 import { GAME_MODE_IDS } from './game-modes.js'
+import { WORD_LENGTH } from './gameplay.js'
 import {
   MAX_NAME_LENGTH,
   MAX_PLAYERS,
@@ -16,6 +17,28 @@ export const PROTOCOL_VERSION = 1
 const idSchema = z.string().min(1)
 const timestampSchema = z.number().int().nonnegative()
 const gameModeSchema = z.enum(GAME_MODE_IDS)
+const tileMarkSchema = z.enum(['correct', 'present', 'absent'])
+const evaluatedGuessSchema = z.object({
+  word: z.string().length(WORD_LENGTH),
+  tiles: z.array(tileMarkSchema).length(WORD_LENGTH),
+}).strict()
+const matchPlayerStateSchema = z.object({
+  playerId: idSchema,
+  guesses: z.array(evaluatedGuessSchema),
+  submitted: z.boolean(),
+  eliminated: z.boolean(),
+}).strict()
+const matchSnapshotSchema = z.object({
+  mode: gameModeSchema,
+  phase: z.enum(['active', 'finished', 'tiebreak']),
+  round: z.number().int().positive(),
+  maxGuesses: z.number().int().positive(),
+  roundEndsAt: timestampSchema.nullable(),
+  players: z.array(matchPlayerStateSchema),
+  winnerId: idSchema.nullable(),
+  tiebreakPlayerIds: z.array(idSchema),
+  answer: z.string().length(WORD_LENGTH).nullable(),
+}).strict()
 
 export const playerSchema = z.object({
   id: idSchema,
@@ -30,7 +53,7 @@ export const playerSchema = z.object({
 
 export const roomStateSchema = z.object({
   roomCode: z.string().regex(ROOM_CODE_REGEX),
-  phase: z.enum(['lobby', 'starting']),
+  phase: z.enum(['lobby', 'starting', 'playing', 'finished']),
   hostId: idSchema.nullable(),
   gameMode: gameModeSchema,
   players: z.array(playerSchema).max(MAX_PLAYERS),
@@ -63,6 +86,10 @@ export const clientMessageSchema = z.discriminatedUnion('t', [
     animalId: z.number().int().min(0).max(ANIMAL_COUNT - 1).optional(),
   }).strict(),
   z.object({ t: z.literal('startMatch') }).strict(),
+  z.object({
+    t: z.literal('submitGuess'),
+    guess: z.string().length(WORD_LENGTH),
+  }).strict(),
   z.object({ t: z.literal('leave') }).strict(),
   z.object({ t: z.literal('ping') }).strict(),
 ])
@@ -74,6 +101,7 @@ export type SetReadyMessage = Extract<ClientMessage, { t: 'setReady' }>
 export type SetGameModeMessage = Extract<ClientMessage, { t: 'setGameMode' }>
 export type UpdateProfileMessage = Extract<ClientMessage, { t: 'updateProfile' }>
 export type StartMatchMessage = Extract<ClientMessage, { t: 'startMatch' }>
+export type SubmitGuessMessage = Extract<ClientMessage, { t: 'submitGuess' }>
 export type LeaveMessage = Extract<ClientMessage, { t: 'leave' }>
 export type PingMessage = Extract<ClientMessage, { t: 'ping' }>
 
@@ -87,6 +115,9 @@ export const ROOM_ERROR_CODES = [
   'MATCH_STARTED',
   'BAD_MESSAGE',
   'RATE_LIMITED',
+  'INVALID_GUESS',
+  'GUESS_LOCKED',
+  'MATCH_NOT_ACTIVE',
 ] as const
 
 export const roomErrorCodeSchema = z.enum(ROOM_ERROR_CODES)
@@ -128,6 +159,14 @@ export const serverMessageSchema = z.discriminatedUnion('t', [
     startsAt: timestampSchema,
   }).strict(),
   z.object({
+    t: z.literal('matchState'),
+    match: matchSnapshotSchema,
+  }).strict(),
+  z.object({
+    t: z.literal('guessAccepted'),
+    guess: z.string().length(WORD_LENGTH),
+  }).strict(),
+  z.object({
     t: z.literal('error'),
     code: roomErrorCodeSchema,
     message: z.string().min(1),
@@ -146,6 +185,8 @@ export type PlayerUpdatedMessage = Extract<ServerMessage, { t: 'playerUpdated' }
 export type GameModeChangedMessage = Extract<ServerMessage, { t: 'gameModeChanged' }>
 export type HostChangedMessage = Extract<ServerMessage, { t: 'hostChanged' }>
 export type MatchStartingMessage = Extract<ServerMessage, { t: 'matchStarting' }>
+export type MatchStateMessage = Extract<ServerMessage, { t: 'matchState' }>
+export type GuessAcceptedMessage = Extract<ServerMessage, { t: 'guessAccepted' }>
 export type ErrorMessage = Extract<ServerMessage, { t: 'error' }>
 export type PongMessage = Extract<ServerMessage, { t: 'pong' }>
 

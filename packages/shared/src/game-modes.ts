@@ -1,7 +1,7 @@
 /**
  * Game modes — copy is ported verbatim from the "Wordle Royale" design
- * prototype. Gameplay for these modes is NOT implemented in Phase 1; only the
- * lobby selector and the "Match starting" dialog consume this.
+ * prototype. The lobby selector and authoritative gameplay runtime share this
+ * source for labels and maximum guesses.
  */
 export type GameMode = 'sync' | 'realtime'
 

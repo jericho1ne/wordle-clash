@@ -32,7 +32,7 @@ export const GAME_MODES: Record<GameMode, GameModeInfo> = {
   },
 }
 
-export const GAME_MODE_IDS = Object.keys(GAME_MODES) as GameMode[]
+export const GAME_MODE_IDS = ['sync', 'realtime'] as const satisfies readonly GameMode[]
 
 export const DEFAULT_GAME_MODE: GameMode = 'sync'
 

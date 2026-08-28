@@ -35,19 +35,26 @@ import {
 
 const LIFECYCLE_STORAGE_KEY = 'lifecycle'
 const DISCONNECT_GRACE_MS = 30_000
+const RESERVATION_TTL_MS = 2 * 60_000
 
 interface RoomLifecycle {
   disconnectDeadlines: Record<string, number>
+  reservationExpiresAt: number | null
 }
 
 function emptyLifecycle(): RoomLifecycle {
-  return { disconnectDeadlines: {} }
+  return {
+    disconnectDeadlines: {},
+    reservationExpiresAt: null,
+  }
 }
 
 function parseLifecycle(value: unknown): RoomLifecycle {
   if (!value || typeof value !== 'object') return emptyLifecycle()
 
   const deadlines = (value as { disconnectDeadlines?: unknown }).disconnectDeadlines
+  const reservationExpiresAt = (value as { reservationExpiresAt?: unknown })
+    .reservationExpiresAt
   if (!deadlines || typeof deadlines !== 'object') return emptyLifecycle()
 
   return {
@@ -57,6 +64,10 @@ function parseLifecycle(value: unknown): RoomLifecycle {
           typeof entry[1] === 'number' && Number.isFinite(entry[1])
         )),
     ),
+    reservationExpiresAt: typeof reservationExpiresAt === 'number' &&
+      Number.isFinite(reservationExpiresAt)
+      ? reservationExpiresAt
+      : null,
   }
 }
 
@@ -90,7 +101,14 @@ export class Room extends Server<Env> {
 
   override async onConnect(connection: Connection, ctx: ConnectionContext): Promise<void> {
     const identity = parseConnectionIdentity(ctx.request)
-    const state = this.#ensureState()
+    const state = this.state
+
+    if (!state || this.#reservationExpired()) {
+      await this.#cleanupEmptyRoom()
+      this.#rejectConnection(connection, 'ROOM_NOT_FOUND', 'The room does not exist')
+      return
+    }
+
     const existingPlayer = state.players.find(({ id }) => id === identity.userId)
 
     if (!existingPlayer && state.phase !== 'lobby') {
@@ -108,6 +126,7 @@ export class Room extends Server<Env> {
       isAnonymous: identity.isAnonymous,
     } satisfies RoomConnectionState)
     delete this.lifecycle.disconnectDeadlines[identity.userId]
+    this.lifecycle.reservationExpiresAt = null
 
     if (existingPlayer) {
       const patch = this.#reconnectPlayer(existingPlayer, identity)
@@ -163,6 +182,16 @@ export class Room extends Server<Env> {
     const now = Date.now()
     const removedPlayerIds: string[] = []
 
+    if (
+      this.lifecycle.reservationExpiresAt !== null &&
+      this.lifecycle.reservationExpiresAt <= now &&
+      this.state?.players.length === 0
+    ) {
+      await this.#cleanupEmptyRoom()
+      await this.#scheduleNextAlarm()
+      return
+    }
+
     for (const [userId, deadline] of Object.entries(this.lifecycle.disconnectDeadlines)) {
       if (deadline > now) continue
 
@@ -216,6 +245,20 @@ export class Room extends Server<Env> {
       default:
         assertNever(message)
     }
+  }
+
+  /** Atomically claim this named DO as a room. Called through Durable Object RPC. */
+  async reserve(userId: string, now = Date.now()): Promise<boolean> {
+    if (this.state) return false
+
+    this.state = createInitialRoomState(this.name, now, userId)
+    this.lifecycle = {
+      disconnectDeadlines: {},
+      reservationExpiresAt: now + RESERVATION_TTL_MS,
+    }
+    await this.#save()
+    await this.#scheduleNextAlarm()
+    return true
   }
 
   async #setReady(connection: Connection, userId: string, ready: boolean): Promise<void> {
@@ -348,8 +391,10 @@ export class Room extends Server<Env> {
   }
 
   #addPlayer(identity: ConnectionIdentity): Player {
-    const state = this.#ensureState()
-    const isHost = state.hostId === null
+    if (!this.state) throw new Error('Cannot add a player to an unreserved room')
+
+    const state = this.state
+    const isHost = state.hostId === null || state.hostId === identity.userId
     const player: Player = {
       id: identity.userId,
       name: identity.name,
@@ -398,9 +443,10 @@ export class Room extends Server<Env> {
     return true
   }
 
-  #ensureState(): RoomState {
-    this.state ??= createInitialRoomState(this.name)
-    return this.state
+  #reservationExpired(now = Date.now()): boolean {
+    return this.lifecycle.reservationExpiresAt !== null &&
+      this.lifecycle.reservationExpiresAt <= now &&
+      (this.state?.players.length ?? 0) === 0
   }
 
   async #save(): Promise<void> {
@@ -419,7 +465,7 @@ export class Room extends Server<Env> {
   }
 
   async #cleanupEmptyRoom(): Promise<void> {
-    if (!this.state || this.state.players.length > 0) return
+    if (this.state?.players.length) return
 
     this.state = null
     this.lifecycle = emptyLifecycle()
@@ -431,6 +477,9 @@ export class Room extends Server<Env> {
 
   async #scheduleNextAlarm(): Promise<void> {
     const deadlines = Object.values(this.lifecycle.disconnectDeadlines)
+    if (this.lifecycle.reservationExpiresAt !== null) {
+      deadlines.push(this.lifecycle.reservationExpiresAt)
+    }
     if (deadlines.length === 0) {
       await this.ctx.storage.deleteAlarm()
       return

@@ -69,12 +69,27 @@ an incognito window) so they get distinct identities.
 4. Toggle **Ready** on each → the other client updates live.
 5. Host (A) changes **game mode** → B sees the new description; B cannot change it.
 6. Close Client A → after the grace period, B is promoted to **HOST**.
-7. Re-open, both ready, 2 players → host **Start game** → both clients show the
-   "Match starting" dialog; `room.phase === 'starting'`.
+7. Re-open, both ready, 2 players → host **Start game** → both clients enter
+   `/room/<CODE>/play` and show the same match.
 8. **Copy** the room code → it's on the clipboard. **Favorite** (star) → toast;
    reload → the star state persists (localStorage for guests).
 9. Kill the Worker mid-session → clients show "reconnecting"; restart it →
    clients recover and re-sync from a fresh `roomState` snapshot.
+10. In Network → Socket → Messages, confirm the client sends `{"t":"ping"}`
+    about every 15 seconds and receives `{"t":"pong"}`. Closing a player's
+    final tab marks them disconnected, then removes them after the 30-second
+    reconnect grace. A silent half-open socket is removed by the 90-second
+    heartbeat sweep.
+
+Gameplay smoke test (Epic 07 onward): set `GAMEPLAY_TEST_ANSWER="CLASH"` in
+`apps/server/.dev.vars`, then repeat the two-client flow in each mode.
+
+- **Real-time:** guesses reveal immediately; the first `CLASH` ends the match.
+  Ten incorrect guesses eliminate a player without ending another player's race.
+- **Synchronous:** one guess locks per player per round; neither word reveals
+  until everyone submits or the 60-second deadline closes. A single `CLASH`
+  wins; simultaneous `CLASH` submissions enter the dance-off boundary.
+- Reload either gameplay tab and confirm its board and terminal result recover.
 
 ---
 

@@ -17,7 +17,7 @@ and the approved phase plan (`~/.claude/plans/hi-i-have-a-sunny-rossum.md`).
 | [`04-title-setup-screens`](./04-title-setup-screens/) | complete | animated title, player profile, and manual create/join flow |
 | [`05-room-invites`](./05-room-invites/) | complete | native share/clipboard invite links and invited-player setup/join flow |
 | [`06-lobby-screen`](./06-lobby-screen/) | implemented | RoomServer-backed lobby: players, ready, mode, favorite, start dialog |
-| [`07-gameplay-leaderboard`](./07-gameplay-leaderboard/) | planned | authoritative Wordle modes, match persistence, gameplay UI, account leaderboard |
+| [`07-gameplay-leaderboard`](./07-gameplay-leaderboard/) | gameplay implemented | authoritative Wordle modes and gameplay UI; account leaderboard deferred |
 
 ## Verification
 
@@ -29,7 +29,8 @@ they cover.
 
 ## Later phases
 
-The gameplay and leaderboard phase is now planned as
-[`07-gameplay-leaderboard`](./07-gameplay-leaderboard/). The bboy dance-off
+Gameplay is implemented in
+[`07-gameplay-leaderboard`](./07-gameplay-leaderboard/); match-history and the
+leaderboard remain deferred. The bboy dance-off
 minigame remains a separate future epic because its scoring/timing rules are
 still forthcoming. Optional email/OAuth account linking also remains later work.

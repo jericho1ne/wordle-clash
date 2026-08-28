@@ -5,6 +5,7 @@ import {
   type ErrorMessage,
   type GameMode,
   type MatchStartingMessage,
+  type MatchSnapshot,
   type RoomState,
   type ServerMessage,
 } from '@wordle-clash/shared'
@@ -24,6 +25,7 @@ interface RoomStoreState {
   selfId: string | null
   error: ErrorMessage | Error | null
   matchStarting: MatchStartingMessage | null
+  match: MatchSnapshot | null
   pendingActions: ClientMessage[]
   connect: (roomCode: string) => void
   disconnect: () => void
@@ -31,6 +33,7 @@ interface RoomStoreState {
   setReady: (ready: boolean) => void
   setGameMode: (mode: GameMode) => void
   startMatch: () => void
+  submitGuess: (guess: string) => void
   dismissMatchStarting: () => void
 }
 
@@ -38,6 +41,7 @@ type RoomDataState = Pick<RoomStoreState, 'room' | 'selfId' | 'pendingActions'>
 
 let activeSocket: RoomSocket | null = null
 let removeSocketListeners: (() => void)[] = []
+const HEARTBEAT_INTERVAL_MS = 15_000
 
 function updatePlayer(
   room: RoomState,
@@ -151,6 +155,10 @@ export function reduceRoomMessage(
         room: { ...state.room, phase: 'starting' },
       }
 
+    case 'matchState':
+    case 'guessAccepted':
+      return state
+
     case 'error':
     case 'pong':
       return state
@@ -170,6 +178,7 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
   selfId: null,
   error: null,
   matchStarting: null,
+  match: null,
   pendingActions: [],
 
   connect(roomCode) {
@@ -183,6 +192,7 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       selfId: null,
       error: null,
       matchStarting: null,
+      match: null,
       pendingActions: [],
     })
 
@@ -191,9 +201,19 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       error: message.t === 'error' ? message : state.error,
     }))
 
+    const sendHeartbeat = () => socket.send({ t: 'ping' })
+    const heartbeatInterval = window.setInterval(sendHeartbeat, HEARTBEAT_INTERVAL_MS)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') sendHeartbeat()
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
     removeSocketListeners = [
+      () => window.clearInterval(heartbeatInterval),
+      () => document.removeEventListener('visibilitychange', handleVisibilityChange),
       socket.on('open', () => {
         set({ status: 'connected' })
+        sendHeartbeat()
         for (const action of get().pendingActions) socket.send(action)
       }),
       socket.on('close', () => {
@@ -211,6 +231,11 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
         reduce(message)
         set({ matchStarting: message })
       }),
+      socket.on('matchState', (message) => set({
+        match: message.match,
+        error: null,
+      })),
+      socket.on('guessAccepted', () => undefined),
       socket.on('error', reduce),
       socket.on('terminalError', (error) => set({
         status: 'terminal',
@@ -230,6 +255,7 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       selfId: null,
       error: null,
       matchStarting: null,
+      match: null,
       pendingActions: [],
     })
   },
@@ -263,6 +289,10 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
 
   startMatch() {
     activeSocket?.send({ t: 'startMatch' })
+  },
+
+  submitGuess(guess) {
+    activeSocket?.send({ t: 'submitGuess', guess })
   },
 
   dismissMatchStarting() {

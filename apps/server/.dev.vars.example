@@ -8,3 +8,7 @@ BETTER_AUTH_SECRET="replace-with-at-least-32-random-characters"
 # HMAC/JWT secret for short-lived WebSocket connect tickets (minimum 32 characters).
 # Generate a separate value with: openssl rand -base64 32
 RT_TICKET_SECRET="replace-with-a-different-32-character-secret"
+
+# Optional local-only deterministic answer for two-browser gameplay testing.
+# Do not configure this binding in production.
+# GAMEPLAY_TEST_ANSWER="CLASH"

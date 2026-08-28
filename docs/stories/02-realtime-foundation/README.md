@@ -12,7 +12,7 @@ snapshot on connect and every reconnect.
 |---|---|---|
 | [00](./00-message-protocol.md) | Message protocol: zod schemas + `parseClientMessage` / `serializeServerMessage` + `assertNever`; unit tests in `packages/shared` | done, in review |
 | [01](./01-room-state-persistence.md) | `Room` state shape + storage layout; `onStart` hydration; validated reconnect snapshot helper | done, in review |
-| [02](./02-room-connection-lifecycle.md) | `Room` connection lifecycle on the hibernation API: `onConnect` (identity from injected headers, capacity check → `ROOM_FULL`, add player, send snapshot, broadcast join), `onMessage` (hydrate → zod → dispatch), `onClose`/`onError` (drop socket, `connected:false`, grace-period removal), `setWebSocketAutoResponse` ping/pong, empty-room cleanup alarm | done, in review |
+| [02](./02-room-connection-lifecycle.md) | `Room` connection lifecycle on the hibernation API: `onConnect` (identity from injected headers, capacity check → `ROOM_FULL`, add player, send snapshot, broadcast join), `onMessage` (hydrate → zod → dispatch), `onClose`/`onError` (drop socket, `connected:false`, grace-period removal), timestamped auto-response heartbeat with stale-player removal, empty-room cleanup alarm | done, in review |
 | [03](./03-room-code-generation.md) | Room-code generation module (already in `packages/shared/src/room-code.ts` from epic 00) + tests | done, in review |
 | [04](./04-create-join-rooms.md) | Create vs join: `POST /api/rooms` reserves a code via DO RPC `reserve(userId)` + 2-min alarm; join opens the socket; unknown room → `ROOM_NOT_FOUND` | done, in review |
 | [05](./05-host-reassignment.md) | Host assignment / reassignment by `joinedAt`; `hostChanged` broadcast | done, in review |

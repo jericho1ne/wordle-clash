@@ -1,0 +1,100 @@
+.gameplay-screen {
+  align-items: flex-start;
+
+  .game {
+    display: grid;
+    gap: var(--space-6);
+    max-width: var(--measure-gameplay);
+    padding-block: var(--space-8);
+  }
+
+  .header,
+  .player-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .header h1 {
+    margin: 0;
+    font-size: var(--font-size-screen-heading);
+  }
+
+  .players {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--measure-player-board), 1fr));
+    gap: var(--space-4);
+  }
+
+  .players article[data-self='true'] {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .player-header {
+    justify-content: flex-start;
+    margin-block-end: var(--space-4);
+  }
+
+  .board {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .guess-row {
+    display: grid;
+    grid-template-columns: repeat(5, var(--size-game-tile));
+    justify-content: center;
+    gap: var(--space-2);
+  }
+
+  .guess-row span {
+    display: grid;
+    width: var(--size-game-tile);
+    aspect-ratio: 1;
+    place-items: center;
+    color: var(--tile-absent-text);
+    font-weight: var(--font-weight-bold);
+    border: var(--border-width-thin) solid var(--tile-absent-border);
+    border-radius: var(--radius-sm);
+  }
+
+  .guess-row span[data-mark='correct'] {
+    color: var(--tile-correct-text);
+    background: var(--tile-correct-bg);
+    border-color: var(--tile-correct-border);
+  }
+
+  .guess-row span[data-mark='present'] {
+    color: var(--tile-present-text);
+    background: var(--tile-present-bg);
+    border-color: var(--tile-present-border);
+  }
+
+  .guess-form {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-3);
+  }
+
+  .guess-form input {
+    text-transform: uppercase;
+  }
+
+  .timer {
+    grid-column: 1 / -1;
+    color: var(--color-accent-300);
+    text-align: center;
+  }
+
+  .results {
+    display: grid;
+    gap: var(--space-3);
+    text-align: center;
+  }
+
+  .error {
+    color: var(--color-danger-300);
+    text-align: center;
+  }
+}

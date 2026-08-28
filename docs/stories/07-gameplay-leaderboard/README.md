@@ -1,7 +1,6 @@
 # Epic 07 — Gameplay & leaderboard
 
-**Status:** planned (Story 07-00 done, pending review; implementation blocked on
-Epic 02 realtime foundation and the minimal Epic 06 lobby connection path).
+**Status:** gameplay implemented; match-history persistence and leaderboard deferred.
 
 The `Room` Durable Object remains authoritative for the secret answer, guesses,
 timers, scoring, winners, and match termination. Clients receive only the state
@@ -26,18 +25,18 @@ The implementation stack completes these foundations before Story 07-01:
 | # | Story | Testable outcome |
 |---|---|---|
 | [00](./00-gameplay-leaderboard-plan.md) | Stack plan, rules boundary, and leaderboard ordering | Reviewable implementation contract |
-| 01 | Gameplay domain: answer-pool loader, five-letter validation, duplicate-letter tile evaluator, deterministic answer injection for tests | Evaluator runs without a room |
-| 02 | Gameplay WebSocket protocol: match snapshots, guesses, tile results, round close, match end, and tiebreak handoff | Shared round-trip protocol tests |
-| 03 | Authoritative match lifecycle in `Room`: start validation, secret selection, persisted gameplay state, reconnect snapshot, no secret leakage | Two clients enter the same match |
-| 04 | Real-time race: immediate guesses/results, first-correct atomic win, ten-guess elimination, no-winner termination | Two clients race live |
-| 05 | Synchronous rounds: private submissions, 60-second alarm deadline, early close when all submit, simultaneous reveal, five-round termination | Two clients reveal together |
-| 06 | Multi-winner tiebreak boundary: transition tied correct players into a persisted `tiebreak` phase and expose versioned `danceOff*` extension points | Tie does not choose an invented winner |
+| 01 | **Done:** gameplay domain, five-letter validation, duplicate-letter evaluator, and server-only answer pool | Evaluator runs without a room |
+| 02 | **Done:** gameplay WebSocket messages and validated sanitized snapshots | Shared round-trip protocol tests |
+| 03 | **Done:** authoritative persisted `Room` match lifecycle and reconnect snapshot | Two clients enter the same match |
+| 04 | **Done:** real-time race, atomic winner, ten-guess elimination, no-winner termination | Two clients race live |
+| 05 | **Done:** private synchronous submissions, 60-second deadline plus 400ms network grace, early reveal, five-round termination | Two clients reveal together |
+| 06 | **Done:** persisted multi-winner `tiebreak` boundary | Tie does not choose an invented winner |
 | 07 | Match persistence: write `matches` / account-owned `match_players` once at terminal state; guest history remains device-local | Completed account matches appear in D1 |
 | 08 | Leaderboard API: authenticated and public reads, wins → win rate → average guesses ordering, pagination, anonymous exclusion | Ranked JSON response |
-| 09 | Gameplay client store: reconnect-safe snapshots/events, pending guess handling, terminal-state recovery | Refresh restores the match |
-| 10 | Shared gameplay UI: `/room/:code/play`, board, keyboard/input, tile feedback, status and reconnect states | A player can submit guesses visually |
-| 11 | Real-time gameplay screen: live opponent progress, elimination, first-winner and no-winner results | Playable real-time match UI |
-| 12 | Synchronous gameplay screen: countdown, submitted/locked state, simultaneous reveal, round progression | Playable synchronous match UI |
+| 09 | **Done:** reconnect-safe gameplay snapshots and terminal-state recovery | Refresh restores the match |
+| 10 | **Done:** `/room/:code/play`, boards, guess input, tile feedback, and status | A player can submit guesses visually |
+| 11 | **Done:** live opponent progress, elimination, winner and no-winner results | Playable real-time match UI |
+| 12 | **Done:** countdown, locked state, simultaneous reveal, round progression | Playable synchronous match UI |
 | 13 | Match results and local guest history; account history reads persisted matches | Results survive navigation/reload |
 | 14 | Leaderboard UI with ranking, player stats, empty/error/loading states, and optional-account messaging | Leaderboard visible in the app |
 | 15 | Full Worker, shared, web, and two-browser verification; production-safe timer/reconnect/race hardening | Epic verification gate passes |
@@ -79,3 +78,7 @@ Baseline: [`../../verification.md`](../../verification.md), plus:
 - guest results remain device-local and excluded from D1 match-player rows;
 - leaderboard ordering and pagination;
 - two real browser contexts completing each mode through the UI.
+
+For a deterministic local win, add `GAMEPLAY_TEST_ANSWER=CLASH` to
+`apps/server/.dev.vars` before running `pnpm dev`. This binding is for local
+verification only and must not be configured in deployed environments.

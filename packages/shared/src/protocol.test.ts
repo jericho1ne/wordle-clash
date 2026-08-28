@@ -19,6 +19,7 @@ const CLIENT_MESSAGES: ClientMessage[] = [
   { t: 'setGameMode', mode: 'realtime' },
   { t: 'updateProfile', name: 'Nova', avatarId: 2, animalId: 7 },
   { t: 'startMatch' },
+  { t: 'submitGuess', guess: 'CLASH' },
   { t: 'leave' },
   { t: 'ping' },
 ]
@@ -89,6 +90,33 @@ describe('server protocol', () => {
         roomCode: 'bad-code',
       },
     })).toThrow()
+  })
+
+  it('round-trips a sanitized gameplay snapshot', () => {
+    const message: ServerMessage = {
+      t: 'matchState',
+      match: {
+        mode: 'realtime',
+        phase: 'active',
+        round: 1,
+        maxGuesses: 10,
+        roundEndsAt: null,
+        players: [{
+          playerId: 'user-1',
+          guesses: [{
+            word: 'CLOUD',
+            tiles: ['correct', 'present', 'absent', 'absent', 'absent'],
+          }],
+          submitted: false,
+          eliminated: false,
+        }],
+        winnerId: null,
+        tiebreakPlayerIds: [],
+        answer: null,
+      },
+    }
+
+    expect(parseServerMessage(serializeServerMessage(message))).toEqual(message)
   })
 })
 

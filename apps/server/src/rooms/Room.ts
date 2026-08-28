@@ -5,8 +5,16 @@ import {
   type WSMessage,
 } from 'partyserver'
 
-import type { RoomState } from '@wordle-clash/shared'
-import { DEFAULT_GAME_MODE } from '@wordle-clash/shared'
+import {
+  serializeServerMessage,
+  type RoomState,
+} from '@wordle-clash/shared'
+
+import {
+  createInitialRoomState,
+  parseStoredRoomState,
+  ROOM_STATE_STORAGE_KEY,
+} from './state'
 
 /**
  * SCAFFOLD STUB. One Durable Object instance per room, addressed by room code
@@ -25,23 +33,23 @@ export class Room extends Server<Env> {
   state: RoomState | null = null
 
   override async onStart(): Promise<void> {
-    this.state = (await this.ctx.storage.get<RoomState>('state')) ?? null
+    const storedState = await this.ctx.storage.get<unknown>(ROOM_STATE_STORAGE_KEY)
+    this.state = storedState === undefined
+      ? null
+      : parseStoredRoomState(storedState)
   }
 
   async #save(): Promise<void> {
-    if (this.state) await this.ctx.storage.put('state', this.state)
+    if (!this.state) return
+    await this.ctx.storage.put(
+      ROOM_STATE_STORAGE_KEY,
+      parseStoredRoomState(this.state),
+    )
   }
 
   /** Ensure a state object exists (created lazily on first connect for now). */
   #ensureState(): RoomState {
-    this.state ??= {
-      roomCode: this.name,
-      phase: 'lobby',
-      hostId: null,
-      gameMode: DEFAULT_GAME_MODE,
-      players: [],
-      createdAt: Date.now(),
-    }
+    this.state ??= createInitialRoomState(this.name)
     return this.state
   }
 
@@ -49,7 +57,11 @@ export class Room extends Server<Env> {
     this.#ensureState()
     await this.#save()
     // epic 02: register the player, send a full roomState snapshot, broadcast join.
-    connection.send(JSON.stringify({ t: 'error', code: 'BAD_MESSAGE', message: 'not implemented' }))
+    connection.send(serializeServerMessage({
+      t: 'error',
+      code: 'BAD_MESSAGE',
+      message: 'not implemented',
+    }))
   }
 
   override async onMessage(_connection: Connection, _message: WSMessage): Promise<void> {

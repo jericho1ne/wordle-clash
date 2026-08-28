@@ -213,10 +213,10 @@ Details and the primitive-by-primitive plan:
 WebSocket frames are `{ t: <type>, ... }`, zod-validated on receipt.
 
 - **Client → server:** `setReady`, `setGameMode` (host), `updateProfile`,
-  `startMatch` (host), `leave`, `ping`.
+  `startMatch` (host), `submitGuess`, `returnToLobby` (host), `leave`, `ping`.
 - **Server → client:** `roomState` (full snapshot; on connect and every
   reconnect), `playerJoined`, `playerLeft`, `playerUpdated`, `gameModeChanged`,
-  `hostChanged`, `matchStarting`, `error`, `pong`.
+  `hostChanged`, `matchStarting`, `matchState`, `guessAccepted`, `error`, `pong`.
 
 Optimistic client updates (e.g. ready toggle) are reconciled by the authoritative
 `playerUpdated` / `roomState` that follows. Full types:

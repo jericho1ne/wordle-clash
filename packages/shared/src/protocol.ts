@@ -86,6 +86,7 @@ export const clientMessageSchema = z.discriminatedUnion('t', [
     animalId: z.number().int().min(0).max(ANIMAL_COUNT - 1).optional(),
   }).strict(),
   z.object({ t: z.literal('startMatch') }).strict(),
+  z.object({ t: z.literal('returnToLobby') }).strict(),
   z.object({
     t: z.literal('submitGuess'),
     guess: z.string().length(WORD_LENGTH),
@@ -101,6 +102,7 @@ export type SetReadyMessage = Extract<ClientMessage, { t: 'setReady' }>
 export type SetGameModeMessage = Extract<ClientMessage, { t: 'setGameMode' }>
 export type UpdateProfileMessage = Extract<ClientMessage, { t: 'updateProfile' }>
 export type StartMatchMessage = Extract<ClientMessage, { t: 'startMatch' }>
+export type ReturnToLobbyMessage = Extract<ClientMessage, { t: 'returnToLobby' }>
 export type SubmitGuessMessage = Extract<ClientMessage, { t: 'submitGuess' }>
 export type LeaveMessage = Extract<ClientMessage, { t: 'leave' }>
 export type PingMessage = Extract<ClientMessage, { t: 'ping' }>

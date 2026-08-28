@@ -41,6 +41,10 @@ The implementation stack completes these foundations before Story 07-01:
 | 14 | Leaderboard UI with ranking, player stats, empty/error/loading states, and optional-account messaging | Leaderboard visible in the app |
 | 15 | Full Worker, shared, web, and two-browser verification; production-safe timer/reconnect/race hardening | Epic verification gate passes |
 
+After a terminal result, the host can return every connected player to the same
+lobby. The Room clears its persisted match, resets all ready states, and sends a
+fresh authoritative lobby snapshot to each client.
+
 ## Leaderboard ordering
 
 Only players whose match-time identity was a linked account are eligible.

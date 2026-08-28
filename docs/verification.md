@@ -108,7 +108,7 @@ Gameplay smoke test (Epic 07 onward): set `GAMEPLAY_TEST_ANSWER="CLASH"` in
 
 ```sh
 pnpm build
-pnpm --filter @wordle-clash/server deploy      # wrangler deploy: assets + Worker + DO + D1
+pnpm --filter @wordle-clash/server run deploy  # wrangler deploy: assets + Worker + DO + D1
 ```
 
 Prerequisites (one-time, need Cloudflare login): `wrangler login`,

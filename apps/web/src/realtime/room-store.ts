@@ -34,6 +34,7 @@ interface RoomStoreState {
   setGameMode: (mode: GameMode) => void
   startMatch: () => void
   submitGuess: (guess: string) => void
+  returnToLobby: () => void
   dismissMatchStarting: () => void
 }
 
@@ -221,7 +222,10 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
           set({ status: 'reconnecting' })
         }
       }),
-      socket.on('roomState', reduce),
+      socket.on('roomState', (message) => {
+        reduce(message)
+        if (message.room.phase === 'lobby') set({ match: null })
+      }),
       socket.on('playerJoined', reduce),
       socket.on('playerLeft', reduce),
       socket.on('playerUpdated', reduce),
@@ -293,6 +297,10 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
 
   submitGuess(guess) {
     activeSocket?.send({ t: 'submitGuess', guess })
+  },
+
+  returnToLobby() {
+    activeSocket?.send({ t: 'returnToLobby' })
   },
 
   dismissMatchStarting() {

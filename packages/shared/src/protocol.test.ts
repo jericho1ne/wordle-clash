@@ -19,6 +19,7 @@ const CLIENT_MESSAGES: ClientMessage[] = [
   { t: 'setGameMode', mode: 'realtime' },
   { t: 'updateProfile', name: 'Nova', avatarId: 2, animalId: 7 },
   { t: 'startMatch' },
+  { t: 'returnToLobby' },
   { t: 'submitGuess', guess: 'CLASH' },
   { t: 'leave' },
   { t: 'ping' },

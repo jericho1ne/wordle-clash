@@ -344,6 +344,10 @@ export class Room extends Server<Env> {
         await this.#startMatch(connection, userId)
         return
 
+      case 'returnToLobby':
+        await this.#returnToLobby(connection, userId)
+        return
+
       case 'submitGuess':
         await this.#submitGuess(connection, userId, message.guess)
         return
@@ -540,6 +544,27 @@ export class Room extends Server<Env> {
     if (match.phase === 'finished') this.state.phase = 'finished'
     await this.#save()
     this.#broadcastMatchState()
+  }
+
+  async #returnToLobby(connection: Connection, userId: string): Promise<void> {
+    if (!this.state || this.state.hostId !== userId) {
+      this.#sendError(connection, 'NOT_HOST', 'Only the host can return to the lobby')
+      return
+    }
+    if (!this.match || (this.match.phase !== 'finished' && this.match.phase !== 'tiebreak')) {
+      this.#sendError(connection, 'MATCH_NOT_ACTIVE', 'The match has not ended')
+      return
+    }
+
+    this.match = null
+    this.state.phase = 'lobby'
+    for (const player of this.state.players) player.ready = false
+    await Promise.all([
+      this.#save(),
+      this.ctx.storage.delete(MATCH_STORAGE_KEY),
+    ])
+    this.#broadcastRoomSnapshots()
+    await this.#scheduleNextAlarm()
   }
 
   async #closeSyncRound(): Promise<void> {
@@ -773,6 +798,15 @@ export class Room extends Server<Env> {
         t: 'matchState',
         match: createMatchSnapshot(this.match, this.state.players),
       })
+    }
+  }
+
+  #broadcastRoomSnapshots(): void {
+    if (!this.state) return
+    for (const connection of this.getConnections()) {
+      const connectionState = getConnectionState(connection)
+      if (!connectionState) continue
+      this.#send(connection, createRoomSnapshot(this.state, connectionState.userId))
     }
   }
 

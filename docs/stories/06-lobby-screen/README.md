@@ -9,7 +9,8 @@ remote players only.
 The lobby also owns a softly mixed, looping soundtrack from
 `public/lobby-music.mp3`. An Ember-styled Radix Toggle in the lower-left corner
 provides explicit play/pause control and recovers when audible autoplay is
-blocked by browser policy.
+blocked by browser policy. Entering gameplay unmounts the lobby audio element
+and pauses playback; returning to the lobby starts a fresh instance.
 
 ## Stories
 

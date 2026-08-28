@@ -39,7 +39,7 @@ Also summarised in [`verification.md`](./verification.md) §4.
 - Deploy (runs `pnpm build` then `wrangler deploy` from `apps/server`):
 
   ```sh
-  pnpm deploy
+  pnpm run deploy
   ```
 
 This gives `wordle-clash.<your-subdomain>.workers.dev`. Smoke-test it before
@@ -74,7 +74,7 @@ Add to `apps/server/wrangler.jsonc`:
 ]
 ```
 
-Then `wrangler deploy`. (Dashboard equivalent: Workers & Pages → `wordle-clash` →
+Then `pnpm run deploy`. (Dashboard equivalent: Workers & Pages → `wordle-clash` →
 Settings → Domains & Routes → Add.) No manual `A` / `CNAME` entry — the Custom
 Domain feature manages it.
 

@@ -19,7 +19,6 @@ import {
   type EvaluatedGuess,
 } from '@wordle-clash/shared'
 
-import { LobbyMusic } from '../lobby/LobbyMusic'
 import { useRoomStore } from '../../realtime'
 import {
   Avatar,
@@ -63,6 +62,8 @@ export function GameplayScreen() {
   const match = useRoomStore(({ match }) => match)
   const error = useRoomStore(({ error }) => error)
   const submitGuess = useRoomStore(({ submitGuess }) => submitGuess)
+  const returnToLobby = useRoomStore(({ returnToLobby }) => returnToLobby)
+  const self = room?.players.find(({ id }) => id === selfId)
   const selfMatch = match?.players.find(({ playerId }) => playerId === selfId)
   const submitted = selfMatch?.submitted ?? false
   const terminal = match?.phase === 'finished' || match?.phase === 'tiebreak'
@@ -77,6 +78,10 @@ export function GameplayScreen() {
     const interval = window.setInterval(() => setNow(Date.now()), 250)
     return () => window.clearInterval(interval)
   }, [match?.roundEndsAt])
+
+  useEffect(() => {
+    if (room?.phase === 'lobby') navigate(`/room/${roomCode}`, { replace: true })
+  }, [navigate, room?.phase, roomCode])
 
   const secondsRemaining = match?.roundEndsAt
     ? Math.max(0, Math.ceil((match.roundEndsAt - now) / 1_000))
@@ -194,8 +199,14 @@ export function GameplayScreen() {
                 </h2>
                 {tiebreakNames.length > 0 && <p>{tiebreakNames.join(' vs ')}</p>}
                 {match.answer && <p>The word was <strong>{match.answer}</strong>.</p>}
-                <Button variant="secondary" onClick={() => navigate('/setup')}>
-                  Back to setup
+                <Button
+                  variant="secondary"
+                  disabled={!self?.isHost}
+                  onClick={returnToLobby}
+                >
+                  {self?.isHost
+                    ? 'Return to Lobby'
+                    : 'Waiting for host…'}
                 </Button>
               </section>
             )}
@@ -204,7 +215,6 @@ export function GameplayScreen() {
           </>
         )}
       </main>
-      <LobbyMusic />
     </div>
   )
 }

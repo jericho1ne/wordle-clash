@@ -4,8 +4,8 @@
 
 The `Room` Durable Object remains authoritative for the secret answer, guesses,
 timers, scoring, winners, and match termination. Clients receive only the state
-and tile feedback they are allowed to render. There is no guess dictionary: any
-five-letter string is accepted.
+and tile feedback they are allowed to render. Guesses must appear in the bundled
+server-only Wordle allow-list.
 
 See the [guess submission flow](./guess-submission-flow.md) for the persistence
 and WebSocket event sequence.

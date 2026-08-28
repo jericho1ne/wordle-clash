@@ -20,7 +20,7 @@ sequenceDiagram
     UI->>Room: WebSocket: submitGuess
 
     Room->>Room: Validate player and match state
-    Room->>Room: Validate five-letter format
+    Room->>Room: Validate five-letter format and allow-list membership
 
     alt Guess rejected
         Room-->>UI: WebSocket: error

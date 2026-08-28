@@ -296,6 +296,7 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
   },
 
   submitGuess(guess) {
+    set({ error: null })
     activeSocket?.send({ t: 'submitGuess', guess })
   },
 

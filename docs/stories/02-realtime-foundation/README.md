@@ -1,6 +1,6 @@
 # Epic 02 — Realtime foundation
 
-**Status:** in progress (02-00 done, pending review; `Room` DO remains a stub).
+**Status:** in progress (02-00 through 02-01 done, pending review).
 
 The `Room` Durable Object becomes the authoritative lobby: players, ready state,
 game mode, host, reconnection. Fat JSON events over the socket; full `roomState`
@@ -11,8 +11,8 @@ snapshot on connect and every reconnect.
 | # | Story | Status |
 |---|---|---|
 | [00](./00-message-protocol.md) | Message protocol: zod schemas + `parseClientMessage` / `serializeServerMessage` + `assertNever`; unit tests in `packages/shared` | done, in review |
-| 01 | `Room` state shape + storage layout; `onStart` hydration; `#save()`; `#snapshot(selfId)` | next |
-| 02 | `Room` connection lifecycle on the hibernation API: `onConnect` (identity from injected headers, capacity check → `ROOM_FULL`, add player, send snapshot, broadcast join), `onMessage` (hydrate → zod → dispatch), `onClose`/`onError` (drop socket, `connected:false`, grace-period removal), `setWebSocketAutoResponse` ping/pong, empty-room cleanup alarm | |
+| [01](./01-room-state-persistence.md) | `Room` state shape + storage layout; `onStart` hydration; validated reconnect snapshot helper | done, in review |
+| 02 | `Room` connection lifecycle on the hibernation API: `onConnect` (identity from injected headers, capacity check → `ROOM_FULL`, add player, send snapshot, broadcast join), `onMessage` (hydrate → zod → dispatch), `onClose`/`onError` (drop socket, `connected:false`, grace-period removal), `setWebSocketAutoResponse` ping/pong, empty-room cleanup alarm | next |
 | 03 | Room-code generation module (already in `packages/shared/src/room-code.ts` from epic 00) + tests | |
 | 04 | Create vs join: `POST /api/rooms` reserves a code via DO RPC `reserve(userId)` + 2-min alarm; join opens the socket; unknown room → `ROOM_NOT_FOUND` | |
 | 05 | Host assignment / reassignment by `joinedAt`; `hostChanged` broadcast | |

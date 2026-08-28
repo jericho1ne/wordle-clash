@@ -2,11 +2,19 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ES2023"],
-    "types": ["@cloudflare/workers-types"],
+    "types": [
+      "@cloudflare/workers-types",
+      "@cloudflare/vitest-pool-workers/types"
+    ],
     "noEmit": true,
     "paths": {
       "@wordle-clash/shared": ["../../packages/shared/src/index.ts"]
     }
   },
-  "include": ["src", "drizzle.config.ts", "worker-configuration.d.ts"]
+  "include": [
+    "src",
+    "drizzle.config.ts",
+    "vitest.config.ts",
+    "worker-configuration.d.ts"
+  ]
 }

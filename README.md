@@ -15,7 +15,7 @@ race to find the word before they do.
 Any five-letter string is a valid guess. There is no dictionary standing between
 you and a deeply questionable strategy.
 
-## See it in action
+## Screenshots
 
 | Synchronous | Real-time |
 |---|---|
@@ -24,14 +24,15 @@ you and a deeply questionable strategy.
 ## Built for friends
 
 - Two to eight players in a room
-- Guest-first—no account or login required
-- Shareable room codes and invite links
+- No account or login required
+- Shareable room codes + invite links
 - Reconnect-safe matches backed by Cloudflare Durable Objects
-- Simultaneous reveals, live opponent boards, and unapologetic brute force
+- Simultaneous reveals, live opponent boards
+- Real-time game allows for rapid-fire brute force guessing
 
 ## Development
 
-Want to run it locally or contribute? Start with [`LOCAL-DEV.md`](./LOCAL-DEV.md).
+To run locally see [`LOCAL-DEV.md`](./LOCAL-DEV.md).
 
 - [Gameplay rules](./docs/game-rules.md)
 - [Architecture](./docs/architecture.md)

@@ -10,7 +10,7 @@ to Epic 05.
 
 | # | Story | UI-testable slice |
 |---|---|---|
-| 00 | **Title screen:** finish `/` with the five animated **CLASH** logo tiles, Multiplayer kicker, Wordle Clash wordmark, tagline, reduced-motion behavior, and Play CTA | Load `/` under normal and throttled networking, verify the animation/reduced-motion variants, and use Play to reach Setup |
+| 00 | **Title screen:** finish `/` with animated **WORDLE** and **CLASH** logo rows, Multiplayer kicker, Wordle Clash wordmark, tagline, reduced-motion behavior, and Play CTA | Load `/` under normal and throttled networking, verify the animation/reduced-motion variants, and use Play to reach Setup |
 | 01 | **Player setup form:** finish the `/setup` shell and back navigation; add the 14-character name field with trimming and live initials; add an accessible five-option avatar picker backed by `AVATAR_STEPS` | Enter and edit a name, select every avatar with pointer and keyboard, and navigate between Title and Setup |
 | 02 | **Manual create/join flow:** add the Create/Join segmented control, conditional normalized room-code input, validation and pending/error UI; persist the selected profile, create via `POST /api/rooms` or manually join a code, then navigate to `/room/:code` | In two browser profiles, create a room in one window, manually enter its code in the other, and land both players in the same lobby; an invalid code stays on Setup with an error |
 
@@ -21,8 +21,8 @@ less; Story 02 completes the frontend-to-backend vertical slice.
 ## Title requirements
 
 - The title screen renders before invisible identity initialization completes.
-- Logo tiles spell **C L A S H** in the prototype's fixed tile-state pattern.
-- The tile row uses perspective and staggered `tileFlip` animation; users with
+- Logo tiles spell **W O R D L E** above **C L A S H** in fixed tile-state patterns.
+- The tile rows use perspective and one continuous staggered `tileFlip` animation; users with
   `prefers-reduced-motion: reduce` see the finished state without animation.
 - Copy: Multiplayer; Wordle Clash; “Race friends to the word. Guess smart, move
   fast, and claim the win.”; Play.

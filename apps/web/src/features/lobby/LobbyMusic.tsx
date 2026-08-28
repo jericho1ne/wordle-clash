@@ -22,8 +22,7 @@ export function LobbyMusic() {
       await audio.current.play()
       setPlaying(true)
       setUnavailable(false)
-    }
-    catch {
+    } catch {
       setPlaying(false)
     }
   }, [])

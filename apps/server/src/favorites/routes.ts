@@ -58,8 +58,7 @@ async function parseJson(request: Request): Promise<Record<string, unknown> | nu
     return value && typeof value === 'object'
       ? value as Record<string, unknown>
       : null
-  }
-  catch {
+  } catch {
     return null
   }
 }

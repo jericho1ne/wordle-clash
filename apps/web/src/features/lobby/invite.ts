@@ -5,6 +5,11 @@ import {
 
 export const INVITE_TITLE = 'Join my Wordle Clash room'
 
+interface InviteNavigator {
+  clipboard: Pick<Clipboard, 'writeText'>
+  share?: (data?: ShareData) => Promise<void>
+}
+
 export function getInviteUrl(origin: string, roomCode: string): string {
   const code = normalizeRoomCode(roomCode)
   if (!isValidRoomCode(code)) throw new Error('A valid room code is required')
@@ -25,7 +30,7 @@ export function getInvitePayload(origin: string, roomCode: string): ShareData {
 export async function shareRoomInvite(
   origin: string,
   roomCode: string,
-  navigatorApi: Pick<Navigator, 'clipboard' | 'share'> = navigator,
+  navigatorApi: InviteNavigator = navigator,
 ): Promise<'shared' | 'copied'> {
   const payload = getInvitePayload(origin, roomCode)
 

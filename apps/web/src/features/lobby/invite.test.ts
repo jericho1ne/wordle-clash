@@ -30,7 +30,7 @@ describe('room invites', () => {
 
     await expect(shareRoomInvite('https://wordleclash.com', 'PLUM-7421', {
       share,
-      clipboard: { writeText } as Clipboard,
+      clipboard: { writeText },
     })).resolves.toBe('shared')
     expect(share).toHaveBeenCalledWith(getInvitePayload(
       'https://wordleclash.com',
@@ -44,7 +44,7 @@ describe('room invites', () => {
 
     await expect(shareRoomInvite('https://wordleclash.com', 'PLUM-7421', {
       share: undefined,
-      clipboard: { writeText } as Clipboard,
+      clipboard: { writeText },
     })).resolves.toBe('copied')
     expect(writeText).toHaveBeenCalledWith(
       'https://wordleclash.com/room/PLUM-7421',

@@ -81,14 +81,12 @@ export function SetupScreen() {
 
       if (mode === 'create') {
         navigate(`/room/${await createRoom()}`)
-      }
-      else {
+      } else {
         const normalizedCode = normalizeRoomCode(roomCode)
         await verifyRoomJoin(normalizedCode)
         navigate(`/room/${normalizedCode}`)
       }
-    }
-    catch (cause: unknown) {
+    } catch (cause: unknown) {
       setError(cause instanceof Error ? cause.message : 'Unable to enter the room')
       setPending(false)
     }

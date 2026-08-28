@@ -104,8 +104,7 @@ export class RoomSocket {
         this.#emit('terminalError', message)
         this.#socket.close(1008, message.message)
       }
-    }
-    catch (error: unknown) {
+    } catch (error: unknown) {
       this.#emit(
         'protocolError',
         error instanceof Error ? error : new Error('Unable to parse realtime message'),

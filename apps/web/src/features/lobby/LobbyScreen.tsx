@@ -134,8 +134,7 @@ export function LobbyScreen() {
     try {
       const nextFavorite = await toggle(roomCode)
       showToast(nextFavorite ? 'Room added to favorites' : 'Room removed from favorites')
-    }
-    catch (cause: unknown) {
+    } catch (cause: unknown) {
       showToast(cause instanceof Error ? cause.message : 'Unable to update favorite')
     }
   }

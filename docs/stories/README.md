@@ -14,9 +14,9 @@ and the approved phase plan (`~/.claude/plans/hi-i-have-a-sunny-rossum.md`).
 | [`01-design-system`](./01-design-system/) | not started | Ember theme (`ember.css`), React primitive wrappers, keyframes, toasts |
 | [`02-realtime-foundation`](./02-realtime-foundation/) | complete | `Room` DO state + hibernation lifecycle, message protocol, room codes, create/join, host reassignment, `partysocket` client, Zustand store |
 | [`03-identity-auth`](./03-identity-auth/) | complete | better-auth (`anonymous`), D1 schema + migrations, guest minting, WS ticket auth, profile + favorites persistence, inert match-history tables |
-| [`04-title-setup-screens`](./04-title-setup-screens/) | not started | animated title, player profile, and manual create/join flow |
-| [`05-room-invites`](./05-room-invites/) | not started | native share/clipboard invite links and invited-player setup/join flow |
-| [`06-lobby-screen`](./06-lobby-screen/) | not started | RoomServer-backed lobby: players, ready, mode, favorite, start dialog |
+| [`04-title-setup-screens`](./04-title-setup-screens/) | complete | animated title, player profile, and manual create/join flow |
+| [`05-room-invites`](./05-room-invites/) | complete | native share/clipboard invite links and invited-player setup/join flow |
+| [`06-lobby-screen`](./06-lobby-screen/) | implemented | RoomServer-backed lobby: players, ready, mode, favorite, start dialog |
 | [`07-gameplay-leaderboard`](./07-gameplay-leaderboard/) | planned | authoritative Wordle modes, match persistence, gameplay UI, account leaderboard |
 
 ## Verification

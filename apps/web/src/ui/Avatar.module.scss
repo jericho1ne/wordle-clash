@@ -11,3 +11,8 @@
   font-weight: var(--font-weight-bold);
   border-radius: 50%;
 }
+
+.lobby {
+  flex-basis: var(--size-lobby-avatar);
+  width: var(--size-lobby-avatar);
+}

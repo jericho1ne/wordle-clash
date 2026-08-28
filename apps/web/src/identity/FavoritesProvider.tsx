@@ -110,8 +110,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       setFavorites(accountFavorites)
       setStatus('ready')
       return !wasFavorite
-    }
-    catch (toggleError) {
+    } catch (toggleError) {
       setFavorites(favorites)
       setStatus('error')
       setError(toggleError instanceof Error

@@ -6,12 +6,15 @@ import { AnimalIcon } from './AnimalIcon'
 export interface AvatarProps {
   avatarId: number
   animalId: number
+  size?: 'default' | 'lobby'
 }
 
-export function Avatar({ avatarId, animalId }: AvatarProps) {
+export function Avatar({ avatarId, animalId, size = 'default' }: AvatarProps) {
   return (
     <span
-      className={styles.avatar}
+      className={[styles.avatar, size === 'lobby' ? styles.lobby : null]
+        .filter(Boolean)
+        .join(' ')}
       data-avatar-id={clampAvatarId(avatarId)}
       aria-hidden="true"
     >

@@ -65,6 +65,10 @@
   animation-delay: var(--duration-stagger-4);
 }
 
+.join-in {
+  animation: joinIn var(--duration-player-join) both;
+}
+
 /* — app shell — */
 
 body {

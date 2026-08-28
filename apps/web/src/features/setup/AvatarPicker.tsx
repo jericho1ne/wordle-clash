@@ -27,14 +27,11 @@ export function AvatarPicker({
 
     if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
       nextIndex = (index - 1 + AVATAR_STEPS.length) % AVATAR_STEPS.length
-    }
-    else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+    } else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
       nextIndex = (index + 1) % AVATAR_STEPS.length
-    }
-    else if (event.key === 'Home') {
+    } else if (event.key === 'Home') {
       nextIndex = 0
-    }
-    else if (event.key === 'End') {
+    } else if (event.key === 'End') {
       nextIndex = AVATAR_STEPS.length - 1
     }
 

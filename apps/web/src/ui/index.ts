@@ -2,12 +2,16 @@ export { AnimalIcon } from './AnimalIcon'
 export { Avatar } from './Avatar'
 export { Button } from './Button'
 export { Card } from './Card'
+export { Dialog } from './Dialog'
 export { Field } from './Field'
 export { IconButton } from './IconButton'
 export { Input } from './Input'
 export { RadioGroup } from './RadioGroup'
 export { SegmentedControl } from './SegmentedControl'
 export { Tag } from './Tag'
+export { Toggle } from './Toggle'
+export { ToastProvider } from './ToastProvider'
+export { useToast } from './useToast'
 
 export type { AnimalIconProps } from './AnimalIcon'
 export type { AvatarProps } from './Avatar'
@@ -16,6 +20,7 @@ export type {
   ButtonVariant,
 } from './Button'
 export type { CardProps } from './Card'
+export type { DialogProps } from './Dialog'
 export type { FieldProps } from './Field'
 export type { IconButtonProps } from './IconButton'
 export type { InputProps } from './Input'
@@ -31,3 +36,5 @@ export type {
   TagProps,
   TagTone,
 } from './Tag'
+export type { ToggleProps } from './Toggle'
+export type { ToastContextValue } from './toast-context'

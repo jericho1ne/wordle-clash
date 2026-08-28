@@ -116,4 +116,19 @@ describe('reduceRoomMessage', () => {
     expect(result.room?.hostId).toBe(guest.id)
     expect(result.room?.players.map(({ isHost }) => isHost)).toEqual([false, true])
   })
+
+  it('locks the room phase when a match starts', () => {
+    const result = reduceRoomMessage(
+      { room: ROOM, selfId: SELF.id, pendingActions: [] },
+      {
+        t: 'matchStarting',
+        mode: 'sync',
+        tries: 5,
+        playerCount: 2,
+        startsAt: 2_000,
+      },
+    )
+
+    expect(result.room?.phase).toBe('starting')
+  })
 })

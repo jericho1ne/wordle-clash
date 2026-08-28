@@ -173,8 +173,7 @@ export class Room extends Server<Env> {
         }, [connection.id])
       }
       if (hostChanged) this.#broadcastHostChanged([connection.id])
-    }
-    else {
+    } else {
       const player = this.#addPlayer(identity)
       const hostChanged = this.#assignHostIfVacant()
       await this.#save()
@@ -190,8 +189,7 @@ export class Room extends Server<Env> {
     let message: ClientMessage
     try {
       message = parseClientMessage(frame)
-    }
-    catch {
+    } catch {
       this.#sendError(connection, 'BAD_MESSAGE', 'The message is invalid')
       return
     }

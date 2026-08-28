@@ -31,8 +31,7 @@ export function readStoredFavorites(): string[] {
     return normalizeFavorites(JSON.parse(
       window.localStorage.getItem(FAVORITES_STORAGE_KEY) ?? '[]',
     ))
-  }
-  catch {
+  } catch {
     return []
   }
 }

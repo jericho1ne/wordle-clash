@@ -1,10 +1,15 @@
 # Epic 06 — Lobby screen
 
-**Status:** not started (epic-00 placeholder in `src/features/lobby/LobbyScreen.tsx`).
+**Status:** implemented; local two-client UI verification pending.
 
 Wires the lobby UI to the `Room` Durable Object (epic 02) and D1 favorites
 (epic 03), building on the invite-link surface from epic 05. No bots — real
 remote players only.
+
+The lobby also owns a softly mixed, looping soundtrack from
+`public/lobby-music.mp3`. An Ember-styled Radix Toggle in the lower-left corner
+provides explicit play/pause control and recovers when audible autoplay is
+blocked by browser policy.
 
 ## Stories
 
@@ -31,3 +36,12 @@ Baseline: [`../../verification.md`](../../verification.md) §0 + the full
 - Non-host sees the game-mode control disabled and no "Start game" button.
 - Start is disabled until ≥ 2 players and everyone ready; the hint line reflects
   why.
+
+## Implementation notes
+
+- `useRoomStore` owns optimistic ready/mode actions and retains the authoritative
+  `matchStarting` payload long enough for every client to acknowledge it.
+- One app-level `ToastProvider` handles invite, favorite, and player-join
+  feedback. Lobby music remains independently controllable through Radix Toggle.
+- The current match-start dialog deliberately stops at the gameplay boundary;
+  Epic 07 replaces acknowledgement with navigation to the live game board.

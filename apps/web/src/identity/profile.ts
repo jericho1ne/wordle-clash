@@ -48,8 +48,7 @@ export function readStoredProfile(): Profile | null {
 
   try {
     return profileFromUnknown(JSON.parse(window.localStorage.getItem(PROFILE_STORAGE_KEY) ?? 'null'))
-  }
-  catch {
+  } catch {
     return null
   }
 }

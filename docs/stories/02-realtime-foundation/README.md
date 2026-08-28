@@ -1,6 +1,6 @@
 # Epic 02 — Realtime foundation
 
-**Status:** in progress (02-00 through 02-07 done, pending review).
+**Status:** in progress (02-00 through 02-08 done, pending review).
 
 The `Room` Durable Object becomes the authoritative lobby: players, ready state,
 game mode, host, reconnection. Fat JSON events over the socket; full `roomState`
@@ -18,7 +18,7 @@ snapshot on connect and every reconnect.
 | [05](./05-host-reassignment.md) | Host assignment / reassignment by `joinedAt`; `hostChanged` broadcast | done, in review |
 | [06](./06-ordered-room-mutations.md) | Broadcast + snapshot helpers; mutation → persist → broadcast ordering | done, in review |
 | [07](./07-partysocket-client.md) | `partysocket` client wrapper: ticket in `query`, typed event emit, terminal-error detection | done, in review |
-| 08 | Zustand room store: status machine, event reducers, optimistic `setReady`, `pendingActions` re-send on reconnect, selector hooks | |
+| [08](./08-zustand-room-store.md) | Zustand room store: status machine, event reducers, optimistic `setReady`, `pendingActions` re-send on reconnect, selector hooks | done, in review |
 | 09 | `Room` tests via `@cloudflare/vitest-pool-workers` | |
 
 ## Verification

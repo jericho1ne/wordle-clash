@@ -1,7 +1,4 @@
-import {
-  useEffect,
-  useState,
-} from 'react'
+import { useEffect } from 'react'
 import { useParams } from 'react-router'
 
 import {
@@ -10,18 +7,16 @@ import {
 } from '@wordle-clash/shared'
 
 import { useFavorites } from '../../identity'
-import { RoomSocket } from '../../realtime'
+import { useRoomStore } from '../../realtime'
 import { Button } from '../../ui'
 import styles from './LobbyScreen.module.scss'
 
-type ConnectionStatus = 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'denied'
-
-const CONNECTION_LABELS: Record<ConnectionStatus, string> = {
+const CONNECTION_LABELS = {
   idle: 'Waiting for a valid room code',
   connecting: 'Connecting…',
   connected: 'Connected',
   reconnecting: 'Reconnecting…',
-  denied: 'Unable to join room',
+  terminal: 'Unable to join room',
 }
 
 /**
@@ -39,38 +34,21 @@ export function LobbyScreen() {
   } = useFavorites()
   const validRoomCode = isValidRoomCode(roomCode)
   const favorite = isFavorite(roomCode)
-  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('idle')
-  const [playerCount, setPlayerCount] = useState<number | null>(null)
-  const [connectionError, setConnectionError] = useState<string | null>(null)
+  const connect = useRoomStore(({ connect }) => connect)
+  const disconnect = useRoomStore(({ disconnect }) => disconnect)
+  const connectionStatus = useRoomStore(({ status }) => status)
+  const room = useRoomStore(({ room }) => room)
+  const selfId = useRoomStore(({ selfId }) => selfId)
+  const connectionError = useRoomStore(({ error }) => error)
+  const setReady = useRoomStore(({ setReady }) => setReady)
+  const self = room?.players.find(({ id }) => id === selfId)
 
   useEffect(() => {
     if (!validRoomCode) return
 
-    const socket = new RoomSocket(roomCode)
-    let terminal = false
-    const unsubscribe = [
-      socket.on('open', () => setConnectionStatus('connected')),
-      socket.on('close', () => {
-        if (!terminal) setConnectionStatus('reconnecting')
-      }),
-      socket.on('roomState', ({ room }) => setPlayerCount(room.players.length)),
-      socket.on('terminalError', ({ message }) => {
-        terminal = true
-        setConnectionStatus('denied')
-        setConnectionError(message)
-      }),
-      socket.on('protocolError', ({ message }) => setConnectionError(message)),
-    ]
-
-    setConnectionStatus('connecting')
-    socket.connect()
-
-    return () => {
-      terminal = true
-      for (const removeListener of unsubscribe) removeListener()
-      socket.disconnect()
-    }
-  }, [roomCode, validRoomCode])
+    connect(roomCode)
+    return disconnect
+  }, [connect, disconnect, roomCode, validRoomCode])
 
   const toggleFavorite = () => {
     void toggle(roomCode).catch(() => undefined)
@@ -84,8 +62,29 @@ export function LobbyScreen() {
           <div className={`card-title ${styles.code}`}>{roomCode || '—'}</div>
           <div className={styles.connection}>
             Realtime: {CONNECTION_LABELS[connectionStatus]}
-            {playerCount === null ? '' : ` · ${playerCount} player${playerCount === 1 ? '' : 's'}`}
+            {!room ? '' : ` · ${room.players.length} player${room.players.length === 1 ? '' : 's'}`}
           </div>
+          {room && (
+            <ul className={styles.players}>
+              {room.players.map((player) => (
+                <li key={player.id}>
+                  {player.name}
+                  {player.isHost ? ' · host' : ''}
+                  {player.ready ? ' · ready' : ''}
+                  {!player.connected ? ' · reconnecting' : ''}
+                </li>
+              ))}
+            </ul>
+          )}
+          {self && (
+            <Button
+              variant={self.ready ? 'secondary' : 'primary'}
+              aria-pressed={self.ready}
+              onClick={() => setReady(!self.ready)}
+            >
+              {self.ready ? 'Not ready' : 'Ready up'}
+            </Button>
+          )}
           <Button
             variant={favorite ? 'secondary' : 'ghost'}
             disabled={!validRoomCode}
@@ -96,7 +95,7 @@ export function LobbyScreen() {
           </Button>
           <div className="card-meta">
             {connectionError
-              ? connectionError
+              ? connectionError.message
               : error
               ? error.message
               : favorite

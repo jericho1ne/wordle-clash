@@ -1,0 +1,100 @@
+import {
+  describe,
+  expect,
+  it,
+} from 'vitest'
+
+import {
+  assertNever,
+  parseClientMessage,
+  parseServerMessage,
+  serializeClientMessage,
+  serializeServerMessage,
+  type ClientMessage,
+  type ServerMessage,
+} from './protocol.js'
+
+const CLIENT_MESSAGES: ClientMessage[] = [
+  { t: 'setReady', ready: true },
+  { t: 'setGameMode', mode: 'realtime' },
+  { t: 'updateProfile', name: 'Nova', avatarId: 2 },
+  { t: 'startMatch' },
+  { t: 'leave' },
+  { t: 'ping' },
+]
+
+const ROOM_STATE_MESSAGE: ServerMessage = {
+  t: 'roomState',
+  selfId: 'user-1',
+  room: {
+    roomCode: 'TEST-0001',
+    phase: 'lobby',
+    hostId: 'user-1',
+    gameMode: 'sync',
+    players: [
+      {
+        id: 'user-1',
+        name: 'Nova',
+        avatarId: 2,
+        isHost: true,
+        ready: false,
+        connected: true,
+        joinedAt: 1_000,
+      },
+    ],
+    createdAt: 1_000,
+  },
+}
+
+describe('client protocol', () => {
+  it.each(CLIENT_MESSAGES)('round-trips $t messages', (message) => {
+    expect(parseClientMessage(serializeClientMessage(message))).toEqual(message)
+  })
+
+  it('accepts UTF-8 binary frames', () => {
+    const frame = new TextEncoder().encode('{"t":"ping"}')
+    expect(parseClientMessage(frame)).toEqual({ t: 'ping' })
+  })
+
+  it('rejects malformed JSON', () => {
+    expect(() => parseClientMessage('{')).toThrow()
+  })
+
+  it('rejects unknown message types and properties', () => {
+    expect(() => parseClientMessage('{"t":"guess"}')).toThrow()
+    expect(() => parseClientMessage('{"t":"ping","secret":"WORD"}')).toThrow()
+  })
+
+  it('rejects invalid profile fields', () => {
+    expect(() => parseClientMessage({
+      t: 'updateProfile',
+      name: 'This name is much too long',
+      avatarId: 99,
+    })).toThrow()
+  })
+})
+
+describe('server protocol', () => {
+  it('round-trips a full room snapshot', () => {
+    expect(parseServerMessage(serializeServerMessage(ROOM_STATE_MESSAGE)))
+      .toEqual(ROOM_STATE_MESSAGE)
+  })
+
+  it('rejects invalid nested room state', () => {
+    expect(() => parseServerMessage({
+      ...ROOM_STATE_MESSAGE,
+      room: {
+        ...ROOM_STATE_MESSAGE.room,
+        roomCode: 'bad-code',
+      },
+    })).toThrow()
+  })
+})
+
+describe('assertNever', () => {
+  it('throws with the unhandled value', () => {
+    const callAssertNever = assertNever as (value: unknown) => never
+    expect(() => callAssertNever({ t: 'futureMessage' }))
+      .toThrow('Unhandled protocol value')
+  })
+})

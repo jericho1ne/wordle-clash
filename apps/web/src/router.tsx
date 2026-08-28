@@ -16,7 +16,7 @@ import { DesignSystem } from './features/dev/DesignSystem'
  *   /design-system design-system showcase (DEV builds only)
  *
  * The deep-link guard on /room/:code (redirect to /setup?join=<code> when no
- * profile) lands in epic 06-lobby-screen; here the routes are just wired.
+ * profile) lands in epic 05-room-invites; here the routes are just wired.
  */
 export const router = createBrowserRouter([
   { path: '/', element: <TitleScreen /> },

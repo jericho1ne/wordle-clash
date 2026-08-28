@@ -17,7 +17,7 @@ The implementation stack completes these foundations before Story 07-01:
 
 1. Epic 02 message protocol, Room persistence/lifecycle, create/join API,
    PartySocket client, room store, and Worker integration tests.
-2. The minimal Epic 05 create/join submit path.
+2. Epic 04's create/join path and Epic 05's invited-player join path.
 3. Epic 06 lobby connection, player list, ready/mode/start controls, and the
    `/room/:code/play` handoff.
 

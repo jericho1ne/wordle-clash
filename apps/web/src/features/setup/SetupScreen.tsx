@@ -8,7 +8,7 @@ import styles from './SetupScreen.module.scss'
 
 /**
  * SCAFFOLD PLACEHOLDER. Name field, avatar picker, create/join segmented
- * control, and conditional room-code field land in epic 05-setup-screen.
+ * control, and conditional room-code field land in epic 04-title-setup-screens.
  */
 export function SetupScreen() {
   const navigate = useNavigate()
@@ -23,7 +23,7 @@ export function SetupScreen() {
         </IconButton>
         <div className={styles.heading}>Set up your player</div>
         <p className={styles.note}>
-          Scaffold placeholder — see docs/stories/05-setup-screen.
+          Scaffold placeholder — see docs/stories/04-title-setup-screens.
           {join ? ` Deep-link join code: ${join}` : ''}
         </p>
       </div>

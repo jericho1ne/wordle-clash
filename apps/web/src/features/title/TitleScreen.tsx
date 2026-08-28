@@ -5,7 +5,7 @@ import styles from './TitleScreen.module.scss'
 
 /**
  * SCAFFOLD PLACEHOLDER. The faithful port (animated CLASH tiles, wordmark,
- * tagline, Play CTA) lands in epic 04-title-screen.
+ * tagline, Play CTA) lands in epic 04-title-setup-screens.
  */
 export function TitleScreen() {
   const navigate = useNavigate()
@@ -21,7 +21,9 @@ export function TitleScreen() {
         <Button block onClick={() => navigate('/setup')}>
           Play
         </Button>
-        <p className={styles.note}>Scaffold placeholder — see docs/stories/04-title-screen.</p>
+        <p className={styles.note}>
+          Scaffold placeholder — see docs/stories/04-title-setup-screens.
+        </p>
       </div>
     </div>
   )

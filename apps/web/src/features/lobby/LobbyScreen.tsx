@@ -20,9 +20,9 @@ const CONNECTION_LABELS = {
 }
 
 /**
- * SCAFFOLD PLACEHOLDER. The RoomServer-backed lobby (player list, ready states,
- * game-mode toggle, favorite/copy, start dialog) lands in epic 06-lobby-screen,
- * on top of the realtime foundation (epic 02).
+ * SCAFFOLD PLACEHOLDER. Invite/copy actions land in epic 05-room-invites. The
+ * finished lobby (player list, ready states, game-mode toggle, favorite, start
+ * dialog) lands in epic 06-lobby-screen on top of the realtime foundation.
  */
 export function LobbyScreen() {
   const { code } = useParams()

@@ -21,7 +21,10 @@ import {
   type ServerMessage,
 } from '@wordle-clash/shared'
 
-import { selectAnswer } from '../gameplay/answers'
+import {
+  isAllowedGuess,
+  selectAnswer,
+} from '../gameplay/answers'
 import {
   createMatch,
   createMatchSnapshot,
@@ -488,6 +491,10 @@ export class Room extends Server<Env> {
     const guess = value.trim().toUpperCase()
     if (!isValidGuess(guess)) {
       this.#sendError(connection, 'INVALID_GUESS', 'Enter exactly five letters')
+      return
+    }
+    if (!isAllowedGuess(guess)) {
+      this.#sendError(connection, 'INVALID_GUESS', 'That word is not in the list')
       return
     }
     if (

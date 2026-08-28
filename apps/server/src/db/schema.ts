@@ -27,6 +27,7 @@ export const user = sqliteTable('user', {
   isAnonymous: integer('is_anonymous', { mode: 'boolean' }).default(false),
   displayName: text('display_name'),
   avatarId: integer('avatar_id'),
+  animalId: integer('animal_id'),
 })
 
 export const session = sqliteTable(

@@ -68,6 +68,10 @@ export function createAuth(request: Request, env: Env) {
           type: 'number',
           required: false,
         },
+        animalId: {
+          type: 'number',
+          required: false,
+        },
       },
     },
   })

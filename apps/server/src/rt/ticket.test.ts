@@ -16,6 +16,7 @@ const IDENTITY = {
   userId: 'guest-123',
   name: 'Nova',
   avatarId: 2,
+  animalId: 7,
   isAnonymous: true,
 }
 

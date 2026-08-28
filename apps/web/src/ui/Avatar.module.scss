@@ -1,0 +1,34 @@
+.avatar {
+  display: grid;
+  flex: 0 0 var(--size-avatar-option);
+  width: var(--size-avatar-option);
+  aspect-ratio: 1;
+  place-items: center;
+  font-weight: var(--font-weight-bold);
+  border-radius: 50%;
+
+  &[data-avatar-id='0'] {
+    color: var(--color-accent-900);
+    background: var(--color-accent-500);
+  }
+
+  &[data-avatar-id='1'] {
+    color: var(--color-accent-2-900);
+    background: var(--color-accent-2-500);
+  }
+
+  &[data-avatar-id='2'] {
+    color: var(--color-neutral-900);
+    background: var(--color-neutral-400);
+  }
+
+  &[data-avatar-id='3'] {
+    color: var(--color-danger-100);
+    background: var(--color-danger-600);
+  }
+
+  &[data-avatar-id='4'] {
+    color: var(--color-accent-900);
+    background: var(--color-accent-300);
+  }
+}

@@ -1,4 +1,5 @@
 import {
+  clampAnimalId,
   clampAvatarId,
   MAX_NAME_LENGTH,
   type Profile,
@@ -12,6 +13,7 @@ export const PROFILE_STORAGE_KEY = 'wc.profile'
 export const EMPTY_PROFILE: Profile = {
   name: '',
   avatarId: 0,
+  animalId: null,
 }
 
 function authError(message: string, error: { message?: string } | null): Error {
@@ -22,6 +24,7 @@ export function normalizeProfile(profile: Profile): Profile {
   return {
     name: profile.name.trim().slice(0, MAX_NAME_LENGTH),
     avatarId: clampAvatarId(profile.avatarId),
+    animalId: profile.animalId === null ? null : clampAnimalId(profile.animalId),
   }
 }
 
@@ -34,6 +37,7 @@ function profileFromUnknown(value: unknown): Profile | null {
   const profile = normalizeProfile({
     name: candidate.name,
     avatarId: candidate.avatarId,
+    animalId: typeof candidate.animalId === 'number' ? candidate.animalId : null,
   })
 
   return profile.name ? profile : null
@@ -59,23 +63,29 @@ export function writeStoredProfile(profile: Profile): void {
 function profileFromUser(user: {
   displayName?: string | null
   avatarId?: number | null
+  animalId?: number | null
 }): Profile | null {
   return profileFromUnknown({
     name: user.displayName,
     avatarId: user.avatarId,
+    animalId: user.animalId ?? null,
   })
 }
 
 function profilesMatch(left: Profile | null, right: Profile): boolean {
-  return left?.name === right.name && left.avatarId === right.avatarId
+  return left?.name === right.name &&
+    left.avatarId === right.avatarId &&
+    left.animalId === right.animalId
 }
 
 export async function mirrorProfile(profile: Profile): Promise<void> {
   await ensureIdentity()
+  if (profile.animalId === null) throw new Error('Animal avatar is required')
 
   const result = await authClient.updateUser({
     displayName: profile.name,
     avatarId: profile.avatarId,
+    animalId: profile.animalId,
   })
 
   if (result.error) {

@@ -39,7 +39,7 @@
 
   .option[data-avatar-id='2'] {
     color: var(--color-neutral-900);
-    background: var(--color-neutral-400);
+    background: var(--color-neutral-500);
   }
 
   .option[data-avatar-id='3'] {
@@ -48,7 +48,8 @@
   }
 
   .option[data-avatar-id='4'] {
-    color: var(--color-accent-900);
-    background: var(--color-accent-300);
+    color: var(--color-neutral-200);
+
+    background: var(--color-accent-900);
   }
 }

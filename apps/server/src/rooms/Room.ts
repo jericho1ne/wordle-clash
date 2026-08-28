@@ -338,7 +338,7 @@ export class Room extends Server<Env> {
     const player = this.state?.players.find(({ id }) => id === userId)
     if (!player) return
 
-    const patch: Partial<Pick<Player, 'name' | 'avatarId'>> = {}
+    const patch: Partial<Pick<Player, 'name' | 'avatarId' | 'animalId'>> = {}
     if (message.name !== undefined && message.name !== player.name) {
       player.name = message.name
       patch.name = message.name
@@ -346,6 +346,10 @@ export class Room extends Server<Env> {
     if (message.avatarId !== undefined && message.avatarId !== player.avatarId) {
       player.avatarId = message.avatarId
       patch.avatarId = message.avatarId
+    }
+    if (message.animalId !== undefined && message.animalId !== player.animalId) {
+      player.animalId = message.animalId
+      patch.animalId = message.animalId
     }
     if (Object.keys(patch).length === 0) return
 
@@ -431,6 +435,7 @@ export class Room extends Server<Env> {
       id: identity.userId,
       name: identity.name,
       avatarId: identity.avatarId,
+      animalId: identity.animalId,
       isHost,
       ready: false,
       connected: true,
@@ -445,8 +450,8 @@ export class Room extends Server<Env> {
   #reconnectPlayer(
     player: Player,
     identity: ConnectionIdentity,
-  ): Partial<Pick<Player, 'name' | 'avatarId' | 'connected'>> {
-    const patch: Partial<Pick<Player, 'name' | 'avatarId' | 'connected'>> = {}
+  ): Partial<Pick<Player, 'name' | 'avatarId' | 'animalId' | 'connected'>> {
+    const patch: Partial<Pick<Player, 'name' | 'avatarId' | 'animalId' | 'connected'>> = {}
 
     if (player.name !== identity.name) {
       player.name = identity.name
@@ -455,6 +460,10 @@ export class Room extends Server<Env> {
     if (player.avatarId !== identity.avatarId) {
       player.avatarId = identity.avatarId
       patch.avatarId = identity.avatarId
+    }
+    if (player.animalId !== identity.animalId) {
+      player.animalId = identity.animalId
+      patch.animalId = identity.animalId
     }
     if (!player.connected) {
       player.connected = true

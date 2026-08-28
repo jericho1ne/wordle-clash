@@ -50,6 +50,13 @@
     gap: var(--space-2);
   }
 
+  .avatar-controls {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
   .room-code {
     letter-spacing: 0.12em;
     text-transform: uppercase;

@@ -83,11 +83,13 @@
   --font-heading: 'Inter', system-ui, sans-serif;
   --font-heading-weight: 500;
   --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
   --font-weight-bold: 700;
   --font-size-kicker: 11px;
   --font-size-title-tile: 22px;
   --font-size-wordmark: 32px;
   --font-size-screen-heading: 24px;
+  --font-size-room-code: 22px;
   --font-size-supporting: 12px;
 
   --space-1: 2.8px;
@@ -105,6 +107,8 @@
   --border-width-selected: 2px;
   --size-title-tile: 54px;
   --size-avatar-option: 40px;
+  --size-animal-icon: 22px;
+  --size-animal-picker: 120px;
   --measure-copy: 32ch;
   --perspective-title-tiles: 600px;
   --duration-tile-flip: 500ms;

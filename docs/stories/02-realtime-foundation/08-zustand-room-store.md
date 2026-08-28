@@ -18,7 +18,7 @@
 
 - Two browser profiles in one room see joins, departures, host changes, and
   ready changes without refreshing.
-- Clicking `Ready up` updates immediately and converges on the server event.
+- Clicking `I'm Ready` updates immediately and converges on the server event.
 - If the Worker drops after an optimistic ready change, the pending action is
   sent again once the socket reconnects.
 - Navigating away closes the active socket and clears room state.

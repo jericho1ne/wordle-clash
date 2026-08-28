@@ -1,4 +1,7 @@
-import { clampAvatarId } from '@wordle-clash/shared'
+import {
+  clampAnimalId,
+  clampAvatarId,
+} from '@wordle-clash/shared'
 
 import { createAuth } from '../auth'
 import {
@@ -41,12 +44,17 @@ export async function handleRealtimeTicket(request: Request, env: Env): Promise<
     return errorResponse(401, 'UNAUTHORIZED', 'An active guest session is required')
   }
 
+  if (session.user.animalId === null || session.user.animalId === undefined) {
+    return errorResponse(409, 'PROFILE_INCOMPLETE', 'Choose an animal avatar before joining a room')
+  }
+
   const name = session.user.displayName?.trim() || session.user.name
   const ticket = await signRealtimeTicket(
     {
       userId: session.user.id,
       name,
       avatarId: clampAvatarId(session.user.avatarId ?? 0),
+      animalId: clampAnimalId(session.user.animalId),
       isAnonymous: session.user.isAnonymous ?? false,
     },
     env.RT_TICKET_SECRET,
@@ -78,6 +86,7 @@ export async function authorizeWebSocketRequest(request: Request, env: Env): Pro
     headers.set('x-user-id', identity.userId)
     headers.set('x-user-name', identity.name)
     headers.set('x-user-avatar', String(identity.avatarId))
+    headers.set('x-user-animal', String(identity.animalId))
     headers.set('x-user-is-anonymous', String(identity.isAnonymous))
 
     return new Request(url, {

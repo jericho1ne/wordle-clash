@@ -1,6 +1,9 @@
 import { z } from 'zod'
 
-import { AVATAR_COUNT } from './avatars.js'
+import {
+  ANIMAL_COUNT,
+  AVATAR_COUNT,
+} from './avatars.js'
 import { GAME_MODE_IDS } from './game-modes.js'
 import {
   MAX_NAME_LENGTH,
@@ -18,6 +21,7 @@ export const playerSchema = z.object({
   id: idSchema,
   name: z.string().min(1).max(MAX_NAME_LENGTH),
   avatarId: z.number().int().min(0).max(AVATAR_COUNT - 1),
+  animalId: z.number().int().min(0).max(ANIMAL_COUNT - 1).default(0),
   isHost: z.boolean(),
   ready: z.boolean(),
   connected: z.boolean(),
@@ -36,6 +40,7 @@ export const roomStateSchema = z.object({
 const playerPatchSchema = z.object({
   name: z.string().min(1).max(MAX_NAME_LENGTH).optional(),
   avatarId: z.number().int().min(0).max(AVATAR_COUNT - 1).optional(),
+  animalId: z.number().int().min(0).max(ANIMAL_COUNT - 1).optional(),
   ready: z.boolean().optional(),
   connected: z.boolean().optional(),
 }).strict()
@@ -55,6 +60,7 @@ export const clientMessageSchema = z.discriminatedUnion('t', [
     t: z.literal('updateProfile'),
     name: z.string().min(1).max(MAX_NAME_LENGTH).optional(),
     avatarId: z.number().int().min(0).max(AVATAR_COUNT - 1).optional(),
+    animalId: z.number().int().min(0).max(ANIMAL_COUNT - 1).optional(),
   }).strict(),
   z.object({ t: z.literal('startMatch') }).strict(),
   z.object({ t: z.literal('leave') }).strict(),

@@ -2,9 +2,13 @@ import {
   useState,
   type FormEvent,
 } from 'react'
-import { useNavigate } from 'react-router'
+import {
+  useNavigate,
+  useSearchParams,
+} from 'react-router'
 
 import {
+  isValidRoomCode,
   MAX_NAME_LENGTH,
   normalizeRoomCode,
 } from '@wordle-clash/shared'
@@ -18,11 +22,13 @@ import {
   SegmentedControl,
 } from '../../ui'
 import { AvatarPicker } from './AvatarPicker'
+import { AnimalPicker } from './AnimalPicker'
 import {
   createRoom,
   verifyRoomJoin,
 } from './room-entry'
 import {
+  getRandomAnimalId,
   isSetupSubmissionValid,
   type RoomEntryMode,
 } from './setup-form'
@@ -30,21 +36,36 @@ import styles from './SetupScreen.module.scss'
 
 export function SetupScreen() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { profile, setProfile } = useProfile()
+  const inviteValue = searchParams.get('join')
+  const inviteCode = normalizeRoomCode(inviteValue ?? '')
+  const isInvite = inviteValue !== null
+  const validInvite = isInvite && isValidRoomCode(inviteCode)
   const [name, setName] = useState(profile.name)
   const [avatarId, setAvatarId] = useState(profile.avatarId)
-  const [mode, setMode] = useState<RoomEntryMode>('create')
-  const [roomCode, setRoomCode] = useState('')
+  const [animalId, setAnimalId] = useState(() => getRandomAnimalId())
+  const [mode, setMode] = useState<RoomEntryMode>(isInvite ? 'join' : 'create')
+  const [roomCode, setRoomCode] = useState(isInvite ? inviteCode : '')
   const [pending, setPending] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(
+    isInvite && !validInvite ? 'This invitation has an invalid room code.' : null,
+  )
   const initial = name.trim().charAt(0).toUpperCase() || '?'
-  const canSubmit = isSetupSubmissionValid(name, mode, roomCode) && !pending
+  const canSubmit = isSetupSubmissionValid(name, animalId, mode, roomCode) && !pending
   const submitLabel = pending
     ? mode === 'create' ? 'Creating room…' : 'Joining room…'
     : mode === 'create' ? 'Create room' : 'Join room'
 
   const changeMode = (nextMode: RoomEntryMode) => {
     setMode(nextMode)
+    setError(null)
+  }
+
+  const leaveInvite = () => {
+    setSearchParams({})
+    setMode('join')
+    setRoomCode('')
     setError(null)
   }
 
@@ -56,7 +77,7 @@ export function SetupScreen() {
     setError(null)
 
     try {
-      await setProfile({ name, avatarId })
+      await setProfile({ name, avatarId, animalId })
 
       if (mode === 'create') {
         navigate(`/room/${await createRoom()}`)
@@ -87,9 +108,15 @@ export function SetupScreen() {
           </IconButton>
 
           <div className={styles.intro}>
-            <div className={styles.kicker}>Player profile</div>
-            <h1 className={styles.heading}>Set up your player</h1>
-            <p className={styles.description}>Choose how friends will see you in the room.</p>
+            <div className={styles.kicker}>{isInvite ? 'Room invitation' : 'Player profile'}</div>
+            <h1 className={styles.heading}>
+              {isInvite ? `Join ${inviteCode || 'a room'}` : 'Set up your player'}
+            </h1>
+            <p className={styles.description}>
+              {isInvite
+                ? 'Choose how your friend will see you in the room.'
+                : 'Choose how friends will see you in the room.'}
+            </p>
           </div>
 
           <fieldset className={styles.controls} disabled={pending}>
@@ -110,35 +137,44 @@ export function SetupScreen() {
 
             <div className={styles.avatarField}>
               <div className={styles.label}>Your avatar</div>
-              <AvatarPicker
-                avatarId={avatarId}
-                initial={initial}
-                disabled={pending}
-                onChange={setAvatarId}
-              />
+              <div className={styles.avatarControls}>
+                <AvatarPicker
+                  avatarId={avatarId}
+                  initial={initial}
+                  disabled={pending}
+                  onChange={setAvatarId}
+                />
+                <AnimalPicker
+                  animalId={animalId}
+                  disabled={pending}
+                  onChange={setAnimalId}
+                />
+              </div>
             </div>
 
-            <div className={styles.modeField}>
-              <div className={styles.label} id="room-entry-label">Room</div>
-              <SegmentedControl
-                name="room-entry-mode"
-                aria-labelledby="room-entry-label"
-                value={mode}
-                onChange={changeMode}
-                options={[
-                  {
-                    value: 'create',
-                    label: 'Create room',
-                    icon: <span aria-hidden="true">+</span>,
-                  },
-                  {
-                    value: 'join',
-                    label: 'Join room',
-                    icon: <span aria-hidden="true">→</span>,
-                  },
-                ]}
-              />
-            </div>
+            {!isInvite && (
+              <div className={styles.modeField}>
+                <div className={styles.label} id="room-entry-label">Room</div>
+                <SegmentedControl
+                  name="room-entry-mode"
+                  aria-labelledby="room-entry-label"
+                  value={mode}
+                  onChange={changeMode}
+                  options={[
+                    {
+                      value: 'create',
+                      label: 'Create room',
+                      icon: <span aria-hidden="true">+</span>,
+                    },
+                    {
+                      value: 'join',
+                      label: 'Join room',
+                      icon: <span aria-hidden="true">→</span>,
+                    },
+                  ]}
+                />
+              </div>
+            )}
 
             {mode === 'join' && (
               <Field
@@ -155,6 +191,7 @@ export function SetupScreen() {
                   autoCapitalize="characters"
                   autoComplete="off"
                   spellCheck={false}
+                  readOnly={isInvite}
                   onChange={(event) => {
                     setRoomCode(normalizeRoomCode(event.target.value))
                     setError(null)
@@ -168,6 +205,12 @@ export function SetupScreen() {
             <p className={styles.error} role="alert">
               {error}
             </p>
+          )}
+
+          {isInvite && error && (
+            <Button variant="ghost" onClick={leaveInvite}>
+              Enter a different room code
+            </Button>
           )}
 
           <Button type="submit" block disabled={!canSubmit}>

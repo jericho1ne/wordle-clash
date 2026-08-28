@@ -1,6 +1,7 @@
 import {
   isValidRoomCode,
   normalizeRoomCode,
+  type ErrorMessage,
 } from '@wordle-clash/shared'
 
 import { RoomSocket } from '../../realtime'
@@ -8,6 +9,12 @@ import { RoomSocket } from '../../realtime'
 interface CreateRoomResponse {
   roomCode?: unknown
   error?: { message?: unknown }
+}
+
+const JOIN_ERROR_MESSAGES: Partial<Record<ErrorMessage['code'], string>> = {
+  ROOM_NOT_FOUND: 'This room no longer exists. Ask the host for a new invitation.',
+  ROOM_FULL: 'This room is full. Ask the host to create another room.',
+  MATCH_STARTED: 'This match has already started. Ask the host for the next room.',
 }
 
 function responseError(body: CreateRoomResponse, status: number): Error {
@@ -54,8 +61,8 @@ export function verifyRoomJoin(roomCode: string): Promise<void> {
 
     removeListeners.push(
       socket.on('roomState', () => finish(() => resolve())),
-      socket.on('terminalError', ({ message }) => {
-        finish(() => reject(new Error(message)))
+      socket.on('terminalError', ({ code, message }) => {
+        finish(() => reject(new Error(JOIN_ERROR_MESSAGES[code] ?? message)))
       }),
       socket.on('protocolError', (error) => finish(() => reject(error))),
     )

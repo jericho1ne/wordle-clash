@@ -31,6 +31,7 @@ function identity(index: number): RealtimeTicketIdentity {
     userId: `player-${index}`,
     name: `Player ${index}`,
     avatarId: index % 5,
+    animalId: index % 20,
     isAnonymous: true,
   }
 }

@@ -27,6 +27,10 @@ import {
   type RoomConnectionState,
 } from './connection'
 import {
+  applyHost,
+  selectNextHostId,
+} from './host'
+import {
   createInitialRoomState,
   createRoomSnapshot,
   parseStoredRoomState,
@@ -130,6 +134,7 @@ export class Room extends Server<Env> {
 
     if (existingPlayer) {
       const patch = this.#reconnectPlayer(existingPlayer, identity)
+      const hostChanged = this.#assignHostIfVacant()
       await this.#save()
       this.#send(connection, createRoomSnapshot(state, identity.userId))
 
@@ -140,12 +145,15 @@ export class Room extends Server<Env> {
           patch,
         }, [connection.id])
       }
+      if (hostChanged) this.#broadcastHostChanged([connection.id])
     }
     else {
       const player = this.#addPlayer(identity)
+      const hostChanged = this.#assignHostIfVacant()
       await this.#save()
       this.#send(connection, createRoomSnapshot(state, identity.userId))
       this.#broadcast({ t: 'playerJoined', player }, [connection.id])
+      if (hostChanged) this.#broadcastHostChanged([connection.id])
     }
 
     await this.#scheduleNextAlarm()
@@ -181,6 +189,7 @@ export class Room extends Server<Env> {
   override async onAlarm(): Promise<void> {
     const now = Date.now()
     const removedPlayerIds: string[] = []
+    let hostChanged = false
 
     if (
       this.lifecycle.reservationExpiresAt !== null &&
@@ -200,7 +209,9 @@ export class Room extends Server<Env> {
         continue
       }
 
-      if (this.#removePlayerFromState(userId)) removedPlayerIds.push(userId)
+      const result = this.#removePlayerFromState(userId)
+      if (result.removed) removedPlayerIds.push(userId)
+      hostChanged ||= result.hostChanged
       delete this.lifecycle.disconnectDeadlines[userId]
     }
 
@@ -212,6 +223,7 @@ export class Room extends Server<Env> {
         hostId: this.state?.hostId ?? null,
       })
     }
+    if (hostChanged) this.#broadcastHostChanged()
     await this.#cleanupEmptyRoom()
     await this.#scheduleNextAlarm()
   }
@@ -351,7 +363,8 @@ export class Room extends Server<Env> {
   }
 
   async #leave(userId: string): Promise<void> {
-    if (!this.#removePlayerFromState(userId)) return
+    const result = this.#removePlayerFromState(userId)
+    if (!result.removed) return
 
     delete this.lifecycle.disconnectDeadlines[userId]
     await this.#save()
@@ -360,6 +373,7 @@ export class Room extends Server<Env> {
       playerId: userId,
       hostId: this.state?.hostId ?? null,
     })
+    if (result.hostChanged) this.#broadcastHostChanged()
 
     for (const connection of this.getConnections(userConnectionTag(userId))) {
       connection.close(1000, 'Player left')
@@ -406,7 +420,7 @@ export class Room extends Server<Env> {
     }
 
     state.players.push(player)
-    if (isHost) state.hostId = player.id
+    if (isHost) applyHost(state, player.id)
     return player
   }
 
@@ -432,14 +446,26 @@ export class Room extends Server<Env> {
     return patch
   }
 
-  #removePlayerFromState(userId: string): boolean {
-    if (!this.state) return false
+  #removePlayerFromState(userId: string): { removed: boolean, hostChanged: boolean } {
+    if (!this.state) return { removed: false, hostChanged: false }
 
     const playerIndex = this.state.players.findIndex(({ id }) => id === userId)
-    if (playerIndex === -1) return false
+    if (playerIndex === -1) return { removed: false, hostChanged: false }
 
     const [removedPlayer] = this.state.players.splice(playerIndex, 1)
-    if (removedPlayer?.isHost) this.state.hostId = null
+    if (!removedPlayer?.isHost) return { removed: true, hostChanged: false }
+
+    applyHost(this.state, selectNextHostId(this.state.players))
+    return { removed: true, hostChanged: true }
+  }
+
+  #assignHostIfVacant(): boolean {
+    if (!this.state || this.state.hostId !== null) return false
+
+    const hostId = selectNextHostId(this.state.players)
+    if (!hostId) return false
+
+    applyHost(this.state, hostId)
     return true
   }
 
@@ -494,6 +520,11 @@ export class Room extends Server<Env> {
 
   #broadcast(message: ServerMessage, without?: string[]): void {
     this.broadcast(serializeServerMessage(message), without)
+  }
+
+  #broadcastHostChanged(without?: string[]): void {
+    if (!this.state?.hostId) return
+    this.#broadcast({ t: 'hostChanged', hostId: this.state.hostId }, without)
   }
 
   #sendError(connection: Connection, code: RoomErrorCode, message: string): void {

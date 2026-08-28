@@ -11,13 +11,13 @@
 
   .code {
     font-family: var(--font-mono);
-    font-size: var(--font-size-room-code);
+    font-size: var(--font-size-700);
   }
 
   .connection {
     padding: var(--space-2) var(--space-3);
     color: var(--color-accent-200);
-    font-size: var(--font-size-supporting);
+    font-size: var(--font-size-200);
     background: var(--color-accent-900);
     border-radius: var(--radius-sm);
   }
@@ -49,14 +49,14 @@
 
   .section-heading {
     color: var(--color-neutral-400);
-    font-size: var(--font-size-kicker);
+    font-size: var(--font-size-100);
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
   .mode-description {
     color: var(--color-neutral-400);
-    font-size: var(--font-size-supporting);
+    font-size: var(--font-size-200);
     margin: 0;
   }
 
@@ -93,13 +93,13 @@
 
   .reconnecting {
     color: var(--color-neutral-400);
-    font-size: var(--font-size-supporting);
+    font-size: var(--font-size-200);
   }
 
   .ready-status {
     margin-inline-start: auto;
     color: var(--color-neutral-500);
-    font-size: var(--font-size-supporting);
+    font-size: var(--font-size-200);
     white-space: nowrap;
   }
 
@@ -109,7 +109,7 @@
 
   .error {
     color: var(--color-danger-300);
-    font-size: var(--font-size-supporting);
+    font-size: var(--font-size-200);
   }
 
   .start-game {
@@ -118,7 +118,7 @@
 
     p {
       color: var(--color-neutral-400);
-      font-size: var(--font-size-supporting);
+      font-size: var(--font-size-200);
       text-align: center;
       margin: 0;
     }

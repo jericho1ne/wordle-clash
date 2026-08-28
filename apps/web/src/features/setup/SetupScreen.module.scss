@@ -17,14 +17,14 @@
   .kicker,
   .label {
     color: var(--color-neutral-400);
-    font-size: var(--font-size-kicker);
+    font-size: var(--font-size-100);
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
   .heading {
     font-family: var(--font-heading);
-    font-size: var(--font-size-screen-heading);
+    font-size: var(--font-size-800);
     font-weight: var(--font-heading-weight);
     margin: 0;
   }
@@ -57,14 +57,24 @@
     gap: var(--space-3);
   }
 
+  .room-entry-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+
+    :global(.seg-opt) {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+
   .room-code {
     letter-spacing: 0.12em;
-    text-transform: uppercase;
   }
 
   .error {
     color: var(--color-danger-300);
-    font-size: var(--font-size-supporting);
+    font-size: var(--font-size-200);
     margin: 0;
   }
 }

@@ -85,12 +85,16 @@
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
   --font-weight-bold: 700;
-  --font-size-kicker: 11px;
-  --font-size-title-tile: 22px;
-  --font-size-wordmark: 32px;
-  --font-size-screen-heading: 24px;
-  --font-size-room-code: 22px;
-  --font-size-supporting: 12px;
+  --font-size-100: 11px;
+  --font-size-200: 12px;
+  --font-size-300: 14px;
+  --font-size-400: 16px;
+  --font-size-500: 18px;
+  --font-size-600: 20px;
+  --font-size-700: 22px;
+  --font-size-800: 24px;
+  --font-size-900: 28px;
+  --font-size-1000: 32px;
 
   --space-1: 2.8px;
   --space-2: 5.6px;
@@ -119,6 +123,7 @@
   --duration-player-join: 350ms;
   --measure-copy: 32ch;
   --measure-gameplay: 960px;
+  --opacity-opponent-board: 0.8;
   --measure-player-board: 220px;
   --perspective-title-tiles: 600px;
   --duration-tile-flip: 500ms;
@@ -126,6 +131,12 @@
   --duration-stagger-2: 160ms;
   --duration-stagger-3: 240ms;
   --duration-stagger-4: 320ms;
+  --duration-stagger-5: 400ms;
+  --duration-stagger-6: 480ms;
+  --duration-stagger-7: 560ms;
+  --duration-stagger-8: 640ms;
+  --duration-stagger-9: 720ms;
+  --duration-stagger-10: 800ms;
 
   /* Elevation on a dark ground: a hairline edge + ambient darkness, no stacked
      drop shadows. */

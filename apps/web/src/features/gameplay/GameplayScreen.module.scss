@@ -18,7 +18,7 @@
 
   .header h1 {
     margin: 0;
-    font-size: var(--font-size-screen-heading);
+    font-size: var(--font-size-800);
   }
 
   .players {
@@ -29,6 +29,10 @@
 
   .players article[data-self='true'] {
     box-shadow: var(--shadow-lg);
+  }
+
+  .players article[data-self='false'] {
+    opacity: var(--opacity-opponent-board);
   }
 
   .player-header {
@@ -48,15 +52,30 @@
     gap: var(--space-2);
   }
 
-  .guess-row span {
+  .guess-row span,
+  .guess-row input {
     display: grid;
     width: var(--size-game-tile);
     aspect-ratio: 1;
     place-items: center;
     color: var(--tile-absent-text);
+    background: transparent;
     font-weight: var(--font-weight-bold);
+    text-align: center;
+    text-transform: uppercase;
     border: var(--border-width-thin) solid var(--tile-absent-border);
     border-radius: var(--radius-sm);
+  }
+
+  .guess-row input:focus {
+    border-color: var(--color-accent-300);
+    box-shadow: var(--shadow-sm);
+    outline: none;
+  }
+
+  .guess-row span[data-pending='true'] {
+    color: var(--color-accent-200);
+    border-color: var(--color-accent-400);
   }
 
   .guess-row span[data-mark='correct'] {
@@ -73,16 +92,10 @@
 
   .guess-form {
     display: grid;
-    grid-template-columns: 1fr auto;
     gap: var(--space-3);
   }
 
-  .guess-form input {
-    text-transform: uppercase;
-  }
-
   .timer {
-    grid-column: 1 / -1;
     color: var(--color-accent-300);
     text-align: center;
   }

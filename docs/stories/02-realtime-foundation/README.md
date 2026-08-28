@@ -1,6 +1,6 @@
 # Epic 02 — Realtime foundation
 
-**Status:** in progress (02-00 through 02-02 done, pending review).
+**Status:** in progress (02-00 through 02-03 done, pending review).
 
 The `Room` Durable Object becomes the authoritative lobby: players, ready state,
 game mode, host, reconnection. Fat JSON events over the socket; full `roomState`
@@ -13,8 +13,8 @@ snapshot on connect and every reconnect.
 | [00](./00-message-protocol.md) | Message protocol: zod schemas + `parseClientMessage` / `serializeServerMessage` + `assertNever`; unit tests in `packages/shared` | done, in review |
 | [01](./01-room-state-persistence.md) | `Room` state shape + storage layout; `onStart` hydration; validated reconnect snapshot helper | done, in review |
 | [02](./02-room-connection-lifecycle.md) | `Room` connection lifecycle on the hibernation API: `onConnect` (identity from injected headers, capacity check → `ROOM_FULL`, add player, send snapshot, broadcast join), `onMessage` (hydrate → zod → dispatch), `onClose`/`onError` (drop socket, `connected:false`, grace-period removal), `setWebSocketAutoResponse` ping/pong, empty-room cleanup alarm | done, in review |
-| 03 | Room-code generation module (already in `packages/shared/src/room-code.ts` from epic 00) + tests | next |
-| 04 | Create vs join: `POST /api/rooms` reserves a code via DO RPC `reserve(userId)` + 2-min alarm; join opens the socket; unknown room → `ROOM_NOT_FOUND` | |
+| [03](./03-room-code-generation.md) | Room-code generation module (already in `packages/shared/src/room-code.ts` from epic 00) + tests | done, in review |
+| 04 | Create vs join: `POST /api/rooms` reserves a code via DO RPC `reserve(userId)` + 2-min alarm; join opens the socket; unknown room → `ROOM_NOT_FOUND` | next |
 | 05 | Host assignment / reassignment by `joinedAt`; `hostChanged` broadcast | |
 | 06 | Broadcast + snapshot helpers; mutation → persist → broadcast ordering | |
 | 07 | `partysocket` client wrapper: ticket in `query`, typed event emit, terminal-error detection | |

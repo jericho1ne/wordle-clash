@@ -45,6 +45,26 @@
   }
 }
 
+.title-tile-flip {
+  animation: tileFlip var(--duration-tile-flip) both;
+}
+
+.title-tile-flip:nth-child(2) {
+  animation-delay: var(--duration-stagger-1);
+}
+
+.title-tile-flip:nth-child(3) {
+  animation-delay: var(--duration-stagger-2);
+}
+
+.title-tile-flip:nth-child(4) {
+  animation-delay: var(--duration-stagger-3);
+}
+
+.title-tile-flip:nth-child(5) {
+  animation-delay: var(--duration-stagger-4);
+}
+
 /* — app shell — */
 
 body {

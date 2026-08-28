@@ -3,27 +3,43 @@ import { useNavigate } from 'react-router'
 import { Button } from '../../ui'
 import styles from './TitleScreen.module.scss'
 
-/**
- * SCAFFOLD PLACEHOLDER. The faithful port (animated CLASH tiles, wordmark,
- * tagline, Play CTA) lands in epic 04-title-setup-screens.
- */
+const LOGO_TILES = [
+  { letter: 'C', state: 'absent' },
+  { letter: 'L', state: 'present' },
+  { letter: 'A', state: 'correct' },
+  { letter: 'S', state: 'present' },
+  { letter: 'H', state: 'correct' },
+] as const
+
 export function TitleScreen() {
   const navigate = useNavigate()
 
   return (
     <div className={`app-stage ${styles.titleScreen}`}>
       <div className="app-stage__inner">
-        <div className={styles.kicker}>GET READY FOR...</div>
-        <div className={styles.wordmark}>Wordle Clash</div>
+        <div className={styles.tiles} aria-hidden="true">
+          {LOGO_TILES.map(({ letter, state }) => (
+            <span
+              key={letter}
+              className={`${styles.tile} title-tile-flip`}
+              data-state={state}
+            >
+              {letter}
+            </span>
+          ))}
+        </div>
+        <div className={styles.kicker}>Multiplayer</div>
+        <h1 className={styles.wordmark}>Wordle Clash</h1>
         <p className={styles.tagline}>
-          Your fave civilized game is now a chaotic multiplayer experience.
+          Race friends to the word. Tie for first? Settle it in a bboy dance-off.
         </p>
-        <Button block onClick={() => navigate('/setup')}>
+        <Button
+          block
+          trailingIcon={<span aria-hidden="true">→</span>}
+          onClick={() => navigate('/setup')}
+        >
           Play
         </Button>
-        <p className={styles.note}>
-          Scaffold placeholder — see docs/stories/04-title-setup-screens.
-        </p>
       </div>
     </div>
   )

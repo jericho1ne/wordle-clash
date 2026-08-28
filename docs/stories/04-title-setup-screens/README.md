@@ -1,7 +1,6 @@
 # Epic 04 — Title and setup screens
 
-**Status:** not started (scaffold placeholders exist in `src/features/title/`
-and `src/features/setup/`).
+**Status:** implemented, pending user verification.
 
 Deliver the complete first-run path from the title screen through manual room
 creation or joining. Invite-link generation and invited-player landing belong
@@ -15,8 +14,9 @@ to Epic 05.
 | 01 | **Player setup form:** finish the `/setup` shell and back navigation; add the 14-character name field with trimming and live initials; add an accessible five-option avatar picker backed by `AVATAR_STEPS` | Enter and edit a name, select every avatar with pointer and keyboard, and navigate between Title and Setup |
 | 02 | **Manual create/join flow:** add the Create/Join segmented control, conditional normalized room-code input, validation and pending/error UI; persist the selected profile, create via `POST /api/rooms` or manually join a code, then navigate to `/room/:code` | In two browser profiles, create a room in one window, manually enter its code in the other, and land both players in the same lobby; an invalid code stays on Setup with an error |
 
-Each story is one PR layer and targets 600–800 changed implementation lines or
-less. Story 02 completes the epic's frontend-to-backend vertical slice.
+The three stories are logical review slices delivered together on the user-owned
+Epic 04 branch. The complete change targets 600–800 implementation lines or
+less; Story 02 completes the frontend-to-backend vertical slice.
 
 ## Title requirements
 
@@ -57,3 +57,13 @@ less. Story 02 completes the epic's frontend-to-backend vertical slice.
 - Baseline: [`../../verification.md`](../../verification.md) §0.
 - `pnpm --filter @wordle-clash/web test` covers title/setup component logic.
 - The full Local UI flow above passes in two browser contexts.
+
+## Implementation notes
+
+- Title and Setup use adjacent SCSS Modules and Ember tokens exclusively.
+- The avatar picker uses radio semantics, roving focus, arrow keys, Home, and
+  End while retaining native button behavior.
+- Manual room creation uses the authenticated `POST /api/rooms` endpoint.
+- Manual joining opens a short authenticated Room connection before navigation,
+  keeping authoritative unknown/full/started errors on Setup. The lobby
+  reconnects the same identity inside the server's disconnect grace period.

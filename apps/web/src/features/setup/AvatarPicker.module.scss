@@ -1,0 +1,54 @@
+.avatar-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+
+  .option {
+    display: grid;
+    width: var(--size-avatar-option);
+    aspect-ratio: 1;
+    padding: 0;
+    place-items: center;
+    cursor: pointer;
+    font: inherit;
+    font-weight: var(--font-weight-bold);
+    border: var(--border-width-thin) solid transparent;
+    border-radius: 50%;
+  }
+
+  .option[aria-checked='true'] {
+    border-width: var(--border-width-selected);
+    border-color: var(--color-accent-300);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .option:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  .option[data-avatar-id='0'] {
+    color: var(--color-accent-900);
+    background: var(--color-accent-500);
+  }
+
+  .option[data-avatar-id='1'] {
+    color: var(--color-accent-2-900);
+    background: var(--color-accent-2-500);
+  }
+
+  .option[data-avatar-id='2'] {
+    color: var(--color-neutral-900);
+    background: var(--color-neutral-400);
+  }
+
+  .option[data-avatar-id='3'] {
+    color: var(--color-danger-100);
+    background: var(--color-danger-600);
+  }
+
+  .option[data-avatar-id='4'] {
+    color: var(--color-accent-900);
+    background: var(--color-accent-300);
+  }
+}

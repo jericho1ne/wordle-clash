@@ -83,6 +83,12 @@
   --font-heading: 'Inter', system-ui, sans-serif;
   --font-heading-weight: 500;
   --font-body: 'Inter', system-ui, sans-serif;
+  --font-weight-bold: 700;
+  --font-size-kicker: 11px;
+  --font-size-title-tile: 22px;
+  --font-size-wordmark: 32px;
+  --font-size-screen-heading: 24px;
+  --font-size-supporting: 12px;
 
   --space-1: 2.8px;
   --space-2: 5.6px;
@@ -94,6 +100,18 @@
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 14px;
+
+  --border-width-thin: 1px;
+  --border-width-selected: 2px;
+  --size-title-tile: 54px;
+  --size-avatar-option: 40px;
+  --measure-copy: 32ch;
+  --perspective-title-tiles: 600px;
+  --duration-tile-flip: 500ms;
+  --duration-stagger-1: 80ms;
+  --duration-stagger-2: 160ms;
+  --duration-stagger-3: 240ms;
+  --duration-stagger-4: 320ms;
 
   /* Elevation on a dark ground: a hairline edge + ambient darkness, no stacked
      drop shadows. */

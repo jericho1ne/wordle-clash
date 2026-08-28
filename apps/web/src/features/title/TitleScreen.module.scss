@@ -1,31 +1,59 @@
-// TitleScreen-specific styling. The Ember utility classes (.btn, …) stay global
-// and are composed via className; everything here nests under the single root
-// class `.title-screen` (referenced as `styles.titleScreen`). Ember tokens only.
-
 .title-screen {
+  text-align: center;
+
+  .tiles {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+    perspective: var(--perspective-title-tiles);
+  }
+
+  .tile {
+    display: grid;
+    width: min(var(--size-title-tile), 16vw);
+    aspect-ratio: 1;
+    place-items: center;
+    color: var(--tile-absent-text);
+    font-family: var(--font-heading);
+    font-size: var(--font-size-title-tile);
+    font-weight: var(--font-weight-bold);
+    line-height: 1;
+    border: var(--border-width-thin) solid var(--tile-absent-border);
+    border-radius: var(--radius-sm);
+    backface-visibility: hidden;
+  }
+
+  .tile[data-state='present'] {
+    color: var(--tile-present-text);
+    border-color: var(--tile-present-border);
+  }
+
+  .tile[data-state='correct'] {
+    color: var(--tile-correct-text);
+    background: var(--tile-correct-bg);
+    border-color: var(--tile-correct-border);
+  }
+
   .kicker {
-    font-size: 11px;
+    color: var(--color-accent);
+    font-size: var(--font-size-kicker);
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    opacity: 0.55;
     margin-bottom: var(--space-3);
   }
 
   .wordmark {
     font-family: var(--font-heading);
-    font-size: 32px;
-    font-weight: 500;
+    font-size: var(--font-size-wordmark);
+    font-weight: var(--font-heading-weight);
     margin-bottom: var(--space-2);
   }
 
   .tagline {
-    opacity: 0.65;
+    max-width: var(--measure-copy);
+    margin-inline: auto;
+    color: var(--color-neutral-400);
     margin-bottom: var(--space-6);
-  }
-
-  .note {
-    font-size: 12px;
-    opacity: 0.45;
-    margin-top: var(--space-6);
   }
 }

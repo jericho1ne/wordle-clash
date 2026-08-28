@@ -8,7 +8,7 @@ declare namespace Cloudflare {
     /** Built SPA assets, with SPA fallback (see wrangler.jsonc). */
     ASSETS: Fetcher
     /** One Durable Object per room, addressed by room code. */
-    ROOM: DurableObjectNamespace
+    ROOM: DurableObjectNamespace<import('./src/rooms/Room').Room>
     /** D1: accounts, favorites, (inert) match history. */
     DB: D1Database
     /** Set via `wrangler secret put` / .dev.vars. */

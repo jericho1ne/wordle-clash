@@ -10,11 +10,12 @@ export const ROOM_STATE_STORAGE_KEY = 'state'
 export function createInitialRoomState(
   roomCode: string,
   createdAt = Date.now(),
+  hostId: string | null = null,
 ): RoomState {
   return roomStateSchema.parse({
     roomCode,
     phase: 'lobby',
-    hostId: null,
+    hostId,
     gameMode: DEFAULT_GAME_MODE,
     players: [],
     createdAt,

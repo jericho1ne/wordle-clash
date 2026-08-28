@@ -2,6 +2,7 @@ import { routePartykitRequest } from 'partyserver'
 
 import { createAuth } from './auth'
 import { handleFavorites } from './favorites/routes'
+import { handleCreateRoom } from './rooms/routes'
 import {
   authorizeWebSocketRequest,
   handleRealtimeTicket,
@@ -33,6 +34,10 @@ export default {
 
     if (url.pathname === '/api/rt/ticket') {
       return handleRealtimeTicket(request, env)
+    }
+
+    if (url.pathname === '/api/rooms') {
+      return handleCreateRoom(request, env)
     }
 
     if (url.pathname === '/api/favorites') {

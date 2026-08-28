@@ -6,4 +6,17 @@
     font-family: ui-monospace, 'SF Mono', Menlo, monospace;
     font-size: 22px;
   }
+
+  .connection {
+    color: var(--color-accent);
+    margin-bottom: var(--space-3);
+  }
+
+  .players {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0 0 var(--space-3);
+    padding: 0;
+    list-style: none;
+  }
 }

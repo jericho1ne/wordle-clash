@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useParams } from 'react-router'
 
 import {
@@ -6,8 +7,17 @@ import {
 } from '@wordle-clash/shared'
 
 import { useFavorites } from '../../identity'
+import { useRoomStore } from '../../realtime'
 import { Button } from '../../ui'
 import styles from './LobbyScreen.module.scss'
+
+const CONNECTION_LABELS = {
+  idle: 'Waiting for a valid room code',
+  connecting: 'Connecting…',
+  connected: 'Connected',
+  reconnecting: 'Reconnecting…',
+  terminal: 'Unable to join room',
+}
 
 /**
  * SCAFFOLD PLACEHOLDER. The RoomServer-backed lobby (player list, ready states,
@@ -24,6 +34,21 @@ export function LobbyScreen() {
   } = useFavorites()
   const validRoomCode = isValidRoomCode(roomCode)
   const favorite = isFavorite(roomCode)
+  const connect = useRoomStore(({ connect }) => connect)
+  const disconnect = useRoomStore(({ disconnect }) => disconnect)
+  const connectionStatus = useRoomStore(({ status }) => status)
+  const room = useRoomStore(({ room }) => room)
+  const selfId = useRoomStore(({ selfId }) => selfId)
+  const connectionError = useRoomStore(({ error }) => error)
+  const setReady = useRoomStore(({ setReady }) => setReady)
+  const self = room?.players.find(({ id }) => id === selfId)
+
+  useEffect(() => {
+    if (!validRoomCode) return
+
+    connect(roomCode)
+    return disconnect
+  }, [connect, disconnect, roomCode, validRoomCode])
 
   const toggleFavorite = () => {
     void toggle(roomCode).catch(() => undefined)
@@ -35,6 +60,31 @@ export function LobbyScreen() {
         <div className="card elev-md">
           <div className="card-kicker">Room code</div>
           <div className={`card-title ${styles.code}`}>{roomCode || '—'}</div>
+          <div className={styles.connection}>
+            Realtime: {CONNECTION_LABELS[connectionStatus]}
+            {!room ? '' : ` · ${room.players.length} player${room.players.length === 1 ? '' : 's'}`}
+          </div>
+          {room && (
+            <ul className={styles.players}>
+              {room.players.map((player) => (
+                <li key={player.id}>
+                  {player.name}
+                  {player.isHost ? ' · host' : ''}
+                  {player.ready ? ' · ready' : ''}
+                  {!player.connected ? ' · reconnecting' : ''}
+                </li>
+              ))}
+            </ul>
+          )}
+          {self && (
+            <Button
+              variant={self.ready ? 'secondary' : 'primary'}
+              aria-pressed={self.ready}
+              onClick={() => setReady(!self.ready)}
+            >
+              {self.ready ? 'Not ready' : 'Ready up'}
+            </Button>
+          )}
           <Button
             variant={favorite ? 'secondary' : 'ghost'}
             disabled={!validRoomCode}
@@ -44,7 +94,9 @@ export function LobbyScreen() {
             {favorite ? 'Favorited' : 'Favorite room'}
           </Button>
           <div className="card-meta">
-            {error
+            {connectionError
+              ? connectionError.message
+              : error
               ? error.message
               : favorite
                 ? 'Saved to your favorites.'

@@ -30,6 +30,7 @@ import {
   applyHost,
   selectNextHostId,
 } from './host'
+import { MutationQueue } from './mutation-queue'
 import {
   createInitialRoomState,
   createRoomSnapshot,
@@ -81,6 +82,7 @@ export class Room extends Server<Env> {
   /** Authoritative room state. Mirror of the durable `state` value. */
   state: RoomState | null = null
   lifecycle: RoomLifecycle = emptyLifecycle()
+  #mutations = new MutationQueue()
 
   override async onStart(): Promise<void> {
     const [storedState, storedLifecycle] = await Promise.all([
@@ -104,6 +106,31 @@ export class Room extends Server<Env> {
   }
 
   override async onConnect(connection: Connection, ctx: ConnectionContext): Promise<void> {
+    await this.#mutations.run(() => this.#handleConnect(connection, ctx))
+  }
+
+  override async onMessage(connection: Connection, frame: WSMessage): Promise<void> {
+    await this.#mutations.run(() => this.#handleMessage(connection, frame))
+  }
+
+  override async onClose(connection: Connection): Promise<void> {
+    await this.#mutations.run(() => this.#handleDisconnect(connection))
+  }
+
+  override async onError(connection: Connection, _error: unknown): Promise<void> {
+    await this.#mutations.run(() => this.#handleDisconnect(connection))
+  }
+
+  override async onAlarm(): Promise<void> {
+    await this.#mutations.run(() => this.#handleAlarm())
+  }
+
+  /** Atomically claim this named DO as a room. Called through Durable Object RPC. */
+  reserve(userId: string, now = Date.now()): Promise<boolean> {
+    return this.#mutations.run(() => this.#reserve(userId, now))
+  }
+
+  async #handleConnect(connection: Connection, ctx: ConnectionContext): Promise<void> {
     const identity = parseConnectionIdentity(ctx.request)
     const state = this.state
 
@@ -136,7 +163,7 @@ export class Room extends Server<Env> {
       const patch = this.#reconnectPlayer(existingPlayer, identity)
       const hostChanged = this.#assignHostIfVacant()
       await this.#save()
-      this.#send(connection, createRoomSnapshot(state, identity.userId))
+      this.#sendSnapshot(connection, identity.userId)
 
       if (Object.keys(patch).length > 0) {
         this.#broadcast({
@@ -151,7 +178,7 @@ export class Room extends Server<Env> {
       const player = this.#addPlayer(identity)
       const hostChanged = this.#assignHostIfVacant()
       await this.#save()
-      this.#send(connection, createRoomSnapshot(state, identity.userId))
+      this.#sendSnapshot(connection, identity.userId)
       this.#broadcast({ t: 'playerJoined', player }, [connection.id])
       if (hostChanged) this.#broadcastHostChanged([connection.id])
     }
@@ -159,7 +186,7 @@ export class Room extends Server<Env> {
     await this.#scheduleNextAlarm()
   }
 
-  override async onMessage(connection: Connection, frame: WSMessage): Promise<void> {
+  async #handleMessage(connection: Connection, frame: WSMessage): Promise<void> {
     let message: ClientMessage
     try {
       message = parseClientMessage(frame)
@@ -178,15 +205,7 @@ export class Room extends Server<Env> {
     await this.#dispatch(connection, connectionState.userId, message)
   }
 
-  override async onClose(connection: Connection): Promise<void> {
-    await this.#handleDisconnect(connection)
-  }
-
-  override async onError(connection: Connection, _error: unknown): Promise<void> {
-    await this.#handleDisconnect(connection)
-  }
-
-  override async onAlarm(): Promise<void> {
+  async #handleAlarm(): Promise<void> {
     const now = Date.now()
     const removedPlayerIds: string[] = []
     let hostChanged = false
@@ -259,8 +278,7 @@ export class Room extends Server<Env> {
     }
   }
 
-  /** Atomically claim this named DO as a room. Called through Durable Object RPC. */
-  async reserve(userId: string, now = Date.now()): Promise<boolean> {
+  async #reserve(userId: string, now: number): Promise<boolean> {
     if (this.state) return false
 
     this.state = createInitialRoomState(this.name, now, userId)
@@ -516,6 +534,11 @@ export class Room extends Server<Env> {
 
   #send(connection: Connection, message: ServerMessage): void {
     connection.send(serializeServerMessage(message))
+  }
+
+  #sendSnapshot(connection: Connection, selfId: string): void {
+    if (!this.state) throw new Error('Cannot snapshot an unreserved room')
+    this.#send(connection, createRoomSnapshot(this.state, selfId))
   }
 
   #broadcast(message: ServerMessage, without?: string[]): void {

@@ -11,7 +11,7 @@ import {
 } from './gameplay'
 
 describe('gameplay', () => {
-  it('normalizes and validates five-letter guesses without a dictionary', () => {
+  it('normalizes and validates the shape of five-letter guesses', () => {
     expect(normalizeGuess('  qzxjk ')).toBe('QZXJK')
     expect(isValidGuess('qzxjk')).toBe(true)
     expect(isValidGuess('four')).toBe(false)

@@ -3,24 +3,34 @@ import {
   normalizeGuess,
 } from '@wordle-clash/shared'
 
-const ANSWERS = [
-  'APPLE', 'BEACH', 'BLAZE', 'BRAVE', 'BRICK', 'CHARM', 'CLASH', 'CLOUD',
-  'CORAL', 'CRANE', 'DANCE', 'EMBER', 'FLAME', 'FROST', 'GIANT', 'GRAPE',
-  'HEART', 'LIGHT', 'MAGIC', 'MANGO', 'NIGHT', 'OCEAN', 'PARTY', 'PEARL',
-  'PIXEL', 'PLANT', 'QUEST', 'RIVER', 'ROBOT', 'SHINE', 'SPARK', 'STORM',
-  'TIGER', 'TOAST', 'WATER', 'WHALE', 'WORLD', 'ZEBRA',
-] as const
+import validWordleWords from './valid-wordle-words.txt'
+import wordleAnswers from './wordle-answers.txt'
+
+const VALID_GUESSES = new Set(validWordleWords
+  .split(/\s+/)
+  .filter(Boolean)
+  .map((word) => word.toUpperCase()))
+
+const ANSWERS = wordleAnswers
+  .split(/\s+/)
+  .filter(Boolean)
+  .map((word) => word.toUpperCase())
 
 export function selectAnswer(forcedAnswer?: string, random = Math.random): string {
   if (forcedAnswer) {
     const normalized = normalizeGuess(forcedAnswer)
-    if (!isValidGuess(normalized)) {
-      throw new Error('GAMEPLAY_TEST_ANSWER must contain exactly five letters')
+    if (!isAllowedGuess(normalized)) {
+      throw new Error('GAMEPLAY_TEST_ANSWER must be in the allowed word list')
     }
     return normalized
   }
 
   const answer = ANSWERS[Math.floor(random() * ANSWERS.length)]
-  if (!answer || !isValidGuess(answer)) throw new Error('The answer pool is invalid')
+  if (!answer || !isAllowedGuess(answer)) throw new Error('The answer pool is invalid')
   return answer
+}
+
+export function isAllowedGuess(value: string): boolean {
+  const normalized = normalizeGuess(value)
+  return isValidGuess(normalized) && VALID_GUESSES.has(normalized)
 }

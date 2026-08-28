@@ -1,5 +1,6 @@
 Synchronous mode — Rules
 
+- Guesses must be five-letter words in the server's Wordle allow-list.
 - 5 total guesses per player.
 - Every player has up to 1 minute to submit each guess.
 - Guesses are secretly registered — no one sees others' guesses until the timer ends or everyone has submitted.
@@ -11,6 +12,7 @@ Synchronous mode — Rules
 
 Real-time mode — Rules
 
+- Guesses must be five-letter words in the server's Wordle allow-list.
 - 10 total guesses per player.
 - No shared timer or turn order — every player submits guesses as fast as they want.
 - Guesses are visible in real time (or per house rule) as players submit them.

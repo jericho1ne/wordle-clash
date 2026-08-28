@@ -56,6 +56,24 @@ export function SetupScreen() {
   const submitLabel = pending
     ? mode === 'create' ? 'Creating room…' : 'Joining room…'
     : mode === 'create' ? 'Create room' : 'Join room'
+  const roomCodeInput = (
+    <Input
+      id="room-code"
+      name="roomCode"
+      value={roomCode}
+      className={styles.roomCode}
+      placeholder="eg: CLSH◦2468"
+      aria-label="Room code"
+      autoCapitalize="characters"
+      autoComplete="off"
+      spellCheck={false}
+      readOnly={isInvite}
+      onChange={(event) => {
+        setRoomCode(normalizeRoomCode(event.target.value))
+        setError(null)
+      }}
+    />
+  )
 
   const changeMode = (nextMode: RoomEntryMode) => {
     setMode(nextMode)
@@ -153,48 +171,33 @@ export function SetupScreen() {
             {!isInvite && (
               <div className={styles.modeField}>
                 <div className={styles.label} id="room-entry-label">Room</div>
-                <SegmentedControl
-                  name="room-entry-mode"
-                  aria-labelledby="room-entry-label"
-                  value={mode}
-                  onChange={changeMode}
-                  options={[
-                    {
-                      value: 'create',
-                      label: 'Create room',
-                      icon: <span aria-hidden="true">+</span>,
-                    },
-                    {
-                      value: 'join',
-                      label: 'Join room',
-                      icon: <span aria-hidden="true">→</span>,
-                    },
-                  ]}
-                />
+                <div className={styles.roomEntryControls}>
+                  <SegmentedControl
+                    name="room-entry-mode"
+                    aria-labelledby="room-entry-label"
+                    value={mode}
+                    onChange={changeMode}
+                    options={[
+                      {
+                        value: 'create',
+                        label: 'Create room',
+                        icon: <span aria-hidden="true">+</span>,
+                      },
+                      {
+                        value: 'join',
+                        label: 'Join room',
+                        icon: <span aria-hidden="true">→</span>,
+                      },
+                    ]}
+                  />
+                  {mode === 'join' && roomCodeInput}
+                </div>
               </div>
             )}
 
-            {mode === 'join' && (
-              <Field
-                label="Room code"
-                htmlFor="room-code"
-                hint="Four letters and four numbers"
-              >
-                <Input
-                  id="room-code"
-                  name="roomCode"
-                  value={roomCode}
-                  className={styles.roomCode}
-                  placeholder="e.g. PLUM-7421"
-                  autoCapitalize="characters"
-                  autoComplete="off"
-                  spellCheck={false}
-                  readOnly={isInvite}
-                  onChange={(event) => {
-                    setRoomCode(normalizeRoomCode(event.target.value))
-                    setError(null)
-                  }}
-                />
+            {isInvite && mode === 'join' && (
+              <Field label="Room code" htmlFor="room-code">
+                {roomCodeInput}
               </Field>
             )}
           </fieldset>

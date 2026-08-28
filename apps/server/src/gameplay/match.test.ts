@@ -12,7 +12,10 @@ import {
   evaluateForMatch,
   isCorrectGuess,
 } from './match'
-import { selectAnswer } from './answers'
+import {
+  isAllowedGuess,
+  selectAnswer,
+} from './answers'
 
 const players: Player[] = [
   {
@@ -30,6 +33,16 @@ const players: Player[] = [
 describe('authoritative match', () => {
   it('accepts a deterministic answer for local and integration tests', () => {
     expect(selectAnswer('clash')).toBe('CLASH')
+  })
+
+  it('selects from the complete server-only answer pool', () => {
+    expect(selectAnswer(undefined, () => 0)).toBe('ABACK')
+    expect(selectAnswer(undefined, () => 0.999_999)).toBe('ZONAL')
+  })
+
+  it('accepts listed words and rejects arbitrary five-letter strings', () => {
+    expect(isAllowedGuess('crane')).toBe(true)
+    expect(isAllowedGuess('qzxjk')).toBe(false)
   })
 
   it('never includes an active answer in a client snapshot', () => {

@@ -68,11 +68,10 @@ full `roomState` snapshot so a client can always resync. The message contract is
 a zod-validated discriminated union in `packages/shared/src/protocol.ts`.
 
 ### The secret word never reaches the client
-There is **no guess dictionary anywhere** — any typed 5-letter string is a valid
-guess (a deliberate design choice: the competitive mode is meant to be chaotic,
-and junk-probing is a legitimate strategy). The only word list is the ~2,300-word
-**answer pool**, which stays server-side and is only introduced with the gameplay
-epics.
+Guess validation and answer selection remain server-side. The Worker bundles a
+Wordle allow-list for submitted guesses plus a smaller answer pool; neither list
+ships in the SPA. The Durable Object normalizes and validates each guess before
+evaluating or persisting it.
 
 ### Guest-first, invisible identity
 First visit silently mints an anonymous identity (better-auth `anonymous`

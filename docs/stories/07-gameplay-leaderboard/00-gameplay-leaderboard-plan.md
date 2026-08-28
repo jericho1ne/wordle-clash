@@ -12,7 +12,7 @@ without bypassing its realtime and lobby dependencies.
 
 - The Durable Object is authoritative for all gameplay and never sends the
   secret answer to clients before an allowed terminal reveal.
-- Any five-letter string is a valid guess; the server ships only an answer pool.
+- Guesses must appear in the server-only Wordle allow-list; answers come from the smaller answer pool.
 - Real-time winner selection is serialized in the Durable Object.
 - Synchronous deadlines use persisted timestamps plus Durable Object alarms, not
   browser timers.

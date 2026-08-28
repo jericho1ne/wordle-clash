@@ -12,8 +12,8 @@ race to find the word before they do.
 - **Real-time:** No turns and no waiting. Submit as quickly as you can—the first
   player to solve the word wins.
 
-Any five-letter string is a valid guess. There is no dictionary standing between
-you and a deeply questionable strategy.
+Guesses come from the familiar Wordle word list, so every clash stays fast,
+fair, and open to deeply questionable strategies.
 
 ## Screenshots
 

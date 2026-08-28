@@ -10,6 +10,7 @@ import {
   ProfileProvider,
 } from './identity'
 import { router } from './router'
+import { ToastProvider } from './ui'
 
 const container = document.getElementById('root')
 if (!container) throw new Error('#root element not found')
@@ -19,7 +20,9 @@ createRoot(container).render(
     <IdentityProvider>
       <ProfileProvider>
         <FavoritesProvider>
-          <RouterProvider router={router} />
+          <ToastProvider>
+            <RouterProvider router={router} />
+          </ToastProvider>
         </FavoritesProvider>
       </ProfileProvider>
     </IdentityProvider>

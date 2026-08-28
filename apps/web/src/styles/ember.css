@@ -110,7 +110,12 @@
   --size-animal-icon: 22px;
   --size-animal-picker: 120px;
   --size-toggle-indicator: 8px;
+  --size-lobby-avatar: 34px;
   --inset-floating-control: var(--space-6);
+  --measure-toast: 360px;
+  --layer-toast: 20;
+  --duration-toast-in: 180ms;
+  --duration-player-join: 350ms;
   --measure-copy: 32ch;
   --perspective-title-tiles: 600px;
   --duration-tile-flip: 500ms;
@@ -474,6 +479,11 @@ textarea.input {
 .seg-opt:has(input:focus-visible) {
   outline: 2px solid var(--color-accent);
   outline-offset: -2px;
+}
+
+.seg-opt:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 /* — cards — */

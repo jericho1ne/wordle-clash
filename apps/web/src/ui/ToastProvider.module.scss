@@ -1,0 +1,22 @@
+.toast-provider {
+  position: fixed;
+  z-index: var(--layer-toast);
+  inset-block-end: var(--space-6);
+  inset-inline-start: 50%;
+  display: grid;
+  gap: var(--space-2);
+  width: min(var(--measure-toast), calc(100% - var(--space-8)));
+  pointer-events: none;
+  transform: translateX(-50%);
+
+  .toast {
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-neutral-100);
+    text-align: center;
+    background: var(--color-neutral-800);
+    border: var(--border-width-thin) solid var(--color-neutral-600);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    animation: toastIn var(--duration-toast-in) both;
+  }
+}

@@ -11,6 +11,7 @@ export interface SegmentedControlProps<T extends string> {
   options: SegmentedOption<T>[]
   value: T
   onChange: (value: T) => void
+  disabled?: boolean
   'aria-label'?: string
   'aria-labelledby'?: string
 }
@@ -20,6 +21,7 @@ export function SegmentedControl<T extends string>({
   options,
   value,
   onChange,
+  disabled = false,
   ...aria
 }: SegmentedControlProps<T>) {
   return (
@@ -31,6 +33,7 @@ export function SegmentedControl<T extends string>({
             name={name}
             value={opt.value}
             checked={value === opt.value}
+            disabled={disabled}
             onChange={() => onChange(opt.value)}
           />
           {opt.icon}

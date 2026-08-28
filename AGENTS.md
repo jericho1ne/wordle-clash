@@ -7,17 +7,26 @@ Rationale and detail: [`docs/architecture.md`](./docs/architecture.md).
 
 ## Operating rules
 
-1. If practical, keep each work item (Story) at 1,000–2,000 changed lines of
-   implementation code or less.
-2. **Use the official `github/gh-stack` extension for stacked pull requests** —
+1. **Keep each pull request small:** target 600–800 changed lines of
+   implementation code and keep every PR at 800 lines or less whenever
+   practical. Split a Story into additional stacked layers before exceeding
+   that limit. Generated files, lockfiles, migrations, and planning docs do not
+   count as implementation code, but still keep them reviewable.
+2. **Build vertical, UI-testable slices.** Plan each feature stack across every
+   required layer—shared contract, backend/storage, client state, and frontend—
+   so the completed stack produces a coherent feature the user can exercise in
+   the browser. Do not end a feature stack at backend plumbing when a small UI
+   integration can make it testable. Every stack plan and handoff must state the
+   exact localhost UI flow used to verify the slice.
+3. **Use the official `github/gh-stack` extension for stacked pull requests** —
    see [PR stacks](#pr-stacks) for the procedure. If `gh stack` is unavailable,
    prompt the user to install it with `gh extension install github/gh-stack`;
    do not install it without explicit authorization.
-3. **Never embed raw SVG markup inline in JSX templates, HTML, or TypeScript.**
+4. **Never embed raw SVG markup inline in JSX templates, HTML, or TypeScript.**
    Store SVG files under `apps/web/public/` and reference them by URL. When an
    icon must inherit the surrounding text color, reference the public SVG as a
    CSS mask and use `currentColor` for the mask background.
-4. **Keep implementation updates concise and status-oriented.**
+5. **Keep implementation updates concise and status-oriented.**
    Before starting a multi-step task, briefly list the work as bullets. As each
    bullet is completed, report its status briefly before moving to the next item.
    Do not paste verbose code-change summaries into chat unless the user explicitly
@@ -69,6 +78,12 @@ When the user asks for **several dependent stories in one go**, ship them as a
 stack of PRs with `gh stack` (github/gh-stack). Each layer is one story, named
 per [Starting a story](#starting-a-story) (`feat/01-04-field-input`, …); the
 bottom targets `main`, each layer above targets the one below.
+
+Define the stack around a complete vertical slice before creating its branches.
+The early layers may establish contracts or backend behavior, but the final
+layer must expose the feature through the UI and document a browser-based
+localhost verification flow. A backend-only stack is incomplete unless the user
+explicitly scopes the work as infrastructure with no UI consumer.
 
 **Prereqs**
 

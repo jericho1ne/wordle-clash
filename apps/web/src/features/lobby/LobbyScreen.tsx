@@ -23,6 +23,7 @@ import {
   copyRoomCode,
   shareRoomInvite,
 } from './invite'
+import { LobbyMusic } from './LobbyMusic'
 import styles from './LobbyScreen.module.scss'
 
 type Feedback = 'code' | 'invite' | null
@@ -180,6 +181,7 @@ export function LobbyScreen() {
           )}
         </div>
       </div>
+      <LobbyMusic />
     </div>
   )
 }

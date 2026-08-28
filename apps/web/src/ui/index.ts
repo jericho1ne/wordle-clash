@@ -8,6 +8,7 @@ export { Input } from './Input'
 export { RadioGroup } from './RadioGroup'
 export { SegmentedControl } from './SegmentedControl'
 export { Tag } from './Tag'
+export { Toggle } from './Toggle'
 
 export type { AnimalIconProps } from './AnimalIcon'
 export type { AvatarProps } from './Avatar'
@@ -31,3 +32,4 @@ export type {
   TagProps,
   TagTone,
 } from './Tag'
+export type { ToggleProps } from './Toggle'

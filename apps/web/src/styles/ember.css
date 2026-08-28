@@ -109,6 +109,8 @@
   --size-avatar-option: 40px;
   --size-animal-icon: 22px;
   --size-animal-picker: 120px;
+  --size-toggle-indicator: 8px;
+  --inset-floating-control: var(--space-6);
   --measure-copy: 32ch;
   --perspective-title-tiles: 600px;
   --duration-tile-flip: 500ms;

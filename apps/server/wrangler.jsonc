@@ -6,6 +6,13 @@
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
 
+  // Production hostnames. Custom Domains make this Worker the origin and let
+  // Cloudflare manage the DNS records and TLS certificates automatically.
+  "routes": [
+    { "pattern": "wordleclash.com", "custom_domain": true },
+    { "pattern": "www.wordleclash.com", "custom_domain": true },
+  ],
+
   // The single Worker also serves the built SPA. `vite build` in apps/web
   // produces ../web/dist; `wrangler deploy` from here ships assets + Worker +
   // Durable Object + D1 in one shot. SPA fallback lets /room/:code deep-link.

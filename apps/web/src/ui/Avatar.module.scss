@@ -1,0 +1,13 @@
+@use '../styles/mixins' as mixins;
+
+.avatar {
+  @include mixins.avatar-color;
+
+  display: grid;
+  flex: 0 0 var(--size-avatar-option);
+  width: var(--size-avatar-option);
+  aspect-ratio: 1;
+  place-items: center;
+  font-weight: var(--font-weight-bold);
+  border-radius: 50%;
+}

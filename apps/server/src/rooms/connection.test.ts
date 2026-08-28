@@ -19,11 +19,13 @@ describe('room connection identity', () => {
       'x-user-id': 'user-1',
       'x-user-name': 'Nova',
       'x-user-avatar': '2',
+      'x-user-animal': '7',
       'x-user-is-anonymous': 'true',
     }))).toEqual({
       userId: 'user-1',
       name: 'Nova',
       avatarId: 2,
+      animalId: 7,
       isAnonymous: true,
     })
   })

@@ -14,7 +14,7 @@ remote players only.
 | 01 | Extend the epic-05 room-code card with favorite `<IconButton>` Star (ghost off / secondary + `weight="fill"` on) → `useFavorites().toggle` + toast |
 | 02 | Game-mode `<SegmentedControl>` "Synchronous" / "Real-time" bound to `room.gameMode`; host-only edit; description paragraph from `GAME_MODES[...].description` |
 | 03 | "Players · N" + list: 34px avatar, name, `<Tag tone="accent">YOU</Tag>` / `<Tag tone="neutral">HOST</Tag>`, right-aligned "✓ Ready" (`--color-accent-200`) / "Waiting…" (`--color-neutral-500`); non-self rows `joinIn 0.35s`; each `playerJoined` → toast "<name> joined the lobby" |
-| 04 | Ready `<Button>`: secondary "Ready up" → ghost "✓ Ready"; `setReady(!self.ready)` optimistic |
+| 04 | Ready `<Button>`: secondary "I'm Ready" → ghost "✓ Ready"; `setReady(!self.ready)` optimistic |
 | 05 | "Start game" primary block, host-only, disabled unless `players.length >= 2 && players.every(ready)`; hint line; `startMatch()` → server validates + broadcasts `matchStarting`; all clients open `<Dialog>` "Match starting" (`<mode> · <tries> tries · <playerCount> players` + subline + "Got it"). **TODO(gameplay-epic): replace dialog with navigation to `/room/:code/play`.** `phase → 'starting'`; late joiner → `error` "match already started" |
 | 06 | Centralize lobby toasts through the one `<ToastProvider>` |
 

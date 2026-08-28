@@ -4,6 +4,7 @@ import {
 } from 'jose'
 
 import {
+  ANIMAL_COUNT,
   AVATAR_COUNT,
   MAX_NAME_LENGTH,
 } from '@wordle-clash/shared'
@@ -18,6 +19,7 @@ export interface RealtimeTicketIdentity {
   userId: string
   name: string
   avatarId: number
+  animalId: number
   isAnonymous: boolean
 }
 
@@ -30,7 +32,14 @@ function ticketKey(secret: string): Uint8Array {
 }
 
 function assertClaims(payload: Record<string, unknown>): RealtimeTicketIdentity {
-  const { sub, name, avatarId, isAnon, exp } = payload
+  const {
+    sub,
+    name,
+    avatarId,
+    animalId,
+    isAnon,
+    exp,
+  } = payload
 
   if (typeof sub !== 'string' || sub.length === 0) {
     throw new Error('Realtime ticket is missing a subject')
@@ -49,6 +58,15 @@ function assertClaims(payload: Record<string, unknown>): RealtimeTicketIdentity 
     throw new Error('Realtime ticket contains an invalid avatar')
   }
 
+  if (
+    typeof animalId !== 'number' ||
+    !Number.isInteger(animalId) ||
+    animalId < 0 ||
+    animalId >= ANIMAL_COUNT
+  ) {
+    throw new Error('Realtime ticket contains an invalid animal')
+  }
+
   if (typeof isAnon !== 'boolean' || typeof exp !== 'number') {
     throw new Error('Realtime ticket contains invalid claims')
   }
@@ -57,6 +75,7 @@ function assertClaims(payload: Record<string, unknown>): RealtimeTicketIdentity 
     userId: sub,
     name,
     avatarId,
+    animalId,
     isAnonymous: isAnon,
   }
 }
@@ -71,6 +90,7 @@ export async function signRealtimeTicket(
   return new SignJWT({
     name: identity.name,
     avatarId: identity.avatarId,
+    animalId: identity.animalId,
     isAnon: identity.isAnonymous,
   })
     .setProtectedHeader({ alg: TICKET_ALGORITHM, typ: 'JWT' })

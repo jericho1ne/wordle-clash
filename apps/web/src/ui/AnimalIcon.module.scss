@@ -1,0 +1,6 @@
+.animal-icon {
+  width: var(--size-animal-icon);
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}

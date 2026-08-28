@@ -17,7 +17,7 @@ import {
 const CLIENT_MESSAGES: ClientMessage[] = [
   { t: 'setReady', ready: true },
   { t: 'setGameMode', mode: 'realtime' },
-  { t: 'updateProfile', name: 'Nova', avatarId: 2 },
+  { t: 'updateProfile', name: 'Nova', avatarId: 2, animalId: 7 },
   { t: 'startMatch' },
   { t: 'leave' },
   { t: 'ping' },
@@ -36,6 +36,7 @@ const ROOM_STATE_MESSAGE: ServerMessage = {
         id: 'user-1',
         name: 'Nova',
         avatarId: 2,
+        animalId: 7,
         isHost: true,
         ready: false,
         connected: true,

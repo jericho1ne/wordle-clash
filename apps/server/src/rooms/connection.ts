@@ -1,6 +1,7 @@
 import type { Connection } from 'partyserver'
 
 import {
+  ANIMAL_COUNT,
   AVATAR_COUNT,
   MAX_NAME_LENGTH,
 } from '@wordle-clash/shared'
@@ -9,6 +10,7 @@ export interface ConnectionIdentity {
   userId: string
   name: string
   avatarId: number
+  animalId: number
   isAnonymous: boolean
 }
 
@@ -25,9 +27,13 @@ export function parseConnectionIdentity(request: Request): ConnectionIdentity {
   const userId = request.headers.get('x-user-id')?.trim()
   const name = request.headers.get('x-user-name')?.trim().slice(0, MAX_NAME_LENGTH)
   const avatarValue = request.headers.get('x-user-avatar')
+  const animalValue = request.headers.get('x-user-animal')
   const isAnonymousValue = request.headers.get('x-user-is-anonymous')
   const avatarId = avatarValue?.trim()
     ? Number(avatarValue)
+    : Number.NaN
+  const animalId = animalValue?.trim()
+    ? Number(animalValue)
     : Number.NaN
 
   if (
@@ -40,6 +46,14 @@ export function parseConnectionIdentity(request: Request): ConnectionIdentity {
     throw new Error('Trusted connection identity headers are missing or invalid')
   }
 
+  if (
+    !Number.isInteger(animalId) ||
+    animalId < 0 ||
+    animalId >= ANIMAL_COUNT
+  ) {
+    throw new Error('Trusted animal identity header is missing or invalid')
+  }
+
   if (isAnonymousValue !== 'true' && isAnonymousValue !== 'false') {
     throw new Error('Trusted anonymous identity header is missing or invalid')
   }
@@ -48,6 +62,7 @@ export function parseConnectionIdentity(request: Request): ConnectionIdentity {
     userId,
     name,
     avatarId,
+    animalId,
     isAnonymous: isAnonymousValue === 'true',
   }
 }

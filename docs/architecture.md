@@ -77,7 +77,7 @@ epics.
 ### Guest-first, invisible identity
 First visit silently mints an anonymous identity (better-auth `anonymous`
 plugin). It is plumbing — a signed token for socket auth plus the player's
-name/avatar — never surfaced as "an account", and there is no login step in the
+name, avatar color, and animal — never surfaced as "an account", and there is no login step in the
 title → setup → lobby flow. **No route or action ever requires an account.**
 
 Signing up is **purely additive**. The only things an account unlocks:

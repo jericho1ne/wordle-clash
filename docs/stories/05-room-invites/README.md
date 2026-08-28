@@ -1,6 +1,6 @@
 # Epic 05 — Room invites
 
-**Status:** not started.
+**Status:** implemented; local UI verification pending.
 
 Let a host send a canonical room link using the device share sheet or clipboard,
 then carry the recipient through guest profile setup into the live room. Invites
@@ -28,6 +28,7 @@ record, or separate invite token.
 |---|---|---|
 | 00 | **Share an invite:** canonical invite URL helper; lobby room-code card; Invite friends action using `navigator.share` with clipboard fallback; separate Copy Code action; accessible success/failure feedback with temporary Check state | Create a room, invoke the native share sheet where supported, verify fallback URL copy, and verify Copy Code writes only the canonical code |
 | 01 | **Open an invite:** canonical `/room/:code` handling; if no saved profile, redirect to `/setup?join=<code>`; force Join mode and lock the normalized code; after profile submit, enter the room; handle `ROOM_NOT_FOUND`, `ROOM_FULL`, and `MATCH_STARTED` with actionable navigation | Copy an invite from one browser profile, open it in incognito, create a distinct profile, and join the same lobby; verify invalid/expired/full/started links do not loop or reconnect forever |
+| 02 | **Animal avatars:** preserve the five-color picker; preselect a random choice from 20 bundled animal SVGs on every Setup load; offer all animals in a 4×5 dropdown; persist the numeric animal ID through Better Auth, D1, realtime tickets, and room state; render the colored animal avatar in the lobby | Load Setup repeatedly to verify randomized defaults, choose distinct color/animal combinations in two browser contexts, join the same room, and verify both combinations render consistently for both players |
 
 Each story is one PR layer and targets 600–800 changed implementation lines or
 less. Story 01 completes the share-to-join vertical slice.
@@ -45,6 +46,8 @@ less. Story 01 completes the share-to-join vertical slice.
    show the same two-player room.
 6. Repeat with an unknown or expired code and confirm a clear error returns the
    recipient to Setup without a reconnect loop.
+7. Confirm Create/Join stays disabled until an animal is selected, then verify
+   each player's chosen color and animal appear in both lobby windows.
 
 ## Verification
 
@@ -52,3 +55,17 @@ less. Story 01 completes the share-to-join vertical slice.
 - Unit coverage for canonical URLs, share capability selection, and clipboard
   fallback.
 - Two-browser invite flow passes through the real Worker and Room Durable Object.
+- Animal selection is keyboard-accessible and required before room entry.
+
+## Implementation notes
+
+- `features/lobby/invite.ts` owns canonical URLs, native sharing, and clipboard
+  behavior; the lobby keeps invite-link and room-code actions distinct.
+- `/room/:code` checks for a stored profile before rendering the lobby. New
+  recipients are sent to locked Join setup and enter the live room only after
+  profile persistence and authoritative room validation succeed.
+- Terminal room errors stop socket reconnection and offer a direct path back to
+  unlocked room setup.
+- `avatarId` remains the five-color index. The separate `animalId` maps to the
+  stable animal filename list in shared code; filenames never enter D1 or the
+  realtime protocol.

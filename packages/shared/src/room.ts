@@ -7,6 +7,7 @@ export type RoomPhase = 'lobby' | 'starting'
 export interface Profile {
   name: string
   avatarId: number
+  animalId: number | null
 }
 
 export interface Player {
@@ -14,6 +15,7 @@ export interface Player {
   id: string
   name: string
   avatarId: number
+  animalId: number
   isHost: boolean
   ready: boolean
   /** True while the player holds >= 1 live socket. */

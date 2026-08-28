@@ -27,6 +27,32 @@ export const AVATAR_STEPS: readonly AvatarStep[] = [
 
 export const AVATAR_COUNT = AVATAR_STEPS.length
 
+export const ANIMAL_NAMES = [
+  'bat',
+  'bird',
+  'butterfly',
+  'crab',
+  'crow',
+  'dog',
+  'dolphin',
+  'duck',
+  'feather',
+  'hippo',
+  'octopus',
+  'owl',
+  'rabbit',
+  'raccoon',
+  'sheep',
+  'spider',
+  'squid',
+  'squirrel',
+  'turtle',
+  'whale',
+] as const
+
+export const ANIMAL_COUNT = ANIMAL_NAMES.length
+export type AnimalName = typeof ANIMAL_NAMES[number]
+
 /** Clamp an arbitrary number to a valid avatar index. */
 export function clampAvatarId(id: number): number {
   if (!Number.isFinite(id)) return 0
@@ -35,4 +61,13 @@ export function clampAvatarId(id: number): number {
 
 export function getAvatarStep(id: number): AvatarStep {
   return AVATAR_STEPS[clampAvatarId(id)]!
+}
+
+export function clampAnimalId(id: number): number {
+  if (!Number.isFinite(id)) return 0
+  return Math.min(ANIMAL_COUNT - 1, Math.max(0, Math.trunc(id)))
+}
+
+export function getAnimalName(id: number): AnimalName {
+  return ANIMAL_NAMES[clampAnimalId(id)]!
 }

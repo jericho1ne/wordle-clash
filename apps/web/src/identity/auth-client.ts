@@ -17,6 +17,10 @@ export const authClient = createAuthClient({
           type: 'number',
           required: false,
         },
+        animalId: {
+          type: 'number',
+          required: false,
+        },
       },
     }),
   ],

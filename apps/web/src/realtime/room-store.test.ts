@@ -15,6 +15,7 @@ const SELF: Player = {
   id: 'self',
   name: 'Ember',
   avatarId: 0,
+  animalId: 0,
   isHost: true,
   ready: false,
   connected: true,

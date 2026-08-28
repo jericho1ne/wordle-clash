@@ -1,3 +1,5 @@
+export { AnimalIcon } from './AnimalIcon'
+export { Avatar } from './Avatar'
 export { Button } from './Button'
 export { Card } from './Card'
 export { Field } from './Field'
@@ -7,6 +9,8 @@ export { RadioGroup } from './RadioGroup'
 export { SegmentedControl } from './SegmentedControl'
 export { Tag } from './Tag'
 
+export type { AnimalIconProps } from './AnimalIcon'
+export type { AvatarProps } from './Avatar'
 export type {
   ButtonProps,
   ButtonVariant,

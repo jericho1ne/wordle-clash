@@ -45,6 +45,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const setProfile = useCallback(async (nextProfile: Profile) => {
     const normalizedProfile = normalizeProfile(nextProfile)
     if (!normalizedProfile.name) throw new Error('Profile name is required')
+    if (normalizedProfile.animalId === null) throw new Error('Animal avatar is required')
 
     writeStoredProfile(normalizedProfile)
     setProfileState(normalizedProfile)

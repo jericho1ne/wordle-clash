@@ -17,6 +17,7 @@ function player(id: string, joinedAt: number, connected = true): Player {
     id,
     name: id,
     avatarId: 0,
+    animalId: 0,
     isHost: false,
     ready: false,
     connected,

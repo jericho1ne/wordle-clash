@@ -3,8 +3,8 @@
 
 .lobby-screen {
   .code {
-    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-    font-size: 22px;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-room-code);
   }
 
   .connection {
@@ -12,11 +12,49 @@
     margin-bottom: var(--space-3);
   }
 
+  .invite-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin: var(--space-3) 0 var(--space-2);
+  }
+
+  .feedback {
+    min-height: var(--space-6);
+    color: var(--color-neutral-400);
+    font-size: var(--font-size-supporting);
+    margin: 0 0 var(--space-3);
+  }
+
   .players {
     display: grid;
-    gap: var(--space-1);
+    gap: var(--space-3);
     margin: 0 0 var(--space-3);
     padding: 0;
     list-style: none;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+  }
+
+  .player-details {
+    display: grid;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  .player-name {
+    overflow: hidden;
+    font-weight: var(--font-weight-bold);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .player-status {
+    color: var(--color-neutral-400);
+    font-size: var(--font-size-supporting);
   }
 }

@@ -1,5 +1,12 @@
-import { useEffect } from 'react'
-import { useParams } from 'react-router'
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+import {
+  useNavigate,
+  useParams,
+} from 'react-router'
 
 import {
   isValidRoomCode,
@@ -8,8 +15,17 @@ import {
 
 import { useFavorites } from '../../identity'
 import { useRoomStore } from '../../realtime'
-import { Button } from '../../ui'
+import {
+  Avatar,
+  Button,
+} from '../../ui'
+import {
+  copyRoomCode,
+  shareRoomInvite,
+} from './invite'
 import styles from './LobbyScreen.module.scss'
+
+type Feedback = 'code' | 'invite' | null
 
 const CONNECTION_LABELS = {
   idle: 'Waiting for a valid room code',
@@ -19,14 +35,14 @@ const CONNECTION_LABELS = {
   terminal: 'Unable to join room',
 }
 
-/**
- * SCAFFOLD PLACEHOLDER. Invite/copy actions land in epic 05-room-invites. The
- * finished lobby (player list, ready states, game-mode toggle, favorite, start
- * dialog) lands in epic 06-lobby-screen on top of the realtime foundation.
- */
+/** Invite-ready room shell. The finished lobby controls land in epic 06. */
 export function LobbyScreen() {
   const { code } = useParams()
+  const navigate = useNavigate()
   const roomCode = normalizeRoomCode(code ?? '')
+  const [feedback, setFeedback] = useState<Feedback>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const feedbackTimeout = useRef<number | null>(null)
   const {
     error,
     isFavorite,
@@ -50,6 +66,30 @@ export function LobbyScreen() {
     return disconnect
   }, [connect, disconnect, roomCode, validRoomCode])
 
+  useEffect(() => () => {
+    if (feedbackTimeout.current !== null) window.clearTimeout(feedbackTimeout.current)
+  }, [])
+
+  const showFeedback = (action: Exclude<Feedback, null>) => {
+    if (feedbackTimeout.current !== null) window.clearTimeout(feedbackTimeout.current)
+    setFeedback(action)
+    setActionError(null)
+    feedbackTimeout.current = window.setTimeout(() => setFeedback(null), 2_000)
+  }
+
+  const runClipboardAction = async (
+    action: Exclude<Feedback, null>,
+    callback: () => Promise<unknown>,
+  ) => {
+    try {
+      await callback()
+      showFeedback(action)
+    } catch (cause: unknown) {
+      if (cause instanceof DOMException && cause.name === 'AbortError') return
+      setActionError(cause instanceof Error ? cause.message : 'Unable to share the room')
+    }
+  }
+
   const toggleFavorite = () => {
     void toggle(roomCode).catch(() => undefined)
   }
@@ -60,6 +100,32 @@ export function LobbyScreen() {
         <div className="card elev-md">
           <div className="card-kicker">Room code</div>
           <div className={`card-title ${styles.code}`}>{roomCode || '—'}</div>
+          <div className={styles.inviteActions}>
+            <Button
+              disabled={!validRoomCode || connectionStatus === 'terminal'}
+              onClick={() => void runClipboardAction(
+                'invite',
+                () => shareRoomInvite(window.location.origin, roomCode),
+              )}
+            >
+              {feedback === 'invite' ? '✓ Invite ready' : 'Invite friends'}
+            </Button>
+            <Button
+              variant="secondary"
+              disabled={!validRoomCode}
+              onClick={() => void runClipboardAction(
+                'code',
+                () => copyRoomCode(roomCode),
+              )}
+            >
+              {feedback === 'code' ? '✓ Code copied' : 'Copy code'}
+            </Button>
+          </div>
+          <p className={styles.feedback} aria-live="polite">
+            {actionError ?? (feedback === 'invite'
+              ? 'The room invitation is ready to send.'
+              : feedback === 'code' ? 'Room code copied to your clipboard.' : '')}
+          </p>
           <div className={styles.connection}>
             Realtime: {CONNECTION_LABELS[connectionStatus]}
             {!room ? '' : ` · ${room.players.length} player${room.players.length === 1 ? '' : 's'}`}
@@ -68,10 +134,15 @@ export function LobbyScreen() {
             <ul className={styles.players}>
               {room.players.map((player) => (
                 <li key={player.id}>
-                  {player.name}
-                  {player.isHost ? ' · host' : ''}
-                  {player.ready ? ' · ready' : ''}
-                  {!player.connected ? ' · reconnecting' : ''}
+                  <Avatar avatarId={player.avatarId} animalId={player.animalId} />
+                  <span className={styles.playerDetails}>
+                    <span className={styles.playerName}>{player.name}</span>
+                    <span className={styles.playerStatus}>
+                      {player.isHost ? 'Host' : 'Player'}
+                      {player.ready ? ' · Ready' : ''}
+                      {!player.connected ? ' · Reconnecting' : ''}
+                    </span>
+                  </span>
                 </li>
               ))}
             </ul>
@@ -82,7 +153,7 @@ export function LobbyScreen() {
               aria-pressed={self.ready}
               onClick={() => setReady(!self.ready)}
             >
-              {self.ready ? 'Not ready' : 'Ready up'}
+              {self.ready ? 'Not ready' : 'I\'m Ready'}
             </Button>
           )}
           <Button
@@ -97,11 +168,16 @@ export function LobbyScreen() {
             {connectionError
               ? connectionError.message
               : error
-              ? error.message
-              : favorite
-                ? 'Saved to your favorites.'
-                : 'Scaffold placeholder — favorites slice is live.'}
+                ? error.message
+                : favorite
+                  ? 'Saved to your favorites.'
+                  : 'Scaffold placeholder — favorites slice is live.'}
           </div>
+          {connectionStatus === 'terminal' && (
+            <Button variant="secondary" onClick={() => navigate('/setup')}>
+              Back to room setup
+            </Button>
+          )}
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 # Epic 05 — Room invites
 
-**Status:** implemented; local UI verification pending.
+**Status:** complete; locally UI-verified.
 
 Let a host send a canonical room link using the device share sheet or clipboard,
 then carry the recipient through guest profile setup into the live room. Invites

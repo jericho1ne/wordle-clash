@@ -3,6 +3,8 @@ import { create } from 'zustand'
 import {
   type ClientMessage,
   type ErrorMessage,
+  type GameMode,
+  type MatchStartingMessage,
   type RoomState,
   type ServerMessage,
 } from '@wordle-clash/shared'
@@ -21,11 +23,15 @@ interface RoomStoreState {
   room: RoomState | null
   selfId: string | null
   error: ErrorMessage | Error | null
+  matchStarting: MatchStartingMessage | null
   pendingActions: ClientMessage[]
   connect: (roomCode: string) => void
   disconnect: () => void
   send: (message: ClientMessage) => void
   setReady: (ready: boolean) => void
+  setGameMode: (mode: GameMode) => void
+  startMatch: () => void
+  dismissMatchStarting: () => void
 }
 
 type RoomDataState = Pick<RoomStoreState, 'room' | 'selfId' | 'pendingActions'>
@@ -163,6 +169,7 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
   room: null,
   selfId: null,
   error: null,
+  matchStarting: null,
   pendingActions: [],
 
   connect(roomCode) {
@@ -175,6 +182,7 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       room: null,
       selfId: null,
       error: null,
+      matchStarting: null,
       pendingActions: [],
     })
 
@@ -199,7 +207,10 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       socket.on('playerUpdated', reduce),
       socket.on('gameModeChanged', reduce),
       socket.on('hostChanged', reduce),
-      socket.on('matchStarting', reduce),
+      socket.on('matchStarting', (message) => {
+        reduce(message)
+        set({ matchStarting: message })
+      }),
       socket.on('error', reduce),
       socket.on('terminalError', (error) => set({
         status: 'terminal',
@@ -218,6 +229,7 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       room: null,
       selfId: null,
       error: null,
+      matchStarting: null,
       pendingActions: [],
     })
   },
@@ -239,5 +251,21 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       ],
     }))
     activeSocket?.send(message)
+  },
+
+  setGameMode(mode) {
+    const { room } = get()
+    if (!room || room.phase !== 'lobby') return
+
+    set({ room: { ...room, gameMode: mode } })
+    activeSocket?.send({ t: 'setGameMode', mode })
+  },
+
+  startMatch() {
+    activeSocket?.send({ t: 'startMatch' })
+  },
+
+  dismissMatchStarting() {
+    set({ matchStarting: null })
   },
 }))

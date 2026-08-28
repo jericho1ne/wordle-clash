@@ -2,14 +2,35 @@
 // stay global; everything here nests under the single root class `.lobby-screen`.
 
 .lobby-screen {
+  .room-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
   .code {
     font-family: var(--font-mono);
     font-size: var(--font-size-room-code);
   }
 
   .connection {
-    color: var(--color-accent);
-    margin-bottom: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    color: var(--color-accent-200);
+    font-size: var(--font-size-supporting);
+    background: var(--color-accent-900);
+    border-radius: var(--radius-sm);
+  }
+
+  .connection[data-status='connecting'],
+  .connection[data-status='reconnecting'] {
+    color: var(--color-accent-2-200);
+    background: var(--color-accent-2-900);
+  }
+
+  .connection[data-status='terminal'] {
+    color: var(--color-danger-100);
+    background: var(--color-danger-800);
   }
 
   .invite-actions {
@@ -19,11 +40,24 @@
     margin: var(--space-3) 0 var(--space-2);
   }
 
-  .feedback {
-    min-height: var(--space-6);
+  .section {
+    display: grid;
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+    border-block-start: var(--border-width-thin) solid var(--color-divider);
+  }
+
+  .section-heading {
+    color: var(--color-neutral-400);
+    font-size: var(--font-size-kicker);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .mode-description {
     color: var(--color-neutral-400);
     font-size: var(--font-size-supporting);
-    margin: 0 0 var(--space-3);
+    margin: 0;
   }
 
   .players {
@@ -37,6 +71,7 @@
       display: flex;
       align-items: center;
       gap: var(--space-3);
+      min-width: 0;
     }
   }
 
@@ -47,14 +82,45 @@
   }
 
   .player-name {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     overflow: hidden;
     font-weight: var(--font-weight-bold);
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .player-status {
+  .reconnecting {
     color: var(--color-neutral-400);
     font-size: var(--font-size-supporting);
+  }
+
+  .ready-status {
+    margin-inline-start: auto;
+    color: var(--color-neutral-500);
+    font-size: var(--font-size-supporting);
+    white-space: nowrap;
+  }
+
+  .ready-status[data-ready='true'] {
+    color: var(--color-accent-200);
+  }
+
+  .error {
+    color: var(--color-danger-300);
+    font-size: var(--font-size-supporting);
+  }
+
+  .start-game {
+    display: grid;
+    gap: var(--space-2);
+
+    p {
+      color: var(--color-neutral-400);
+      font-size: var(--font-size-supporting);
+      text-align: center;
+      margin: 0;
+    }
   }
 }

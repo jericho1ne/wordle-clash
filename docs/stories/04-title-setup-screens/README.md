@@ -1,6 +1,6 @@
 # Epic 04 — Title and setup screens
 
-**Status:** implemented, pending user verification.
+**Status:** complete; locally UI-verified.
 
 Deliver the complete first-run path from the title screen through manual room
 creation or joining. Invite-link generation and invited-player landing belong

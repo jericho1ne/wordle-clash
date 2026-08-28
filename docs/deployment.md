@@ -18,16 +18,17 @@ with **no client or config changes** — there is no API URL to set.
 
 Also summarised in [`verification.md`](./verification.md) §4.
 
-- `wrangler login` — or rely on `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`
-  in `apps/server/.env` (gitignored; never commit it).
+- Run `pnpm --filter @wordle-clash/server exec wrangler login`, or provide
+  `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` through the shell or CI
+  environment. Never put deploy credentials in `apps/server/.env`; Wrangler
+  loads that file as local Worker runtime bindings.
 - D1 already exists — `database_id` is filled in `apps/server/wrangler.jsonc`, so
   no `wrangler d1 create` is needed.
 - Set the two runtime secrets (they currently only exist in local `.dev.vars`):
 
   ```sh
-  cd apps/server
-  wrangler secret put BETTER_AUTH_SECRET
-  wrangler secret put RT_TICKET_SECRET
+  pnpm --filter @wordle-clash/server exec wrangler secret put BETTER_AUTH_SECRET
+  pnpm --filter @wordle-clash/server exec wrangler secret put RT_TICKET_SECRET
   ```
 
 - Apply migrations to remote D1:
@@ -81,8 +82,8 @@ Domain feature manages it.
 ### Canonical host
 
 Serving both apex and `www` is fine. For a single canonical host, add a Redirect
-Rule (`www.wordleclash.com/*` → `https://wordleclash.com/$1`, 308) and drop the
-`www` custom domain.
+Rule (`www.wordleclash.com/*` → `https://wordleclash.com/$1`, 308). Keep the
+`www` custom domain connected so Cloudflare continues answering that hostname.
 
 ### When manual DNS is needed
 

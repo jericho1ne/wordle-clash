@@ -24,8 +24,8 @@ less; Story 02 completes the frontend-to-backend vertical slice.
 - Logo tiles spell **C L A S H** in the prototype's fixed tile-state pattern.
 - The tile row uses perspective and staggered `tileFlip` animation; users with
   `prefers-reduced-motion: reduce` see the finished state without animation.
-- Copy: Multiplayer; Wordle Clash; “Race friends to the word. Tie for first?
-  Settle it in a bboy dance-off.”; Play.
+- Copy: Multiplayer; Wordle Clash; “Race friends to the word. Guess smart, move
+  fast, and claim the win.”; Play.
 
 ## Setup requirements
 

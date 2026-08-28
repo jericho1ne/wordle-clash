@@ -1,53 +1,40 @@
 # Wordle Clash
 
-A multiplayer (2–8 player) Wordle race. Create or join a room by code, pick a
-mode in the lobby, and race friends to the word.
+**Multiplayer Wordle, built for chaos.** Create a room, invite your friends, and
+race to find the word before they do.
 
-- **Conventions (non-negotiable):** [`AGENTS.md`](./AGENTS.md)
-- **Architecture & all technical decisions:** [`docs/architecture.md`](./docs/architecture.md)
-- **Epic / story breakdown:** [`docs/stories/`](./docs/stories/) — a numbered
-  folder is an Epic, a numbered file inside it is a Story/Task.
-- **Verification checklist** (run after every epic): [`docs/verification.md`](./docs/verification.md)
-- **Deployment & custom domain:** [`docs/deployment.md`](./docs/deployment.md)
-- **Gameplay rules** (later phases): [`docs/game-rules.md`](./docs/game-rules.md)
+[Play Wordle Clash](https://wordleclash.com)
 
-## Status
+## Two ways to clash
 
-Phase 1 — foundation + the title → setup → lobby screens. Wordle gameplay is a
-later phase (see the architecture doc's "Out of scope" section).
+- **Synchronous:** Everyone locks in one guess per round. Guesses stay secret
+  until every player submits or the timer expires, then reveal together.
+- **Real-time:** No turns and no waiting. Submit as quickly as you can—the first
+  player to solve the word wins.
 
-## Workspace
+Any five-letter string is a valid guess. There is no dictionary standing between
+you and a deeply questionable strategy.
 
-| Package | Path | What |
-|---|---|---|
-| `@wordle-clash/web` | `apps/web` | Vite + React 19 SPA |
-| `@wordle-clash/server` | `apps/server` | Cloudflare Worker + `Room` Durable Object |
-| `@wordle-clash/shared` | `packages/shared` | Protocol / room types, room codes, game modes, avatars |
-| `@wordle-clash/e2e` | `e2e` | Playwright end-to-end tests |
+## See it in action
 
-## Quick start
-
-```sh
-pnpm install
-pnpm dev        # starts BOTH: vite (:5173) + wrangler dev (:8787), in parallel
-```
-
-Open http://localhost:5173 — Vite proxies `/api` and `/ws` to the Worker, so the
-browser only ever talks to `:5173`. Run one side alone with `pnpm dev:web` or
-`pnpm dev:server`. See [`docs/architecture.md`](./docs/architecture.md) for the
-full dev and deploy runbook.
-
-## Scripts (root)
-
-| Script | Does |
+| Synchronous | Real-time |
 |---|---|
-| `pnpm dev` | Web + Worker in parallel (`vite` :5173, `wrangler dev` :8787) |
-| `pnpm dev:web` / `pnpm dev:server` | One side only |
-| `pnpm build` | Build `shared` then `web` |
-| `pnpm typecheck` | `tsc --noEmit` across all packages |
-| `pnpm lint` | ESLint |
-| `pnpm format` / `pnpm format:check` | Prettier |
-| `pnpm test` | Vitest across all packages |
-| `pnpm db:generate` | `drizzle-kit generate` (server) |
-| `pnpm db:migrate:local` / `:remote` | Apply D1 migrations |
-| `pnpm deploy` | Build, then `wrangler deploy` (assets + Worker + DO + D1) |
+| ![A synchronous Wordle Clash match](docs/assets/traditional-game-mode.png) | ![A real-time Wordle Clash match](docs/assets/brute-force-win.png) |
+
+## Built for friends
+
+- Two to eight players in a room
+- Guest-first—no account or login required
+- Shareable room codes and invite links
+- Reconnect-safe matches backed by Cloudflare Durable Objects
+- Simultaneous reveals, live opponent boards, and unapologetic brute force
+
+## Development
+
+Want to run it locally or contribute? Start with [`LOCAL-DEV.md`](./LOCAL-DEV.md).
+
+- [Gameplay rules](./docs/game-rules.md)
+- [Architecture](./docs/architecture.md)
+- [Stories and roadmap](./docs/stories/)
+- [Deployment](./docs/deployment.md)
+- [Repository conventions](./AGENTS.md)

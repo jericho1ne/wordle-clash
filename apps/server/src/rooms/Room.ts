@@ -6,69 +6,457 @@ import {
 } from 'partyserver'
 
 import {
+  assertNever,
+  canStartMatch,
+  GAME_MODES,
+  MAX_PLAYERS,
+  parseClientMessage,
   serializeServerMessage,
+  type ClientMessage,
+  type Player,
+  type RoomErrorCode,
   type RoomState,
+  type ServerMessage,
 } from '@wordle-clash/shared'
 
 import {
+  getConnectionState,
+  parseConnectionIdentity,
+  userConnectionTag,
+  type ConnectionIdentity,
+  type RoomConnectionState,
+} from './connection'
+import {
   createInitialRoomState,
+  createRoomSnapshot,
   parseStoredRoomState,
   ROOM_STATE_STORAGE_KEY,
 } from './state'
 
-/**
- * SCAFFOLD STUB. One Durable Object instance per room, addressed by room code
- * (`this.name`). The authoritative in-memory + persisted room state, the
- * WebSocket message protocol, host reassignment, and the "match starting"
- * broadcast all land in epic 02-realtime-foundation. Ticket-based auth at the
- * connection boundary lands in epic 03-identity-auth.
- *
- * Hibernation is on: the DO can be evicted between messages, so `state` is
- * rehydrated from storage in `onStart()` and re-persisted on every mutation.
- */
+const LIFECYCLE_STORAGE_KEY = 'lifecycle'
+const DISCONNECT_GRACE_MS = 30_000
+
+interface RoomLifecycle {
+  disconnectDeadlines: Record<string, number>
+}
+
+function emptyLifecycle(): RoomLifecycle {
+  return { disconnectDeadlines: {} }
+}
+
+function parseLifecycle(value: unknown): RoomLifecycle {
+  if (!value || typeof value !== 'object') return emptyLifecycle()
+
+  const deadlines = (value as { disconnectDeadlines?: unknown }).disconnectDeadlines
+  if (!deadlines || typeof deadlines !== 'object') return emptyLifecycle()
+
+  return {
+    disconnectDeadlines: Object.fromEntries(
+      Object.entries(deadlines)
+        .filter((entry): entry is [string, number] => (
+          typeof entry[1] === 'number' && Number.isFinite(entry[1])
+        )),
+    ),
+  }
+}
+
 export class Room extends Server<Env> {
   static override options = { hibernate: true }
 
-  /** Authoritative room state. Mirror of the `state` storage key. */
+  /** Authoritative room state. Mirror of the durable `state` value. */
   state: RoomState | null = null
+  lifecycle: RoomLifecycle = emptyLifecycle()
 
   override async onStart(): Promise<void> {
-    const storedState = await this.ctx.storage.get<unknown>(ROOM_STATE_STORAGE_KEY)
+    const [storedState, storedLifecycle] = await Promise.all([
+      this.ctx.storage.get<unknown>(ROOM_STATE_STORAGE_KEY),
+      this.ctx.storage.get<unknown>(LIFECYCLE_STORAGE_KEY),
+    ])
+
     this.state = storedState === undefined
       ? null
       : parseStoredRoomState(storedState)
+    this.lifecycle = parseLifecycle(storedLifecycle)
+    this.ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair(
+      '{"t":"ping"}',
+      '{"t":"pong"}',
+    ))
   }
 
-  async #save(): Promise<void> {
-    if (!this.state) return
-    await this.ctx.storage.put(
-      ROOM_STATE_STORAGE_KEY,
-      parseStoredRoomState(this.state),
-    )
+  override getConnectionTags(_connection: Connection, ctx: ConnectionContext): string[] {
+    const identity = parseConnectionIdentity(ctx.request)
+    return [userConnectionTag(identity.userId)]
   }
 
-  /** Ensure a state object exists (created lazily on first connect for now). */
+  override async onConnect(connection: Connection, ctx: ConnectionContext): Promise<void> {
+    const identity = parseConnectionIdentity(ctx.request)
+    const state = this.#ensureState()
+    const existingPlayer = state.players.find(({ id }) => id === identity.userId)
+
+    if (!existingPlayer && state.phase !== 'lobby') {
+      this.#rejectConnection(connection, 'MATCH_STARTED', 'The match has already started')
+      return
+    }
+
+    if (!existingPlayer && state.players.length >= MAX_PLAYERS) {
+      this.#rejectConnection(connection, 'ROOM_FULL', 'The room is full')
+      return
+    }
+
+    connection.setState({
+      userId: identity.userId,
+      isAnonymous: identity.isAnonymous,
+    } satisfies RoomConnectionState)
+    delete this.lifecycle.disconnectDeadlines[identity.userId]
+
+    if (existingPlayer) {
+      const patch = this.#reconnectPlayer(existingPlayer, identity)
+      await this.#save()
+      this.#send(connection, createRoomSnapshot(state, identity.userId))
+
+      if (Object.keys(patch).length > 0) {
+        this.#broadcast({
+          t: 'playerUpdated',
+          playerId: identity.userId,
+          patch,
+        }, [connection.id])
+      }
+    }
+    else {
+      const player = this.#addPlayer(identity)
+      await this.#save()
+      this.#send(connection, createRoomSnapshot(state, identity.userId))
+      this.#broadcast({ t: 'playerJoined', player }, [connection.id])
+    }
+
+    await this.#scheduleNextAlarm()
+  }
+
+  override async onMessage(connection: Connection, frame: WSMessage): Promise<void> {
+    let message: ClientMessage
+    try {
+      message = parseClientMessage(frame)
+    }
+    catch {
+      this.#sendError(connection, 'BAD_MESSAGE', 'The message is invalid')
+      return
+    }
+
+    const connectionState = getConnectionState(connection)
+    if (!connectionState) {
+      this.#rejectConnection(connection, 'BAD_MESSAGE', 'Connection identity is unavailable')
+      return
+    }
+
+    await this.#dispatch(connection, connectionState.userId, message)
+  }
+
+  override async onClose(connection: Connection): Promise<void> {
+    await this.#handleDisconnect(connection)
+  }
+
+  override async onError(connection: Connection, _error: unknown): Promise<void> {
+    await this.#handleDisconnect(connection)
+  }
+
+  override async onAlarm(): Promise<void> {
+    const now = Date.now()
+    const removedPlayerIds: string[] = []
+
+    for (const [userId, deadline] of Object.entries(this.lifecycle.disconnectDeadlines)) {
+      if (deadline > now) continue
+
+      if ([...this.getConnections(userConnectionTag(userId))].length > 0) {
+        delete this.lifecycle.disconnectDeadlines[userId]
+        continue
+      }
+
+      if (this.#removePlayerFromState(userId)) removedPlayerIds.push(userId)
+      delete this.lifecycle.disconnectDeadlines[userId]
+    }
+
+    await this.#save()
+    for (const playerId of removedPlayerIds) {
+      this.#broadcast({
+        t: 'playerLeft',
+        playerId,
+        hostId: this.state?.hostId ?? null,
+      })
+    }
+    await this.#cleanupEmptyRoom()
+    await this.#scheduleNextAlarm()
+  }
+
+  async #dispatch(connection: Connection, userId: string, message: ClientMessage): Promise<void> {
+    switch (message.t) {
+      case 'ping':
+        this.#send(connection, { t: 'pong' })
+        return
+
+      case 'leave':
+        await this.#leave(userId)
+        return
+
+      case 'setReady':
+        await this.#setReady(connection, userId, message.ready)
+        return
+
+      case 'setGameMode':
+        await this.#setGameMode(connection, userId, message.mode)
+        return
+
+      case 'updateProfile':
+        await this.#updateProfile(userId, message)
+        return
+
+      case 'startMatch':
+        await this.#startMatch(connection, userId)
+        return
+
+      default:
+        assertNever(message)
+    }
+  }
+
+  async #setReady(connection: Connection, userId: string, ready: boolean): Promise<void> {
+    const player = this.state?.players.find(({ id }) => id === userId)
+    if (!player || this.state?.phase !== 'lobby') {
+      this.#sendError(connection, 'MATCH_STARTED', 'Ready state is locked')
+      return
+    }
+
+    player.ready = ready
+    await this.#save()
+    this.#broadcast({
+      t: 'playerUpdated',
+      playerId: userId,
+      patch: { ready },
+    })
+  }
+
+  async #setGameMode(
+    connection: Connection,
+    userId: string,
+    mode: RoomState['gameMode'],
+  ): Promise<void> {
+    if (!this.state || this.state.hostId !== userId) {
+      this.#sendError(connection, 'NOT_HOST', 'Only the host can change the game mode')
+      return
+    }
+
+    if (this.state.phase !== 'lobby') {
+      this.#sendError(connection, 'MATCH_STARTED', 'The game mode is locked')
+      return
+    }
+
+    this.state.gameMode = mode
+    await this.#save()
+    this.#broadcast({
+      t: 'gameModeChanged',
+      mode,
+      byPlayerId: userId,
+    })
+  }
+
+  async #updateProfile(
+    userId: string,
+    message: Extract<ClientMessage, { t: 'updateProfile' }>,
+  ): Promise<void> {
+    const player = this.state?.players.find(({ id }) => id === userId)
+    if (!player) return
+
+    const patch: Partial<Pick<Player, 'name' | 'avatarId'>> = {}
+    if (message.name !== undefined && message.name !== player.name) {
+      player.name = message.name
+      patch.name = message.name
+    }
+    if (message.avatarId !== undefined && message.avatarId !== player.avatarId) {
+      player.avatarId = message.avatarId
+      patch.avatarId = message.avatarId
+    }
+    if (Object.keys(patch).length === 0) return
+
+    await this.#save()
+    this.#broadcast({
+      t: 'playerUpdated',
+      playerId: userId,
+      patch,
+    })
+  }
+
+  async #startMatch(connection: Connection, userId: string): Promise<void> {
+    if (!this.state || this.state.hostId !== userId) {
+      this.#sendError(connection, 'NOT_HOST', 'Only the host can start the match')
+      return
+    }
+
+    if (!canStartMatch(this.state)) {
+      this.#sendError(connection, 'NOT_READY', 'Every player must be ready')
+      return
+    }
+
+    const startsAt = Date.now() + 1_000
+    this.state.phase = 'starting'
+    await this.#save()
+    this.#broadcast({
+      t: 'matchStarting',
+      mode: this.state.gameMode,
+      tries: GAME_MODES[this.state.gameMode].tries,
+      playerCount: this.state.players.length,
+      startsAt,
+    })
+  }
+
+  async #leave(userId: string): Promise<void> {
+    if (!this.#removePlayerFromState(userId)) return
+
+    delete this.lifecycle.disconnectDeadlines[userId]
+    await this.#save()
+    this.#broadcast({
+      t: 'playerLeft',
+      playerId: userId,
+      hostId: this.state?.hostId ?? null,
+    })
+
+    for (const connection of this.getConnections(userConnectionTag(userId))) {
+      connection.close(1000, 'Player left')
+    }
+    await this.#cleanupEmptyRoom()
+    await this.#scheduleNextAlarm()
+  }
+
+  async #handleDisconnect(connection: Connection): Promise<void> {
+    const connectionState = getConnectionState(connection)
+    if (!connectionState || !this.state) return
+
+    const userId = connectionState.userId
+    if ([...this.getConnections(userConnectionTag(userId))]
+      .some(({ id }) => id !== connection.id)) return
+
+    const player = this.state.players.find(({ id }) => id === userId)
+    if (!player || !player.connected) return
+
+    player.connected = false
+    this.lifecycle.disconnectDeadlines[userId] = Date.now() + DISCONNECT_GRACE_MS
+    await this.#save()
+    this.#broadcast({
+      t: 'playerUpdated',
+      playerId: userId,
+      patch: { connected: false },
+    })
+    await this.#scheduleNextAlarm()
+  }
+
+  #addPlayer(identity: ConnectionIdentity): Player {
+    const state = this.#ensureState()
+    const isHost = state.hostId === null
+    const player: Player = {
+      id: identity.userId,
+      name: identity.name,
+      avatarId: identity.avatarId,
+      isHost,
+      ready: false,
+      connected: true,
+      joinedAt: Date.now(),
+    }
+
+    state.players.push(player)
+    if (isHost) state.hostId = player.id
+    return player
+  }
+
+  #reconnectPlayer(
+    player: Player,
+    identity: ConnectionIdentity,
+  ): Partial<Pick<Player, 'name' | 'avatarId' | 'connected'>> {
+    const patch: Partial<Pick<Player, 'name' | 'avatarId' | 'connected'>> = {}
+
+    if (player.name !== identity.name) {
+      player.name = identity.name
+      patch.name = identity.name
+    }
+    if (player.avatarId !== identity.avatarId) {
+      player.avatarId = identity.avatarId
+      patch.avatarId = identity.avatarId
+    }
+    if (!player.connected) {
+      player.connected = true
+      patch.connected = true
+    }
+
+    return patch
+  }
+
+  #removePlayerFromState(userId: string): boolean {
+    if (!this.state) return false
+
+    const playerIndex = this.state.players.findIndex(({ id }) => id === userId)
+    if (playerIndex === -1) return false
+
+    const [removedPlayer] = this.state.players.splice(playerIndex, 1)
+    if (removedPlayer?.isHost) this.state.hostId = null
+    return true
+  }
+
   #ensureState(): RoomState {
     this.state ??= createInitialRoomState(this.name)
     return this.state
   }
 
-  override async onConnect(connection: Connection, _ctx: ConnectionContext): Promise<void> {
-    this.#ensureState()
-    await this.#save()
-    // epic 02: register the player, send a full roomState snapshot, broadcast join.
-    connection.send(serializeServerMessage({
-      t: 'error',
-      code: 'BAD_MESSAGE',
-      message: 'not implemented',
-    }))
+  async #save(): Promise<void> {
+    const writes: Promise<unknown>[] = [
+      this.ctx.storage.put(LIFECYCLE_STORAGE_KEY, this.lifecycle),
+    ]
+
+    if (this.state) {
+      writes.push(this.ctx.storage.put(
+        ROOM_STATE_STORAGE_KEY,
+        parseStoredRoomState(this.state),
+      ))
+    }
+
+    await Promise.all(writes)
   }
 
-  override async onMessage(_connection: Connection, _message: WSMessage): Promise<void> {
-    // epic 02: zod-parse the frame and dispatch (setReady / setGameMode / ...).
+  async #cleanupEmptyRoom(): Promise<void> {
+    if (!this.state || this.state.players.length > 0) return
+
+    this.state = null
+    this.lifecycle = emptyLifecycle()
+    await Promise.all([
+      this.ctx.storage.delete(ROOM_STATE_STORAGE_KEY),
+      this.ctx.storage.delete(LIFECYCLE_STORAGE_KEY),
+    ])
   }
 
-  override async onClose(_connection: Connection): Promise<void> {
-    // epic 02: drop the socket, mark disconnected, schedule grace-period removal.
+  async #scheduleNextAlarm(): Promise<void> {
+    const deadlines = Object.values(this.lifecycle.disconnectDeadlines)
+    if (deadlines.length === 0) {
+      await this.ctx.storage.deleteAlarm()
+      return
+    }
+
+    await this.ctx.storage.setAlarm(Math.min(...deadlines))
+  }
+
+  #send(connection: Connection, message: ServerMessage): void {
+    connection.send(serializeServerMessage(message))
+  }
+
+  #broadcast(message: ServerMessage, without?: string[]): void {
+    this.broadcast(serializeServerMessage(message), without)
+  }
+
+  #sendError(connection: Connection, code: RoomErrorCode, message: string): void {
+    this.#send(connection, { t: 'error', code, message })
+  }
+
+  #rejectConnection(
+    connection: Connection,
+    code: RoomErrorCode,
+    message: string,
+  ): void {
+    this.#sendError(connection, code, message)
+    connection.close(1008, message)
   }
 }

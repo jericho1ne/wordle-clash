@@ -1,20 +1,63 @@
-// SetupScreen-specific styling. Ember utility classes stay global; everything
-// here nests under the single root class `.setup-screen`.
-
 .setup-screen {
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
   .back {
-    margin-bottom: var(--space-4);
+    align-self: flex-start;
+  }
+
+  .intro {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .kicker,
+  .label {
+    color: var(--color-neutral-400);
+    font-size: var(--font-size-kicker);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
 
   .heading {
     font-family: var(--font-heading);
-    font-size: 24px;
-    font-weight: 500;
+    font-size: var(--font-size-screen-heading);
+    font-weight: var(--font-heading-weight);
+    margin: 0;
   }
 
-  .note {
-    font-size: 12px;
-    opacity: 0.45;
-    margin-top: var(--space-6);
+  .description {
+    color: var(--color-neutral-400);
+    margin: 0;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .avatar-field,
+  .mode-field {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .room-code {
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .error {
+    color: var(--color-danger-300);
+    font-size: var(--font-size-supporting);
+    margin: 0;
   }
 }

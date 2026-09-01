@@ -5,9 +5,11 @@ import { anonymous } from 'better-auth/plugins'
 import { createDb } from './db/client'
 import * as schema from './db/schema'
 
-const LOCAL_WORKER_ORIGINS = new Set([
-  'http://localhost:8787',
-  'http://127.0.0.1:8787',
+const LOCAL_WORKER_HOSTS = new Set([
+  'localhost',
+  '127.0.0.1',
+  '0.0.0.0',
+  '[::1]',
 ])
 
 const LOCAL_WEB_ORIGINS = new Set([
@@ -23,11 +25,17 @@ function requireBetterAuthSecret(secret: string | undefined): string {
   return secret
 }
 
+function isLocalWorkerRequest(request: Request): boolean {
+  const url = new URL(request.url)
+
+  return url.protocol === 'http:' && LOCAL_WORKER_HOSTS.has(url.hostname)
+}
+
 function resolveOrigins(request: Request): { baseURL: string, trustedOrigins: string[] } {
   const workerOrigin = new URL(request.url).origin
   const browserOrigin = request.headers.get('Origin')
   const isLocalProxyRequest =
-    LOCAL_WORKER_ORIGINS.has(workerOrigin) &&
+    isLocalWorkerRequest(request) &&
     browserOrigin !== null &&
     LOCAL_WEB_ORIGINS.has(browserOrigin)
 

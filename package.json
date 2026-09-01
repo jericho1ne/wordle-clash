@@ -22,7 +22,8 @@
     "db:generate": "pnpm --filter @wordle-clash/server db:generate",
     "db:migrate:local": "pnpm --filter @wordle-clash/server db:migrate:local",
     "db:migrate:remote": "pnpm --filter @wordle-clash/server db:migrate:remote",
-    "deploy": "pnpm build && pnpm --filter @wordle-clash/server run deploy"
+    "deploy": "pnpm build && pnpm --filter @wordle-clash/server run deploy",
+    "deploy:prod": "pnpm run deploy"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

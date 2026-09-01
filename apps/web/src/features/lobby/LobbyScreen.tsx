@@ -293,10 +293,12 @@ export function LobbyScreen() {
           }
         }}
         actions={(
-          <Button onClick={() => {
-            dismissMatchStarting()
-            navigate(`/room/${roomCode}/play`)
-          }}>
+          <Button
+            onClick={() => {
+              dismissMatchStarting()
+              navigate(`/room/${roomCode}/play`)
+            }}
+          >
             Enter game
           </Button>
         )}

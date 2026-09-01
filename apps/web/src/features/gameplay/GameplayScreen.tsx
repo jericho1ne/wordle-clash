@@ -130,10 +130,12 @@ export function GameplayScreen() {
   const { code = '' } = useParams()
   const navigate = useNavigate()
   const roomCode = normalizeRoomCode(code)
-  const [guess, setGuess] = useState('')
-  const [pendingGuess, setPendingGuess] = useState<string | null>(null)
-  const [lockedGuess, setLockedGuess] = useState<string | null>(null)
-  const [now, setNow] = useState(Date.now())
+  const [draft, setDraft] = useState({
+    acceptedGuessCount: 0,
+    round: 0,
+    value: '',
+  })
+  const [now, setNow] = useState(Date.now)
   const connect = useRoomStore(({ connect }) => connect)
   const disconnect = useRoomStore(({ disconnect }) => disconnect)
   const status = useRoomStore(({ status }) => status)
@@ -147,7 +149,17 @@ export function GameplayScreen() {
   const selfMatch = match?.players.find(({ playerId }) => playerId === selfId)
   const submitted = selfMatch?.submitted ?? false
   const terminal = match?.phase === 'finished' || match?.phase === 'tiebreak'
-  const lastAcceptedGuess = selfMatch?.guesses.at(-1)?.word
+  const currentRound = match?.round ?? 0
+  const acceptedGuessCount = selfMatch?.guesses.length ?? 0
+  const guess =
+    draft.round === currentRound && draft.acceptedGuessCount === acceptedGuessCount
+      ? draft.value
+      : ''
+  const setGuess = (value: string) => setDraft({
+    acceptedGuessCount,
+    round: currentRound,
+    value,
+  })
 
   useEffect(() => {
     connect(roomCode)
@@ -163,22 +175,6 @@ export function GameplayScreen() {
   useEffect(() => {
     if (room?.phase === 'lobby') navigate(`/room/${roomCode}`, { replace: true })
   }, [navigate, room?.phase, roomCode])
-
-  useEffect(() => {
-    if (!pendingGuess) return
-    if (lastAcceptedGuess !== pendingGuess && !(match?.mode === 'sync' && submitted)) return
-    if (match?.mode === 'sync') setLockedGuess(pendingGuess)
-    setGuess('')
-    setPendingGuess(null)
-  }, [lastAcceptedGuess, match?.mode, pendingGuess, submitted])
-
-  useEffect(() => {
-    if (error) setPendingGuess(null)
-  }, [error])
-
-  useEffect(() => {
-    setLockedGuess(null)
-  }, [match?.round])
 
   const secondsRemaining = match?.roundEndsAt
     ? Math.max(0, Math.ceil((match.roundEndsAt - now) / 1_000))
@@ -201,8 +197,7 @@ export function GameplayScreen() {
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault()
     const normalized = normalizeGuess(guess)
-    if (!isValidGuess(normalized) || pendingGuess || submitted || terminal) return
-    setPendingGuess(normalized)
+    if (!isValidGuess(normalized) || submitted || terminal) return
     submitGuess(normalized)
   }
 
@@ -227,13 +222,12 @@ export function GameplayScreen() {
                 if (!player) return null
                 const isSelf = player.id === selfId
                 const inputDisabled = Boolean(
-                  pendingGuess ||
                   submitted ||
                   selfMatch?.eliminated ||
                   secondsRemaining === 0,
                 )
                 const showDraft = isSelf && !terminal && !submitted
-                const showLockedGuess = isSelf && submitted && lockedGuess
+                const showLockedGuess = isSelf && submitted && guess
                 const reservedRows = showDraft || showLockedGuess ? 1 : 0
                 const emptyRows = Math.max(
                   0,
@@ -267,7 +261,7 @@ export function GameplayScreen() {
                           onChange={setGuess}
                         />
                       )}
-                      {showLockedGuess && <PendingGuessRow guess={lockedGuess} />}
+                      {showLockedGuess && <PendingGuessRow guess={guess} />}
                       {Array.from({ length: emptyRows }, (_, index) => (
                         <EmptyRow key={`empty-${index}`} />
                       ))}
@@ -292,17 +286,12 @@ export function GameplayScreen() {
                   type="submit"
                   disabled={
                     !isValidGuess(guess) ||
-                    Boolean(pendingGuess) ||
                     submitted ||
                     selfMatch?.eliminated ||
                     secondsRemaining === 0
                   }
                 >
-                  {submitted
-                    ? 'Waiting for players…'
-                    : pendingGuess
-                      ? 'Checking…'
-                      : 'Submit guess'}
+                  {submitted ? 'Waiting for players…' : 'Submit guess'}
                 </Button>
               </form>
             )}

@@ -6,6 +6,13 @@
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
 
+  // Keep local request URLs on the dev origin - otherwise, Wrangler won't work locally
+  "dev": {
+    "host": "localhost",
+    "port": 8787,
+    "local_protocol": "http",
+  },
+
   // Production hostnames. Custom Domains make this Worker the origin and let
   // Cloudflare manage the DNS records and TLS certificates automatically.
   "routes": [

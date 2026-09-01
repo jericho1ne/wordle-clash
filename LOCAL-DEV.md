@@ -46,31 +46,31 @@ Open [http://localhost:5173](http://localhost:5173). Vite proxies `/api` and
 
 ## Workspace
 
-| Package | Path | Purpose |
-|---|---|---|
-| `@wordle-clash/web` | `apps/web` | Vite and React SPA |
-| `@wordle-clash/server` | `apps/server` | Cloudflare Worker and `Room` Durable Object |
-| `@wordle-clash/shared` | `packages/shared` | Realtime protocol and shared domain types |
-| `@wordle-clash/e2e` | `e2e` | Playwright end-to-end tests |
+| Package                | Path              | Purpose                                     |
+| ---------------------- | ----------------- | ------------------------------------------- |
+| `@wordle-clash/web`    | `apps/web`        | Vite and React SPA                          |
+| `@wordle-clash/server` | `apps/server`     | Cloudflare Worker and `Room` Durable Object |
+| `@wordle-clash/shared` | `packages/shared` | Realtime protocol and shared domain types   |
+| `@wordle-clash/e2e`    | `e2e`             | Playwright end-to-end tests                 |
 
 ## Scripts
 
-| Command | Purpose |
-|---|---|
-| `pnpm dev` | Run the web app and Worker together |
-| `pnpm dev:web` | Run only Vite on port 5173 |
-| `pnpm dev:server` | Run only Wrangler on port 8787 |
-| `pnpm build` | Build the shared package and production SPA |
-| `pnpm typecheck` | Type-check every package |
-| `pnpm lint` | Run ESLint and Stylelint |
-| `pnpm format` | Apply ESLint, Prettier, and Stylelint formatting |
-| `pnpm format:check` | Check formatting without changing files |
-| `pnpm test` | Run Vitest across the workspace |
-| `pnpm check` | Run the complete verification pipeline |
-| `pnpm db:generate --name=<name>` | Generate a Drizzle migration |
-| `pnpm db:migrate:local` | Apply migrations to local D1 |
-| `pnpm db:migrate:remote` | Apply migrations to production D1 |
-| `pnpm run deploy` | Build and deploy the SPA, Worker, Durable Object, and D1 bindings |
+| Command                          | Purpose                                                           |
+| -------------------------------- | ----------------------------------------------------------------- |
+| `pnpm dev`                       | Run the web app and Worker together                               |
+| `pnpm dev:web`                   | Run only Vite on port 5173                                        |
+| `pnpm dev:server`                | Run only Wrangler on port 8787                                    |
+| `pnpm build`                     | Build the shared package and production SPA                       |
+| `pnpm typecheck`                 | Type-check every package                                          |
+| `pnpm lint`                      | Run ESLint and Stylelint                                          |
+| `pnpm format`                    | Apply ESLint, Prettier, and Stylelint formatting                  |
+| `pnpm format:check`              | Check formatting without changing files                           |
+| `pnpm test`                      | Run Vitest across the workspace                                   |
+| `pnpm check`                     | Run the complete verification pipeline                            |
+| `pnpm db:generate --name=<name>` | Generate a Drizzle migration                                      |
+| `pnpm db:migrate:local`          | Apply migrations to local D1                                      |
+| `pnpm db:migrate:remote`         | Apply migrations to production D1                                 |
+| `pnpm run deploy`                | Build and deploy the SPA, Worker, Durable Object, and D1 bindings |
 
 ## Cloudflare credentials
 

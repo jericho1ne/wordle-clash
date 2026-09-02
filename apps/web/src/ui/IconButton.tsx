@@ -1,45 +1,38 @@
-import type {
-  ButtonHTMLAttributes,
-  ReactNode,
-} from 'react'
+import type { ButtonHTMLAttributes } from 'react'
 
-import type { ButtonVariant } from './Button'
-
-const VARIANT_CLASS: Record<ButtonVariant, string> = {
-  primary: 'btn-primary',
-  secondary: 'btn-secondary',
-  ghost: 'btn-ghost',
-  danger: 'btn-danger',
-}
+import {
+  Button,
+  type ButtonAppearance,
+} from './Button'
+import styles from './IconButton.module.scss'
 
 export interface IconButtonProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   'aria-label'
 > {
-  variant?: ButtonVariant
+  appearance?: ButtonAppearance
   /** Required — an icon-only control needs an accessible name. */
   'aria-label': string
-  /** The icon element. */
-  children: ReactNode
 }
 
 /**
- * Square icon-only button (`.btn .btn-icon`). Same pass-through rules as
- * `<Button>`; `aria-label` is mandatory. Default variant `ghost`.
+ * Square icon-only `Button`; `aria-label` is mandatory. Defaults to `outline`.
  */
 export function IconButton({
-  variant = 'ghost',
+  appearance = 'outline',
   type = 'button',
   className,
   children,
   ...rest
 }: IconButtonProps) {
-  const classes = ['btn', 'btn-icon', VARIANT_CLASS[variant]]
-  if (className) classes.push(className)
-
   return (
-    <button type={type} className={classes.join(' ')} {...rest}>
+    <Button
+      appearance={appearance}
+      type={type}
+      className={[styles.iconButton, className].filter(Boolean).join(' ')}
+      {...rest}
+    >
       {children}
-    </button>
+    </Button>
   )
 }

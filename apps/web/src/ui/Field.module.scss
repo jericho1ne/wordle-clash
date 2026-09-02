@@ -2,6 +2,8 @@
 // comes from the global Ember `.field` class. Root class matches the file name.
 
 .field {
+  text-align: left;
+
   .hint,
   .error {
     margin: var(--space-1) 0 0;
@@ -10,6 +12,7 @@
 
   .hint {
     color: var(--color-neutral-500);
+    opacity: 0.6;
   }
 
   .error {

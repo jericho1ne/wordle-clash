@@ -25,6 +25,7 @@ export const user = sqliteTable('user', {
     .$onUpdate(() => new Date())
     .notNull(),
   isAnonymous: integer('is_anonymous', { mode: 'boolean' }).default(false),
+  username: text('username').unique(),
   displayName: text('display_name'),
   avatarId: integer('avatar_id'),
   animalId: integer('animal_id'),

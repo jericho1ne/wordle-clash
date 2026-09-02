@@ -1,6 +1,10 @@
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { betterAuth } from 'better-auth/minimal'
-import { anonymous } from 'better-auth/plugins'
+import {
+  anonymous,
+  username,
+} from 'better-auth/plugins'
+import { eq } from 'drizzle-orm'
 
 import { createDb } from './db/client'
 import * as schema from './db/schema'
@@ -55,17 +59,65 @@ function resolveOrigins(request: Request): { baseURL: string, trustedOrigins: st
 /** Create a request-scoped Better Auth instance backed by the Worker D1 binding. */
 export function createAuth(request: Request, env: Env) {
   const { baseURL, trustedOrigins } = resolveOrigins(request)
+  const db = createDb(env.DB)
 
   return betterAuth({
     appName: 'Wordle Clash',
     baseURL,
     secret: requireBetterAuthSecret(env.BETTER_AUTH_SECRET),
     trustedOrigins,
-    database: drizzleAdapter(createDb(env.DB), {
+    database: drizzleAdapter(db, {
       provider: 'sqlite',
       schema,
     }),
-    plugins: [anonymous()],
+    emailAndPassword: { enabled: true },
+    plugins: [
+      anonymous({
+        onLinkAccount: async ({ anonymousUser, newUser }) => {
+          const [guest, account] = await Promise.all([
+            db
+              .select({
+                displayName: schema.user.displayName,
+                avatarId: schema.user.avatarId,
+                animalId: schema.user.animalId,
+              })
+              .from(schema.user)
+              .where(eq(schema.user.id, anonymousUser.user.id))
+              .get(),
+            db
+              .select({
+                displayName: schema.user.displayName,
+                avatarId: schema.user.avatarId,
+                animalId: schema.user.animalId,
+              })
+              .from(schema.user)
+              .where(eq(schema.user.id, newUser.user.id))
+              .get(),
+          ])
+
+          if (!guest || !account) return
+
+          const hasProfile = Boolean(account.displayName) ||
+            account.avatarId !== null && account.avatarId !== undefined ||
+            account.animalId !== null && account.animalId !== undefined
+
+          if (hasProfile) return
+
+          await db
+            .update(schema.user)
+            .set({
+              displayName: guest.displayName,
+              avatarId: guest.avatarId,
+              animalId: guest.animalId,
+            })
+            .where(eq(schema.user.id, newUser.user.id))
+        },
+      }),
+      username({
+        displayUsername: false,
+        immutableUsername: true,
+      }),
+    ],
     user: {
       additionalFields: {
         displayName: {

@@ -15,6 +15,13 @@
       "when": 1787933617686,
       "tag": "0001_story_05_02__alter_add_column__user_animal_id",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1788308860632,
+      "tag": "0002_story_03_07__alter_add_column__user_username",
+      "breakpoints": true
     }
   ]
 }

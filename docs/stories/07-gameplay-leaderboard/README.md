@@ -29,7 +29,7 @@ The implementation stack completes these foundations before Story 07-01:
 | 02 | **Done:** gameplay WebSocket messages and validated sanitized snapshots | Shared round-trip protocol tests |
 | 03 | **Done:** authoritative persisted `Room` match lifecycle and reconnect snapshot | Two clients enter the same match |
 | 04 | **Done:** real-time race, atomic winner, ten-guess elimination, no-winner termination | Two clients race live |
-| 05 | **Done:** private synchronous submissions, 60-second deadline plus 400ms network grace, early reveal, five-round termination | Two clients reveal together |
+| 05 | **Done:** private synchronous submissions, host-selected 1/3/5-minute deadline plus 400ms network grace, early reveal, five-round termination | Two clients reveal together |
 | 06 | **Done:** persisted multi-winner `tiebreak` boundary | Tie does not choose an invented winner |
 | 07 | Match persistence: write `matches` / account-owned `match_players` once at terminal state; guest history remains device-local | Completed account matches appear in D1 |
 | 08 | Leaderboard API: authenticated and public reads, wins → win rate → average guesses ordering, pagination, anonymous exclusion | Ranked JSON response |

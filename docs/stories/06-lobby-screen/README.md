@@ -18,7 +18,7 @@ and pauses playback; returning to the lobby starts a fresh instance.
 |---|---|
 | 00 | Polish the existing `/room/:code` connection lifecycle: connecting state, reconnecting banner, terminal-error recovery, and `connect(code)` / `disconnect()` route ownership |
 | 01 | Extend the epic-05 room-code card with favorite `<IconButton>` Star (ghost off / secondary + `weight="fill"` on) → `useFavorites().toggle` + toast |
-| 02 | Game-mode `<SegmentedControl>` "Synchronous" / "Real-time" bound to `room.gameMode`; host-only edit; description paragraph from `GAME_MODES[...].description` |
+| 02 | Game-mode `<SegmentedControl>` "Synchronous" / "Real-time" bound to `room.gameMode`; host-only edit; when synchronous is selected, a host-only 1/3/5-minute round-limit dropdown persisted in the room state; description paragraph from `GAME_MODES[...].description` |
 | 03 | "Players · N" + list: 34px avatar, name, `<Tag tone="accent">YOU</Tag>` / `<Tag tone="neutral">HOST</Tag>`, right-aligned "✓ Ready" (`--color-accent-200`) / "Waiting…" (`--color-neutral-500`); non-self rows `joinIn 0.35s`; each `playerJoined` → toast "<name> joined the lobby" |
 | 04 | Ready `<Button>`: secondary "I'm Ready" → ghost "✓ Ready"; `setReady(!self.ready)` optimistic |
 | 05 | "Start game" primary block, host-only, disabled unless `players.length >= 2 && players.every(ready)`; hint line; `startMatch()` → server validates + broadcasts `matchStarting`; all clients open `<Dialog>` "Match starting" (`<mode> · <tries> tries · <playerCount> players` + subline + "Got it"). **TODO(gameplay-epic): replace dialog with navigation to `/room/:code/play`.** `phase → 'starting'`; late joiner → `error` "match already started" |

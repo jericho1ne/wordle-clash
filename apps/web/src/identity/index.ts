@@ -17,4 +17,6 @@ export type {
   IdentityStatus,
 } from './identity'
 
+export type { IdentityContextValue } from './identity-context'
+
 export type { ProfileContextValue } from './profile-context'

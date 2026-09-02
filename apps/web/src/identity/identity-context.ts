@@ -1,5 +1,12 @@
 import { createContext } from 'react'
 
-import type { IdentityState } from './identity'
+import type {
+  Identity,
+  IdentityState,
+} from './identity'
 
-export const IdentityContext = createContext<IdentityState | null>(null)
+export interface IdentityContextValue extends IdentityState {
+  refreshIdentity: () => Promise<Identity>
+}
+
+export const IdentityContext = createContext<IdentityContextValue | null>(null)

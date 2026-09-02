@@ -1,18 +1,32 @@
 import {
+  useCallback,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from 'react'
 
 import { IdentityContext } from './identity-context'
+import type { IdentityContextValue } from './identity-context'
 import {
   ensureIdentity,
   INITIAL_IDENTITY_STATE,
+  refreshIdentity,
   type IdentityState,
 } from './identity'
 
 export function IdentityProvider({ children }: { children: ReactNode }) {
   const [identity, setIdentity] = useState<IdentityState>(INITIAL_IDENTITY_STATE)
+
+  const refresh = useCallback(async () => {
+    const result = await refreshIdentity()
+    setIdentity({
+      ...result,
+      status: 'ready',
+      error: null,
+    })
+    return result
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -43,5 +57,14 @@ export function IdentityProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  return <IdentityContext value={identity}>{children}</IdentityContext>
+  const identityContextValue = useMemo<IdentityContextValue>(
+    () => ({ ...identity, refreshIdentity: refresh }),
+    [identity, refresh],
+  )
+
+  return (
+    <IdentityContext.Provider value={identityContextValue}>
+      {children}
+    </IdentityContext.Provider>
+  )
 }

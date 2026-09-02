@@ -62,3 +62,9 @@ export function ensureIdentity(): Promise<Identity> {
 
   return identityPromise
 }
+
+/** Reload identity after an account sign-in, sign-up, or account link. */
+export function refreshIdentity(): Promise<Identity> {
+  identityPromise = null
+  return ensureIdentity()
+}

@@ -14,6 +14,8 @@ import {
   GAME_MODE_IDS,
   isValidRoomCode,
   normalizeRoomCode,
+  SYNC_ROUND_DURATION_MINUTES,
+  type SyncRoundDurationMinutes,
 } from '@wordle-clash/shared'
 import { Star } from '@phosphor-icons/react'
 
@@ -22,7 +24,7 @@ import { useRoomStore } from '../../realtime'
 import {
   Avatar,
   Button,
-  Dialog,
+  DialogBox,
   IconButton,
   SegmentedControl,
   Tag,
@@ -69,6 +71,9 @@ export function LobbyScreen() {
   const connectionError = useRoomStore(({ error }) => error)
   const setReady = useRoomStore(({ setReady }) => setReady)
   const setGameMode = useRoomStore(({ setGameMode }) => setGameMode)
+  const setSyncRoundDuration = useRoomStore(
+    ({ setSyncRoundDuration }) => setSyncRoundDuration,
+  )
   const startMatch = useRoomStore(({ startMatch }) => startMatch)
   const matchStarting = useRoomStore(({ matchStarting }) => matchStarting)
   const dismissMatchStarting = useRoomStore(
@@ -162,7 +167,7 @@ export function LobbyScreen() {
               <div className={`card-title ${styles.code}`}>{roomCode || '—'}</div>
             </div>
             <IconButton
-              variant={favorite ? 'secondary' : 'ghost'}
+              appearance={favorite ? 'secondary' : 'outline'}
               aria-label={favorite ? 'Remove room from favorites' : 'Add room to favorites'}
               aria-pressed={favorite}
               disabled={!validRoomCode}
@@ -182,7 +187,7 @@ export function LobbyScreen() {
               {feedback === 'invite' ? '✓ Invite ready' : 'Invite friends'}
             </Button>
             <Button
-              variant="secondary"
+              appearance="secondary"
               disabled={!validRoomCode}
               onClick={() => void runClipboardAction(
                 'code',
@@ -214,6 +219,25 @@ export function LobbyScreen() {
                 }))}
               />
               <p className={styles.modeDescription}>{GAME_MODES[room.gameMode].description}</p>
+              {room.gameMode === 'sync' && (
+                <label className={styles.roundDuration}>
+                  <span>Round time limit</span>
+                  <select
+                    className="input"
+                    value={room.syncRoundDurationMinutes}
+                    disabled={!self?.isHost || room.phase !== 'lobby'}
+                    onChange={({ target }) => setSyncRoundDuration(
+                      Number(target.value) as SyncRoundDurationMinutes,
+                    )}
+                  >
+                    {SYNC_ROUND_DURATION_MINUTES.map((minutes) => (
+                      <option key={minutes} value={minutes}>
+                        {minutes} {minutes === 1 ? 'minute' : 'minutes'}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
             </section>
           )}
           {room && (
@@ -250,7 +274,7 @@ export function LobbyScreen() {
           )}
           {self && (
             <Button
-              variant={self.ready ? 'ghost' : 'secondary'}
+              appearance={self.ready ? 'outline' : 'secondary'}
               aria-pressed={self.ready}
               onClick={() => setReady(!self.ready)}
             >
@@ -276,14 +300,14 @@ export function LobbyScreen() {
             <div className={styles.error} role="alert">{error.message}</div>
           )}
           {connectionStatus === 'terminal' && (
-            <Button variant="secondary" onClick={() => navigate('/setup')}>
+            <Button appearance="secondary" onClick={() => navigate('/setup')}>
               Back to room setup
             </Button>
           )}
         </div>
       </div>
       <LobbyMusic />
-      <Dialog
+      <DialogBox
         open={matchStarting !== null}
         title="Match starting"
         onOpenChange={(open) => {
@@ -312,7 +336,7 @@ export function LobbyScreen() {
             <p>Get ready. The game board is coming next.</p>
           </>
         )}
-      </Dialog>
+      </DialogBox>
     </div>
   )
 }

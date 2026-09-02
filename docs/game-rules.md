@@ -2,7 +2,7 @@ Synchronous mode — Rules
 
 - Guesses must be five-letter words in the server's Wordle allow-list.
 - 5 total guesses per player.
-- Every player has up to 1 minute to submit each guess.
+- The host selects a 1-, 3-, or 5-minute limit for every round before the match starts (default: 1 minute).
 - Guesses are secretly registered — no one sees others' guesses until the timer ends or everyone has submitted.
 - When the round closes, all guesses reveal simultaneously with standard color feedback.
 - If exactly one player guesses the word, they win immediately.

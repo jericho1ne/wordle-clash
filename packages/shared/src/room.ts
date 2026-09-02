@@ -1,4 +1,5 @@
 import type { GameMode } from './game-modes.js'
+import type { SyncRoundDurationMinutes } from './gameplay.js'
 
 /** Lobby is pre-match; `starting` is the brief window after "Start game". */
 export type RoomPhase = 'lobby' | 'starting' | 'playing' | 'finished'
@@ -30,6 +31,8 @@ export interface RoomState {
   phase: RoomPhase
   hostId: string | null
   gameMode: GameMode
+  /** Host-selected time limit for each synchronous round. */
+  syncRoundDurationMinutes: SyncRoundDurationMinutes
   /** Insertion order preserved. */
   players: Player[]
   createdAt: number

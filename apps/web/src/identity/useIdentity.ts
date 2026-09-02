@@ -1,9 +1,9 @@
 import { useContext } from 'react'
 
 import { IdentityContext } from './identity-context'
-import type { IdentityState } from './identity'
+import type { IdentityContextValue } from './identity-context'
 
-export function useIdentity(): IdentityState {
+export function useIdentity(): IdentityContextValue {
   const identity = useContext(IdentityContext)
 
   if (!identity) {

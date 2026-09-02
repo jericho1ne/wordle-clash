@@ -1,6 +1,11 @@
+import {
+  useState,
+} from 'react'
 import { useNavigate } from 'react-router'
 
+import { useIdentity } from '../../identity'
 import { Button } from '../../ui'
+import { AccountDialog } from '../account/AccountDialog'
 import styles from './TitleScreen.module.scss'
 
 const WORDLE_TILES = [
@@ -22,6 +27,14 @@ const CLASH_TILES = [
 
 export function TitleScreen() {
   const navigate = useNavigate()
+  const { isAnonymous, status } = useIdentity()
+  const [accountOpen, setAccountOpen] = useState(false)
+  const [accountMode, setAccountMode] = useState<'sign-in' | 'sign-up'>('sign-up')
+
+  const openAccount = (mode: 'sign-in' | 'sign-up') => {
+    setAccountMode(mode)
+    setAccountOpen(true)
+  }
 
   return (
     <div className={`app-stage ${styles.titleScreen}`}>
@@ -61,7 +74,22 @@ export function TitleScreen() {
         >
           Play
         </Button>
+        {status === 'ready' && isAnonymous && (
+          <div className={styles.accountActions}>
+            <Button block appearance="secondary" onClick={() => openAccount('sign-up')}>
+              Sign up
+            </Button>
+            <Button block appearance="outline" onClick={() => openAccount('sign-in')}>
+              Sign in
+            </Button>
+          </div>
+        )}
       </div>
+      <AccountDialog
+        open={accountOpen}
+        initialMode={accountMode}
+        onOpenChange={setAccountOpen}
+      />
     </div>
   )
 }

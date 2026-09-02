@@ -2,7 +2,7 @@ export { AnimalIcon } from './AnimalIcon'
 export { Avatar } from './Avatar'
 export { Button } from './Button'
 export { Card } from './Card'
-export { Dialog } from './Dialog'
+export { DialogBox } from './DialogBox'
 export { Field } from './Field'
 export { IconButton } from './IconButton'
 export { Input } from './Input'
@@ -17,10 +17,10 @@ export type { AnimalIconProps } from './AnimalIcon'
 export type { AvatarProps } from './Avatar'
 export type {
   ButtonProps,
-  ButtonVariant,
+  ButtonAppearance,
 } from './Button'
 export type { CardProps } from './Card'
-export type { DialogProps } from './Dialog'
+export type { DialogBoxProps } from './DialogBox'
 export type { FieldProps } from './Field'
 export type { IconButtonProps } from './IconButton'
 export type { InputProps } from './Input'

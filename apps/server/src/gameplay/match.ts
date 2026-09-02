@@ -1,7 +1,8 @@
 import {
   evaluateGuess,
   GAME_MODES,
-  SYNC_ROUND_MS,
+  syncRoundDurationMs,
+  type SyncRoundDurationMinutes,
   type EvaluatedGuess,
   type GameMode,
   type MatchSnapshot,
@@ -16,6 +17,7 @@ export interface AuthoritativeMatch {
   phase: MatchSnapshot['phase']
   round: number
   roundEndsAt: number | null
+  syncRoundDurationMinutes: SyncRoundDurationMinutes
   guesses: Record<string, EvaluatedGuess[]>
   pendingGuesses: Record<string, EvaluatedGuess>
   eliminatedPlayerIds: string[]
@@ -27,6 +29,7 @@ export function createMatch(
   mode: GameMode,
   answer: string,
   players: Player[],
+  syncRoundDurationMinutes: SyncRoundDurationMinutes,
   now = Date.now(),
 ): AuthoritativeMatch {
   return {
@@ -34,7 +37,8 @@ export function createMatch(
     answer,
     phase: 'active',
     round: 1,
-    roundEndsAt: mode === 'sync' ? now + SYNC_ROUND_MS : null,
+    roundEndsAt: mode === 'sync' ? now + syncRoundDurationMs(syncRoundDurationMinutes) : null,
+    syncRoundDurationMinutes,
     guesses: Object.fromEntries(players.map(({ id }) => [id, []])),
     pendingGuesses: {},
     eliminatedPlayerIds: [],

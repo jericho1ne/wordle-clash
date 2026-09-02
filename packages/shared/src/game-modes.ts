@@ -21,7 +21,7 @@ export const GAME_MODES: Record<GameMode, GameModeInfo> = {
     label: 'Synchronous',
     tries: 5,
     description:
-      '5 tries. Everyone submits a guess within 1 minute, then all guesses reveal together. Multiple correct guesses at once trigger a bboy dance-off to decide the winner.',
+      '5 tries. Everyone submits a guess before the round timer expires, then all guesses reveal together. Multiple correct guesses at once trigger a bboy dance-off to decide the winner.',
   },
   realtime: {
     id: 'realtime',

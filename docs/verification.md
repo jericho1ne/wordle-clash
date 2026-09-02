@@ -86,8 +86,9 @@ Gameplay smoke test (Epic 07 onward): set `GAMEPLAY_TEST_ANSWER="CLASH"` in
 
 - **Real-time:** guesses reveal immediately; the first `CLASH` ends the match.
   Ten incorrect guesses eliminate a player without ending another player's race.
-- **Synchronous:** one guess locks per player per round; neither word reveals
-  until everyone submits or the 60-second deadline closes. A single `CLASH`
+- **Synchronous:** set the host-controlled round limit to 1, 3, and 5 minutes
+  in turn; one guess locks per player per round, and neither word reveals until
+  everyone submits or that deadline closes. A single `CLASH`
   wins; simultaneous `CLASH` submissions enter the dance-off boundary.
 - Reload either gameplay tab and confirm its board and terminal result recover.
 

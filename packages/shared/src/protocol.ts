@@ -5,7 +5,10 @@ import {
   AVATAR_COUNT,
 } from './avatars.js'
 import { GAME_MODE_IDS } from './game-modes.js'
-import { WORD_LENGTH } from './gameplay.js'
+import {
+  SYNC_ROUND_DURATION_MINUTES,
+  WORD_LENGTH,
+} from './gameplay.js'
 import {
   MAX_NAME_LENGTH,
   MAX_PLAYERS,
@@ -17,6 +20,11 @@ export const PROTOCOL_VERSION = 1
 const idSchema = z.string().min(1)
 const timestampSchema = z.number().int().nonnegative()
 const gameModeSchema = z.enum(GAME_MODE_IDS)
+const syncRoundDurationMinutesSchema = z.union([
+  z.literal(SYNC_ROUND_DURATION_MINUTES[0]),
+  z.literal(SYNC_ROUND_DURATION_MINUTES[1]),
+  z.literal(SYNC_ROUND_DURATION_MINUTES[2]),
+])
 const tileMarkSchema = z.enum(['correct', 'present', 'absent'])
 const evaluatedGuessSchema = z.object({
   word: z.string().length(WORD_LENGTH),
@@ -56,6 +64,7 @@ export const roomStateSchema = z.object({
   phase: z.enum(['lobby', 'starting', 'playing', 'finished']),
   hostId: idSchema.nullable(),
   gameMode: gameModeSchema,
+  syncRoundDurationMinutes: syncRoundDurationMinutesSchema,
   players: z.array(playerSchema).max(MAX_PLAYERS),
   createdAt: timestampSchema,
 }).strict()
@@ -80,6 +89,10 @@ export const clientMessageSchema = z.discriminatedUnion('t', [
     mode: gameModeSchema,
   }).strict(),
   z.object({
+    t: z.literal('setSyncRoundDuration'),
+    minutes: syncRoundDurationMinutesSchema,
+  }).strict(),
+  z.object({
     t: z.literal('updateProfile'),
     name: z.string().min(1).max(MAX_NAME_LENGTH).optional(),
     avatarId: z.number().int().min(0).max(AVATAR_COUNT - 1).optional(),
@@ -100,6 +113,7 @@ export type ClientMessageType = ClientMessage['t']
 
 export type SetReadyMessage = Extract<ClientMessage, { t: 'setReady' }>
 export type SetGameModeMessage = Extract<ClientMessage, { t: 'setGameMode' }>
+export type SetSyncRoundDurationMessage = Extract<ClientMessage, { t: 'setSyncRoundDuration' }>
 export type UpdateProfileMessage = Extract<ClientMessage, { t: 'updateProfile' }>
 export type StartMatchMessage = Extract<ClientMessage, { t: 'startMatch' }>
 export type ReturnToLobbyMessage = Extract<ClientMessage, { t: 'returnToLobby' }>
@@ -150,6 +164,11 @@ export const serverMessageSchema = z.discriminatedUnion('t', [
     byPlayerId: idSchema,
   }).strict(),
   z.object({
+    t: z.literal('syncRoundDurationChanged'),
+    minutes: syncRoundDurationMinutesSchema,
+    byPlayerId: idSchema,
+  }).strict(),
+  z.object({
     t: z.literal('hostChanged'),
     hostId: idSchema,
   }).strict(),
@@ -185,6 +204,7 @@ export type PlayerJoinedMessage = Extract<ServerMessage, { t: 'playerJoined' }>
 export type PlayerLeftMessage = Extract<ServerMessage, { t: 'playerLeft' }>
 export type PlayerUpdatedMessage = Extract<ServerMessage, { t: 'playerUpdated' }>
 export type GameModeChangedMessage = Extract<ServerMessage, { t: 'gameModeChanged' }>
+export type SyncRoundDurationChangedMessage = Extract<ServerMessage, { t: 'syncRoundDurationChanged' }>
 export type HostChangedMessage = Extract<ServerMessage, { t: 'hostChanged' }>
 export type MatchStartingMessage = Extract<ServerMessage, { t: 'matchStarting' }>
 export type MatchStateMessage = Extract<ServerMessage, { t: 'matchState' }>

@@ -1,6 +1,6 @@
 # Epic 03 — Identity & auth (guest-first, invisible, additive)
 
-**Status:** complete (03-00 through 03-05 done, pending review; 03-06 deferred).
+**Status:** complete through 03-05; 03-07 username/password accounts in progress.
 
 Constraints: no route/action ever requires an account; the anonymous identity is
 invisible plumbing (no "log in" step, never shown as an account); an account is
@@ -19,6 +19,7 @@ email/OAuth" is a later post-match upsell.
 | [04](./04-profile-persistence.md) | Profile `{ name, avatarId }`: `localStorage["wc.profile"]` source of truth + mirror to the user row via `updateUser` for every user (anon included). `useProfile()`. | done, in review |
 | [05](./05-favorites-abstraction.md) | Favorites abstraction: `useFavorites()` — anon → `localStorage["wc.favorites"]`; account → `/api/favorites` on `favorite_rooms`; one-time merge on future account link. | done, in review |
 | 06 | Inert match-history placeholder | deferred to [Epic 07 Stories 07–08](../07-gameplay-leaderboard/README.md) so persistence and leaderboard queries are implemented against real gameplay state rather than a no-op API |
+| 07 | Username/password accounts: Better Auth credential + username plugins, guest-account profile preservation, and a landing-page sign-up/sign-in flow | in progress |
 
 ## Verification
 

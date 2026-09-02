@@ -17,6 +17,7 @@ import {
 const CLIENT_MESSAGES: ClientMessage[] = [
   { t: 'setReady', ready: true },
   { t: 'setGameMode', mode: 'realtime' },
+  { t: 'setSyncRoundDuration', minutes: 3 },
   { t: 'updateProfile', name: 'Nova', avatarId: 2, animalId: 7 },
   { t: 'startMatch' },
   { t: 'returnToLobby' },
@@ -33,6 +34,7 @@ const ROOM_STATE_MESSAGE: ServerMessage = {
     phase: 'lobby',
     hostId: 'user-1',
     gameMode: 'sync',
+    syncRoundDurationMinutes: 1,
     players: [
       {
         id: 'user-1',
@@ -78,6 +80,16 @@ describe('client protocol', () => {
 })
 
 describe('server protocol', () => {
+  it('round-trips a synchronous round-duration update', () => {
+    const message: ServerMessage = {
+      t: 'syncRoundDurationChanged',
+      minutes: 5,
+      byPlayerId: 'user-1',
+    }
+
+    expect(parseServerMessage(serializeServerMessage(message))).toEqual(message)
+  })
+
   it('round-trips a full room snapshot', () => {
     expect(parseServerMessage(serializeServerMessage(ROOM_STATE_MESSAGE)))
       .toEqual(ROOM_STATE_MESSAGE)

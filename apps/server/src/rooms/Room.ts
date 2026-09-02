@@ -8,11 +8,13 @@ import {
 import {
   assertNever,
   canStartMatch,
+  DEFAULT_SYNC_ROUND_DURATION_MINUTES,
   GAME_MODES,
   isValidGuess,
   MAX_PLAYERS,
   parseClientMessage,
   serializeServerMessage,
+  syncRoundDurationMs,
   SYNC_GRACE_MS,
   type ClientMessage,
   type Player,
@@ -120,6 +122,9 @@ export class Room extends Server<Env> {
       : parseStoredRoomState(storedState)
     this.lifecycle = parseLifecycle(storedLifecycle)
     this.match = storedMatch ?? null
+    if (this.match && this.match.syncRoundDurationMinutes === undefined) {
+      this.match.syncRoundDurationMinutes = DEFAULT_SYNC_ROUND_DURATION_MINUTES
+    }
     this.ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair(
       '{"t":"ping"}',
       '{"t":"pong"}',
@@ -339,6 +344,10 @@ export class Room extends Server<Env> {
         await this.#setGameMode(connection, userId, message.mode)
         return
 
+      case 'setSyncRoundDuration':
+        await this.#setSyncRoundDuration(connection, userId, message.minutes)
+        return
+
       case 'updateProfile':
         await this.#updateProfile(userId, message)
         return
@@ -419,6 +428,30 @@ export class Room extends Server<Env> {
     })
   }
 
+  async #setSyncRoundDuration(
+    connection: Connection,
+    userId: string,
+    minutes: RoomState['syncRoundDurationMinutes'],
+  ): Promise<void> {
+    if (!this.state || this.state.hostId !== userId) {
+      this.#sendError(connection, 'NOT_HOST', 'Only the host can change the round time limit')
+      return
+    }
+
+    if (this.state.phase !== 'lobby') {
+      this.#sendError(connection, 'MATCH_STARTED', 'The round time limit is locked')
+      return
+    }
+
+    this.state.syncRoundDurationMinutes = minutes
+    await this.#save()
+    this.#broadcast({
+      t: 'syncRoundDurationChanged',
+      minutes,
+      byPlayerId: userId,
+    })
+  }
+
   async #updateProfile(
     userId: string,
     message: Extract<ClientMessage, { t: 'updateProfile' }>,
@@ -466,6 +499,7 @@ export class Room extends Server<Env> {
       this.state.gameMode,
       selectAnswer(this.env.GAMEPLAY_TEST_ANSWER),
       this.state.players,
+      this.state.syncRoundDurationMinutes,
       startsAt,
     )
     this.state.phase = 'playing'
@@ -597,7 +631,7 @@ export class Room extends Server<Env> {
       match.phase = 'finished'
     } else {
       match.round += 1
-      match.roundEndsAt = Date.now() + 60_000
+      match.roundEndsAt = Date.now() + syncRoundDurationMs(match.syncRoundDurationMinutes)
     }
 
     if (match.phase !== 'active') {

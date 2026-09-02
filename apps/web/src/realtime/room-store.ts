@@ -8,6 +8,7 @@ import {
   type MatchSnapshot,
   type RoomState,
   type ServerMessage,
+  type SyncRoundDurationMinutes,
 } from '@wordle-clash/shared'
 
 import { RoomSocket } from './room-socket'
@@ -32,6 +33,7 @@ interface RoomStoreState {
   send: (message: ClientMessage) => void
   setReady: (ready: boolean) => void
   setGameMode: (mode: GameMode) => void
+  setSyncRoundDuration: (minutes: SyncRoundDurationMinutes) => void
   startMatch: () => void
   submitGuess: (guess: string) => void
   returnToLobby: () => void
@@ -137,6 +139,12 @@ export function reduceRoomMessage(
         room: { ...state.room, gameMode: message.mode },
       }
 
+    case 'syncRoundDurationChanged':
+      return {
+        ...state,
+        room: { ...state.room, syncRoundDurationMinutes: message.minutes },
+      }
+
     case 'hostChanged':
       return {
         ...state,
@@ -230,6 +238,7 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       socket.on('playerLeft', reduce),
       socket.on('playerUpdated', reduce),
       socket.on('gameModeChanged', reduce),
+      socket.on('syncRoundDurationChanged', reduce),
       socket.on('hostChanged', reduce),
       socket.on('matchStarting', (message) => {
         reduce(message)
@@ -289,6 +298,14 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
 
     set({ room: { ...room, gameMode: mode } })
     activeSocket?.send({ t: 'setGameMode', mode })
+  },
+
+  setSyncRoundDuration(minutes) {
+    const { room } = get()
+    if (!room || room.phase !== 'lobby') return
+
+    set({ room: { ...room, syncRoundDurationMinutes: minutes } })
+    activeSocket?.send({ t: 'setSyncRoundDuration', minutes })
   },
 
   startMatch() {

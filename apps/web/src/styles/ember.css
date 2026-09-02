@@ -96,12 +96,13 @@
   --font-size-900: 28px;
   --font-size-1000: 32px;
 
-  --space-1: 2.8px;
-  --space-2: 5.6px;
-  --space-3: 8.4px;
-  --space-4: 11.2px;
-  --space-6: 16.8px;
-  --space-8: 22.4px;
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 8px;
+  --space-4: 12px;
+  --space-6: 16px;
+  --space-8: 24px;
+  --space-10: 32px;
 
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -275,103 +276,6 @@ figcaption {
     var(--color-divider) calc(100% - 48px),
     transparent
   );
-}
-
-/* — buttons — outlined, never flood-filled — */
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  cursor: pointer;
-  text-decoration: none;
-  font-family: var(--font-heading);
-  font-weight: var(--font-heading-weight);
-  font-size: 14px;
-  line-height: 1.2;
-  color: var(--color-text);
-  background: transparent;
-  border: 1px solid transparent;
-  padding: var(--space-2) calc(var(--space-3) * 1.2);
-  border-radius: var(--radius-md);
-}
-
-.btn svg {
-  display: block;
-}
-
-.btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.btn-primary {
-  color: var(--color-accent);
-  border-color: var(--color-accent);
-}
-
-.btn-primary:hover {
-  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
-}
-
-.btn-primary:active {
-  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
-}
-
-.btn-secondary {
-  border-color: var(--color-divider);
-}
-
-.btn-secondary:hover {
-  background: color-mix(in srgb, var(--color-text) 7%, transparent);
-}
-
-.btn-secondary:active {
-  background: color-mix(in srgb, var(--color-text) 14%, transparent);
-}
-
-.btn-ghost {
-  color: var(--color-accent);
-  padding-inline: var(--space-1);
-}
-
-.btn-ghost:hover {
-  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
-}
-
-.btn-ghost:active {
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
-}
-
-/* Destructive — leave room, elimination confirmations, etc. Mahogany fill with
-   light text (the mid ramp is too dark to read as an outline on the ground). */
-
-.btn-danger {
-  color: var(--color-danger-100);
-  background: var(--color-danger-600);
-  border-color: var(--color-danger-600);
-}
-
-.btn-danger:hover {
-  background: var(--color-danger-500);
-  border-color: var(--color-danger-500);
-}
-
-.btn-danger:active {
-  background: var(--color-danger-700);
-  border-color: var(--color-danger-700);
-}
-
-.btn-icon {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-}
-
-.btn-block {
-  width: 100%;
-  margin-top: var(--space-2);
 }
 
 /* — forms — */
@@ -676,44 +580,4 @@ textarea.input {
         transparent
       )
       no-repeat bottom / 100% 1px;
-}
-
-/* — dialog — */
-
-.dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: var(--space-4);
-  background: color-mix(in srgb, var(--color-neutral-900) 50%, transparent);
-}
-
-.dialog {
-  width: min(440px, 100%);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-lg);
-}
-
-.dialog-title {
-  font-family: var(--font-heading);
-  font-weight: var(--font-heading-weight);
-  font-size: 20px;
-}
-
-.dialog-body {
-  font-size: 14px;
-  opacity: 0.85;
-}
-
-.dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
 }

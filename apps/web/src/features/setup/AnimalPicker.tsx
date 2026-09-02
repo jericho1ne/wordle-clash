@@ -8,7 +8,10 @@ import {
   getAnimalName,
 } from '@wordle-clash/shared'
 
-import { AnimalIcon } from '../../ui'
+import {
+  AnimalIcon,
+  Button,
+} from '../../ui'
 import styles from './AnimalPicker.module.scss'
 
 interface AnimalPickerProps {
@@ -62,7 +65,8 @@ export function AnimalPicker({
       </summary>
       <div className={styles.grid} role="listbox" aria-label="Animal avatars">
         {ANIMAL_NAMES.map((animal, index) => (
-          <button
+          <Button
+            appearance="outline"
             key={animal}
             ref={(button) => {
               buttons.current[index] = button
@@ -76,7 +80,7 @@ export function AnimalPicker({
             onKeyDown={(event) => move(event, index)}
           >
             <AnimalIcon animalId={index} />
-          </button>
+          </Button>
         ))}
       </div>
     </details>

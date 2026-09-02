@@ -46,13 +46,19 @@ describe('authoritative match', () => {
   })
 
   it('never includes an active answer in a client snapshot', () => {
-    const match = createMatch('realtime', 'CLASH', players, 1_000)
+    const match = createMatch('realtime', 'CLASH', players, 1, 1_000)
     expect(createMatchSnapshot(match, players).answer).toBeNull()
   })
 
   it('evaluates correctness against the server-only answer', () => {
-    const match = createMatch('realtime', 'CLASH', players, 1_000)
+    const match = createMatch('realtime', 'CLASH', players, 1, 1_000)
     expect(isCorrectGuess(evaluateForMatch(match, 'CLASH'))).toBe(true)
     expect(isCorrectGuess(evaluateForMatch(match, 'CLOUD'))).toBe(false)
+  })
+
+  it('uses the selected duration for a synchronous round', () => {
+    const match = createMatch('sync', 'CLASH', players, 3, 1_000)
+
+    expect(match.roundEndsAt).toBe(181_000)
   })
 })

@@ -5,6 +5,7 @@ import {
 
 import { AVATAR_STEPS } from '@wordle-clash/shared'
 
+import { Button } from '../../ui'
 import styles from './AvatarPicker.module.scss'
 
 interface AvatarPickerProps {
@@ -45,7 +46,8 @@ export function AvatarPicker({
   return (
     <div className={styles.avatarPicker} role="radiogroup" aria-label="Choose an avatar color">
       {AVATAR_STEPS.map((step, index) => (
-        <button
+        <Button
+          appearance="outline"
           key={step.name}
           ref={(button) => {
             buttons.current[index] = button
@@ -62,7 +64,7 @@ export function AvatarPicker({
           onKeyDown={(event) => selectWithKeyboard(event, index)}
         >
           <span aria-hidden="true">{initial}</span>
-        </button>
+        </Button>
       ))}
     </div>
   )

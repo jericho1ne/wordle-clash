@@ -27,6 +27,7 @@ const ROOM: RoomState = {
   phase: 'lobby',
   hostId: SELF.id,
   gameMode: 'sync',
+  syncRoundDurationMinutes: 1,
   players: [SELF],
   createdAt: 1,
 }
@@ -130,5 +131,14 @@ describe('reduceRoomMessage', () => {
     )
 
     expect(result.room?.phase).toBe('starting')
+  })
+
+  it('updates the authoritative synchronous round duration', () => {
+    const result = reduceRoomMessage(
+      { room: ROOM, selfId: SELF.id, pendingActions: [] },
+      { t: 'syncRoundDurationChanged', minutes: 5, byPlayerId: SELF.id },
+    )
+
+    expect(result.room?.syncRoundDurationMinutes).toBe(5)
   })
 })

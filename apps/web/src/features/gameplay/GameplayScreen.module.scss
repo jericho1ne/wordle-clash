@@ -1,9 +1,10 @@
+@use '../../styles/mixins' as mixins;
+
 .gameplay-screen {
   align-items: flex-start;
 
   .game {
-    display: grid;
-    gap: var(--space-6);
+    @include mixins.stack(var(--space-6));
     max-width: var(--measure-gameplay);
     padding-block: var(--space-8);
   }
@@ -41,8 +42,7 @@
   }
 
   .board {
-    display: grid;
-    gap: var(--space-2);
+    @include mixins.stack(var(--space-2));
   }
 
   .guess-row {
@@ -91,8 +91,7 @@
   }
 
   .guess-form {
-    display: grid;
-    gap: var(--space-3);
+    @include mixins.stack;
   }
 
   .timer {
@@ -101,8 +100,7 @@
   }
 
   .results {
-    display: grid;
-    gap: var(--space-3);
+    @include mixins.stack;
     text-align: center;
   }
 

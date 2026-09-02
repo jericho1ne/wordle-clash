@@ -1,4 +1,5 @@
 import {
+  DEFAULT_SYNC_ROUND_DURATION_MINUTES,
   DEFAULT_GAME_MODE,
   roomStateSchema,
   type RoomState,
@@ -17,12 +18,24 @@ export function createInitialRoomState(
     phase: 'lobby',
     hostId,
     gameMode: DEFAULT_GAME_MODE,
+    syncRoundDurationMinutes: DEFAULT_SYNC_ROUND_DURATION_MINUTES,
     players: [],
     createdAt,
   })
 }
 
 export function parseStoredRoomState(value: unknown): RoomState {
+  if (
+    value &&
+    typeof value === 'object' &&
+    !('syncRoundDurationMinutes' in value)
+  ) {
+    return roomStateSchema.parse({
+      ...value,
+      syncRoundDurationMinutes: DEFAULT_SYNC_ROUND_DURATION_MINUTES,
+    })
+  }
+
   return roomStateSchema.parse(value)
 }
 

@@ -17,6 +17,7 @@ describe('room state', () => {
       phase: 'lobby',
       hostId: null,
       gameMode: 'sync',
+      syncRoundDurationMinutes: 1,
       players: [],
       createdAt: 1_000,
     })

@@ -1,8 +1,18 @@
 import type { GameMode } from './game-modes.js'
 
 export const WORD_LENGTH = 5
-export const SYNC_ROUND_MS = 60_000
+
+// Minutes per round (Configurable)
+export const SYNC_ROUND_DURATION_MINUTES = [1, 3, 5] as const
+export type SyncRoundDurationMinutes = (typeof SYNC_ROUND_DURATION_MINUTES)[number]
+export const DEFAULT_SYNC_ROUND_DURATION_MINUTES: SyncRoundDurationMinutes = 1
+
+// In Synchronous mode, if two correct guesses (or more) arrive within this threshold, then it's a TIE.
 export const SYNC_GRACE_MS = 400
+
+export function syncRoundDurationMs(minutes: SyncRoundDurationMinutes): number {
+  return minutes * 60_000
+}
 
 export type TileMark = 'correct' | 'present' | 'absent'
 export type MatchPhase = 'active' | 'finished' | 'tiebreak'

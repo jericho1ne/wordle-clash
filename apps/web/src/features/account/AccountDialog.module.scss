@@ -1,0 +1,19 @@
+@use '../../styles/mixins' as mixins;
+
+.account-dialog {
+  .mode-switch {
+    @include mixins.two-column-grid(var(--space-2));
+
+    margin-bottom: var(--space-6);
+  }
+
+  .form {
+    @include mixins.stack(var(--space-4));
+  }
+
+  .error {
+    margin: 0;
+    color: var(--color-danger-300);
+    text-align: left;
+  }
+}

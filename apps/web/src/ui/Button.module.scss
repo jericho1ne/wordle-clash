@@ -24,6 +24,11 @@
     opacity: 0.45;
   }
 
+  &[aria-pressed='true'] {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
   &.primary {
     color: var(--color-accent);
     border-color: var(--color-accent);

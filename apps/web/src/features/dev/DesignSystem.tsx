@@ -79,27 +79,23 @@ export function DesignSystem() {
         <div className={styles.row}>
           <span className={styles.rowLabel}>default</span>
           <Button>Primary</Button>
-          <Button variant="secondary">Secondary</Button>
-          <Button variant="ghost">Ghost</Button>
-          <Button variant="danger">Danger</Button>
+          <Button appearance="secondary">Secondary</Button>
+          <Button appearance="outline">Outline</Button>
         </div>
         <div className={styles.row}>
           <span className={styles.rowLabel}>disabled</span>
           <Button disabled>Primary</Button>
-          <Button variant="secondary" disabled>
+          <Button appearance="secondary" disabled>
             Secondary
           </Button>
-          <Button variant="ghost" disabled>
-            Ghost
-          </Button>
-          <Button variant="danger" disabled>
-            Danger
+          <Button appearance="outline" disabled>
+            Outline
           </Button>
         </div>
         <div className={styles.row}>
           <span className={styles.rowLabel}>icons</span>
           <Button leadingIcon={<span aria-hidden>+</span>}>New room</Button>
-          <Button variant="secondary" trailingIcon={<span aria-hidden>→</span>}>
+          <Button appearance="secondary" trailingIcon={<span aria-hidden>→</span>}>
             Continue
           </Button>
         </div>
@@ -116,13 +112,13 @@ export function DesignSystem() {
         <div className={styles.row}>
           <span className={styles.rowLabel}>default</span>
           <IconButton aria-label="Back">‹</IconButton>
-          <IconButton variant="secondary" aria-label="Copy">
+          <IconButton appearance="secondary" aria-label="Copy">
             ⧉
           </IconButton>
-          <IconButton variant="primary" aria-label="Favorite">
+          <IconButton appearance="primary" aria-label="Favorite">
             ★
           </IconButton>
-          <IconButton variant="danger" aria-label="Delete">
+          <IconButton appearance="outline" aria-label="Delete">
             ✕
           </IconButton>
           <IconButton aria-label="Disabled" disabled>

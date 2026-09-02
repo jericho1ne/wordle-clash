@@ -30,6 +30,19 @@ fair, and open to deeply questionable strategies.
 - Simultaneous reveals, live opponent boards
 - Real-time game allows for rapid-fire brute force guessing
 
+## Infrastructure
+
+- One Cloudflare Durable Object per room provides authoritative, reconnect-safe
+  multiplayer state without a database in the gameplay hot path.
+- Server-generated WebSocket events and full room-state snapshots keep every
+  client synchronized, including after reconnecting.
+- A shared, Zod-validated protocol package keeps React and the Worker aligned on
+  every realtime message shape.
+- Short-lived realtime tickets authenticate WebSocket connections at the Worker
+  edge; the Durable Object receives only trusted identity data.
+- One Cloudflare Worker serves the React SPA, API, WebSockets, Durable Objects,
+  and D1-backed account data from a single origin and deployment.
+
 ## Development
 
 To run locally see [`LOCAL-DEV.md`](./LOCAL-DEV.md).

@@ -14,7 +14,7 @@ per-epic/story breakdown is under [`docs/stories/`](./stories/).
 
 A multiplayer (2–8 player) Wordle race. Players create or join a room by code,
 pick a mode in the lobby, and race to guess the word. Two modes: **Synchronous**
-(5 tries; everyone submits within a minute, all guesses reveal together; a
+(5 tries; the host selects a 1-, 3-, or 5-minute round limit and all guesses reveal together; a
 simultaneous-correct tie triggers a "bboy dance-off" mini-game) and **Real-time**
 (10 tries; first to solve wins — deliberately chaotic). Playing needs no account;
 signing up is optional and only unlocks a leaderboard, a saved avatar, and saved
@@ -34,7 +34,7 @@ room codes.
 | Realtime runtime | **Cloudflare Durable Objects**, one per room, via the **`partyserver`** library (client: **`partysocket`**) | Our own Cloudflare account. `partyserver` is an MIT library that wraps the DO **WebSocket hibernation** API — **not** the hosted PartyKit service, no third-party bill. Swapping to the raw DO API is a contained change inside `Room.ts`. |
 | Backend | **Cloudflare Worker** (TypeScript), **Hono** router | The same Worker also serves the built SPA assets. |
 | Database | **Cloudflare D1** (SQLite) + **Drizzle ORM** | `drizzle-kit generate` → `wrangler d1 migrations apply`. Accounts, favorites, and (Phase 1: inert) match history. |
-| Auth | **better-auth** — `anonymous` plugin now, `emailOTP` / OAuth later | Guest-first and invisible. |
+| Auth | **better-auth** — anonymous, username/password; `emailOTP` / OAuth later | Guest-first and invisible. |
 | Hosting | **Cloudflare**, single `wrangler deploy` | Assets + Worker + Durable Object + D1 in one deploy. (Supersedes an earlier Netlify/Vercel idea.) Runbook + custom domain: [`deployment.md`](./deployment.md). |
 | Package layout | **pnpm workspaces** monorepo, no Turborepo yet | `apps/web`, `apps/server`, `packages/shared`, `e2e`. |
 
@@ -79,7 +79,9 @@ plugin). It is plumbing — a signed token for socket auth plus the player's
 name, avatar color, and animal — never surfaced as "an account", and there is no login step in the
 title → setup → lobby flow. **No route or action ever requires an account.**
 
-Signing up is **purely additive**. The only things an account unlocks:
+Signing up is **purely additive**. Users can create an account with a username,
+email, and password; email verification and recovery mail remain deferred until
+an email delivery service is added. The only things an account unlocks:
 - leaderboard-eligible match history (attributed to a real identity),
 - a saved avatar,
 - saved room codes (favorites) that sync across devices.

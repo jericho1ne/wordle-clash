@@ -60,6 +60,14 @@ function PendingGuessRow({ guess }: { guess: string }) {
   )
 }
 
+function formatRemainingTime(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`
+
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = String(seconds % 60).padStart(2, '0')
+  return `${minutes}:${remainingSeconds}`
+}
+
 interface DraftGuessRowProps {
   disabled: boolean
   value: string
@@ -226,7 +234,12 @@ export function GameplayScreen() {
                   selfMatch?.eliminated ||
                   secondsRemaining === 0,
                 )
-                const showDraft = isSelf && !terminal && !submitted
+                const hasGuessesRemaining = matchPlayer.guesses.length < match.maxGuesses
+                const showDraft = isSelf &&
+                  !terminal &&
+                  !submitted &&
+                  !matchPlayer.eliminated &&
+                  hasGuessesRemaining
                 const showLockedGuess = isSelf && submitted && guess
                 const reservedRows = showDraft || showLockedGuess ? 1 : 0
                 const emptyRows = Math.max(
@@ -279,7 +292,7 @@ export function GameplayScreen() {
               >
                 {secondsRemaining !== null && (
                   <div className={styles.timer} role="timer">
-                    {submitted ? 'Guess locked' : `${secondsRemaining}s remaining`}
+                    {submitted ? 'Guess locked' : `${formatRemainingTime(secondsRemaining)} remaining`}
                   </div>
                 )}
                 <Button
@@ -309,7 +322,7 @@ export function GameplayScreen() {
                 {tiebreakNames.length > 0 && <p>{tiebreakNames.join(' vs ')}</p>}
                 {match.answer && <p>The word was <strong>{match.answer}</strong>.</p>}
                 <Button
-                  variant="secondary"
+                  appearance="secondary"
                   disabled={!self?.isHost}
                   onClick={returnToLobby}
                 >

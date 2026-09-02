@@ -209,7 +209,7 @@ export function SetupScreen() {
           )}
 
           {isInvite && error && (
-            <Button variant="ghost" onClick={leaveInvite}>
+            <Button appearance="outline" onClick={leaveInvite}>
               Enter a different room code
             </Button>
           )}

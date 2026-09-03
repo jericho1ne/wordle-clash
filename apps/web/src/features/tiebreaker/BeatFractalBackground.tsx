@@ -6,7 +6,7 @@ import {
 } from 'react'
 
 import type { ThemeName } from './beatFractalEngine'
-import { BeatFractalEngine } from './beatFractalEngine'
+import type { BeatFractalEngine } from './beatFractalEngine'
 import {
   useBeatFractal,
   useBeatFractalTheme,

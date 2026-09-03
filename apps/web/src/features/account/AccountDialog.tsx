@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useId,
   useState,
   type FormEvent,
@@ -36,11 +35,15 @@ export function AccountDialog({
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => {
-    if (!open) return
+  // Resets mode/error whenever the dialog opens (or initialMode changes
+  // while open) by adjusting state during render rather than in an effect —
+  // see https://react.dev/learn/you-might-not-need-an-effect#adjusting-state-when-a-prop-changes.
+  const [prevOpenState, setPrevOpenState] = useState({ open, initialMode })
+  if (open && (prevOpenState.open !== open || prevOpenState.initialMode !== initialMode)) {
+    setPrevOpenState({ open, initialMode })
     setMode(initialMode)
     setError(null)
-  }, [initialMode, open])
+  }
 
   const changeMode = (nextMode: AccountMode) => {
     setMode(nextMode)

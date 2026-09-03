@@ -1,5 +1,12 @@
-import type { Beatmap, BeatmapEntry, Lane } from './beatmap.js'
-import { findNearestEntryInLane, sliceBeatmapClip } from './beatmap.js'
+import type {
+  Beatmap,
+  BeatmapEntry,
+  Lane,
+} from './beatmap.js'
+import {
+  findNearestEntryInLane,
+  sliceBeatmapClip,
+} from './beatmap.js'
 
 /**
  * Tiebreaker Battle scoring contract (Epic 09). Shared by the playground,

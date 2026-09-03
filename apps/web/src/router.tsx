@@ -7,14 +7,17 @@ import { TitleScreen } from './features/title/TitleScreen'
 import { SetupScreen } from './features/setup/SetupScreen'
 import { InviteRoomRoute } from './features/lobby/InviteRoomRoute'
 import { DesignSystem } from './features/dev/DesignSystem'
+import { BeatmapPreview } from './features/dev/BeatmapPreview'
 import { GameplayScreen } from './features/gameplay/GameplayScreen'
 
 /**
  * Routes (see docs/stories/00-app-scaffold/08-routing-react-router.md):
- *   /              title
- *   /setup         player setup + create/join room  (?join=<code> deep-link)
- *   /room/:code    invite-aware lobby entry
- *   /design-system design-system showcase (DEV builds only)
+ *   /               title
+ *   /setup          player setup + create/join room  (?join=<code> deep-link)
+ *   /room/:code     invite-aware lobby entry
+ *   /design-system  design-system showcase (DEV builds only)
+ *   /beatmap-preview beat map visual/audio scrub tool (DEV builds only,
+ *                    docs/stories/08-beatmap-engine)
  *
  */
 export const router = createBrowserRouter([
@@ -22,6 +25,11 @@ export const router = createBrowserRouter([
   { path: '/setup', element: <SetupScreen /> },
   { path: '/room/:code', element: <InviteRoomRoute /> },
   { path: '/room/:code/play', element: <GameplayScreen /> },
-  ...(import.meta.env.DEV ? [{ path: '/design-system', element: <DesignSystem /> }] : []),
+  ...(import.meta.env.DEV
+    ? [
+        { path: '/design-system', element: <DesignSystem /> },
+        { path: '/beatmap-preview', element: <BeatmapPreview /> },
+      ]
+    : []),
   { path: '*', element: <Navigate to="/" replace /> },
 ])

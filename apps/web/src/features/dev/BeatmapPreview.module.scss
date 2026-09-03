@@ -1,0 +1,38 @@
+// Dev-only beat map preview (route `/beatmap-preview`, DEV builds only).
+
+.beatmap-preview {
+  min-height: 100vh;
+  padding: var(--space-8);
+  background: var(--color-bg);
+  color: var(--color-text);
+  text-align: center;
+
+  .error {
+    color: var(--color-danger-600);
+  }
+
+  .audio {
+    width: 100%;
+    max-width: 480px;
+    margin: var(--space-4) 0;
+  }
+
+  .lane-labels {
+    display: flex;
+    justify-content: center;
+    max-width: 480px;
+    margin: 0 auto;
+    font-size: 1.5rem;
+
+    span {
+      flex: 1;
+    }
+  }
+
+  .canvas {
+    display: block;
+    margin: 0 auto;
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+}

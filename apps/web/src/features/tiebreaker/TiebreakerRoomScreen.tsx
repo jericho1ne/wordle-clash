@@ -24,11 +24,14 @@ import styles from './TiebreakerRoomScreen.module.scss'
 
 const LANES: readonly Lane[] = ['left', 'up', 'down', 'right']
 const LANE_LABEL: Record<Lane, string> = { up: '↑', down: '↓', left: '←', right: '→' }
+// A/S/D/F — four adjacent keys under the left hand's resting fingers, easier
+// to "drum" on quickly than the spread-out arrow cluster. Order follows the
+// on-screen lane order (left, up, down, right) left to right.
 const KEY_TO_LANE: Record<string, Lane> = {
-  ArrowUp: 'up',
-  ArrowDown: 'down',
-  ArrowLeft: 'left',
-  ArrowRight: 'right',
+  a: 'left',
+  s: 'up',
+  d: 'down',
+  f: 'right',
 }
 const DANCER_THEMES: ThemeName[] = ['neonArcade', 'synthwaveSunset', 'cyberIce', 'inferno']
 const LOOKAHEAD_MS = 1800
@@ -52,7 +55,7 @@ function DanceFloor({ name, theme, score, entries, startsAt, canPlay, onHit }: D
     if (!canPlay) return
 
     function onKeyDown(event: KeyboardEvent) {
-      const lane = KEY_TO_LANE[event.key]
+      const lane = KEY_TO_LANE[event.key.toLowerCase()]
       if (!lane) return
       // Sent for a future latency-compensation story; the Room DO judges
       // against its own receipt time today (see docs/stories/09-tiebreaker-battle).
@@ -117,7 +120,7 @@ function DanceFloor({ name, theme, score, entries, startsAt, canPlay, onHit }: D
       <div className={styles.panel}>
         <div className={styles.dancerHeader}>
           <strong>{name}</strong>
-          {canPlay && <span>Arrow keys</span>}
+          {canPlay && <span>A S D F</span>}
         </div>
         <div className={styles.hud}>Score {score}</div>
         <div className={styles.laneLabels}>

@@ -48,15 +48,20 @@ const DANCERS: DancerConfig[] = [
     id: 'p1',
     name: 'Player 1',
     theme: 'neonArcade',
-    keyToLane: { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' },
-    keyLegend: 'Arrow keys',
+    // Four adjacent keys under the left hand's resting fingers — easier to
+    // "drum" on quickly than the spread-out arrow cluster. Order follows
+    // the on-screen lane order (left, up, down, right) left to right.
+    keyToLane: { a: 'left', s: 'up', d: 'down', f: 'right' },
+    keyLegend: 'A S D F',
   },
   {
     id: 'p2',
     name: 'Player 2',
     theme: 'synthwaveSunset',
-    keyToLane: { w: 'up', s: 'down', a: 'left', d: 'right' },
-    keyLegend: 'W A S D',
+    // Arrow keys instead of WASD so the two local players' key clusters
+    // never overlap now that Player 1 uses A/S/D/F.
+    keyToLane: { ArrowLeft: 'left', ArrowUp: 'up', ArrowDown: 'down', ArrowRight: 'right' },
+    keyLegend: 'Arrow keys',
   },
 ]
 
@@ -109,7 +114,9 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange }: Danc
     if (phase !== 'running') return
 
     function onKeyDown(event: KeyboardEvent) {
-      const lane = dancer.keyToLane[event.key]
+      // Exact match first for "ArrowLeft" etc., falling back to a
+      // lowercased lookup so Shift/CapsLock doesn't break the letter keys.
+      const lane = dancer.keyToLane[event.key] ?? dancer.keyToLane[event.key.toLowerCase()]
       if (!lane) return
       const nowMs = clockMs()
 

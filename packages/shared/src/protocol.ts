@@ -4,6 +4,10 @@ import {
   ANIMAL_COUNT,
   AVATAR_COUNT,
 } from './avatars.js'
+import {
+  beatmapSchema,
+  laneSchema,
+} from './beatmap.js'
 import { GAME_MODE_IDS } from './game-modes.js'
 import {
   SYNC_ROUND_DURATION_MINUTES,
@@ -106,6 +110,11 @@ export const clientMessageSchema = z.discriminatedUnion('t', [
   }).strict(),
   z.object({ t: z.literal('leave') }).strict(),
   z.object({ t: z.literal('ping') }).strict(),
+  z.object({
+    t: z.literal('submitDanceHit'),
+    lane: laneSchema,
+    clientTimeMs: z.number().int().nonnegative(),
+  }).strict(),
 ])
 
 export type ClientMessage = z.infer<typeof clientMessageSchema>
@@ -120,6 +129,7 @@ export type ReturnToLobbyMessage = Extract<ClientMessage, { t: 'returnToLobby' }
 export type SubmitGuessMessage = Extract<ClientMessage, { t: 'submitGuess' }>
 export type LeaveMessage = Extract<ClientMessage, { t: 'leave' }>
 export type PingMessage = Extract<ClientMessage, { t: 'ping' }>
+export type SubmitDanceHitMessage = Extract<ClientMessage, { t: 'submitDanceHit' }>
 
 /* ------------------------------- server -> client ------------------------------- */
 
@@ -134,6 +144,7 @@ export const ROOM_ERROR_CODES = [
   'INVALID_GUESS',
   'GUESS_LOCKED',
   'MATCH_NOT_ACTIVE',
+  'DANCE_OFF_NOT_ACTIVE',
 ] as const
 
 export const roomErrorCodeSchema = z.enum(ROOM_ERROR_CODES)
@@ -188,6 +199,20 @@ export const serverMessageSchema = z.discriminatedUnion('t', [
     guess: z.string().length(WORD_LENGTH),
   }).strict(),
   z.object({
+    t: z.literal('danceOffStarted'),
+    beatmap: beatmapSchema,
+    startsAt: timestampSchema,
+    playerIds: z.array(idSchema),
+  }).strict(),
+  z.object({
+    t: z.literal('danceOffScore'),
+    scores: z.record(idSchema, z.number().int().nonnegative()),
+  }).strict(),
+  z.object({
+    t: z.literal('danceOffEnded'),
+    winnerId: idSchema,
+  }).strict(),
+  z.object({
     t: z.literal('error'),
     code: roomErrorCodeSchema,
     message: z.string().min(1),
@@ -209,6 +234,9 @@ export type HostChangedMessage = Extract<ServerMessage, { t: 'hostChanged' }>
 export type MatchStartingMessage = Extract<ServerMessage, { t: 'matchStarting' }>
 export type MatchStateMessage = Extract<ServerMessage, { t: 'matchState' }>
 export type GuessAcceptedMessage = Extract<ServerMessage, { t: 'guessAccepted' }>
+export type DanceOffStartedMessage = Extract<ServerMessage, { t: 'danceOffStarted' }>
+export type DanceOffScoreMessage = Extract<ServerMessage, { t: 'danceOffScore' }>
+export type DanceOffEndedMessage = Extract<ServerMessage, { t: 'danceOffEnded' }>
 export type ErrorMessage = Extract<ServerMessage, { t: 'error' }>
 export type PongMessage = Extract<ServerMessage, { t: 'pong' }>
 

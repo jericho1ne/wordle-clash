@@ -1,4 +1,7 @@
-import type { BeatmapEntry, Lane } from '@wordle-clash/shared'
+import type {
+  BeatmapEntry,
+  Lane,
+} from '@wordle-clash/shared'
 import {
   isValidRoomCode,
   normalizeRoomCode,
@@ -22,17 +25,21 @@ import { BeatFractalBackground } from './BeatFractalBackground'
 import type { ThemeName } from './beatFractalEngine'
 import styles from './TiebreakerRoomScreen.module.scss'
 
-const LANES: readonly Lane[] = ['left', 'up', 'down', 'right']
-const LANE_LABEL: Record<Lane, string> = { up: '↑', down: '↓', left: '←', right: '→' }
-// A/S/D/F — four adjacent keys under the left hand's resting fingers, easier
-// to "drum" on quickly than the spread-out arrow cluster. Order follows the
-// on-screen lane order (left, up, down, right) left to right.
+const LANES: readonly Lane[] = ['left', 'down', 'right']
+// A/S/D — three adjacent keys under the left hand's resting fingers, easier
+// to "drum" on quickly than a four-key spread. Order follows the on-screen
+// lane order (left, down, right) left to right. This is the ONLY place the
+// key scheme is defined — the column headers and the legend text below are
+// both derived from it, so they can't drift out of sync with each other again.
 const KEY_TO_LANE: Record<string, Lane> = {
   a: 'left',
-  s: 'up',
-  d: 'down',
-  f: 'right',
+  s: 'down',
+  d: 'right',
 }
+const LANE_KEY_LABEL = Object.fromEntries(
+  Object.entries(KEY_TO_LANE).map(([key, lane]) => [lane, key.toUpperCase()]),
+) as Record<Lane, string>
+const KEY_LEGEND = Object.keys(KEY_TO_LANE).map((key) => key.toUpperCase()).join(' ')
 const DANCER_THEMES: ThemeName[] = ['neonArcade', 'synthwaveSunset', 'cyberIce', 'inferno']
 const LOOKAHEAD_MS = 1800
 
@@ -49,7 +56,7 @@ interface DanceFloorProps {
 function DanceFloor({ name, theme, score, entries, startsAt, canPlay, onHit }: DanceFloorProps) {
   const bgRef = useRef<BeatFractalHandle | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const flashRefs = useRef<Record<Lane, number>>({ up: 0, down: 0, left: 0, right: 0 })
+  const flashRefs = useRef<Record<Lane, number>>({ down: 0, left: 0, right: 0 })
 
   useEffect(() => {
     if (!canPlay) return
@@ -120,11 +127,11 @@ function DanceFloor({ name, theme, score, entries, startsAt, canPlay, onHit }: D
       <div className={styles.panel}>
         <div className={styles.dancerHeader}>
           <strong>{name}</strong>
-          {canPlay && <span>A S D F</span>}
+          {canPlay && <span>{KEY_LEGEND}</span>}
         </div>
         <div className={styles.hud}>Score {score}</div>
         <div className={styles.laneLabels}>
-          {LANES.map((lane) => <span key={lane}>{LANE_LABEL[lane]}</span>)}
+          {LANES.map((lane) => <span key={lane}>{LANE_KEY_LABEL[lane]}</span>)}
         </div>
         <canvas ref={canvasRef} width={260} height={380} className={styles.canvas} />
       </div>
@@ -135,7 +142,7 @@ function DanceFloor({ name, theme, score, entries, startsAt, canPlay, onHit }: D
 /**
  * Story 09-04 — the real, guarded Tiebreaker Battle (route
  * `/room/:code/tiebreaker`). Tied players (room.match.tiebreakPlayerIds)
- * get interactive arrow-key input; every other connected player lands here
+ * get interactive A/S/D input; every other connected player lands here
  * too, in read-only spectator mode. All scoring comes from the Room DO's
  * broadcast danceOffScore/danceOffEnded messages — this screen never
  * judges a hit locally.

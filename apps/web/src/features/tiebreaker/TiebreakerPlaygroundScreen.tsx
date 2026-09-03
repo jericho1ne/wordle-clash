@@ -31,8 +31,7 @@ import styles from './TiebreakerPlaygroundScreen.module.scss'
 
 const TRACK_SRC = '/audio/canto-de-ossanha.mp3'
 const BEATMAP_SRC = '/audio/canto-de-ossanha.beatmap.json'
-const LANES: readonly Lane[] = ['left', 'up', 'down', 'right']
-const LANE_LABEL: Record<Lane, string> = { up: '↑', down: '↓', left: '←', right: '→' }
+const LANES: readonly Lane[] = ['left', 'down', 'right']
 const LOOKAHEAD_MS = 1800
 
 interface DancerConfig {
@@ -40,7 +39,6 @@ interface DancerConfig {
   name: string
   theme: ThemeName
   keyToLane: Record<string, Lane>
-  keyLegend: string
 }
 
 const DANCERS: DancerConfig[] = [
@@ -48,22 +46,42 @@ const DANCERS: DancerConfig[] = [
     id: 'p1',
     name: 'Player 1',
     theme: 'neonArcade',
-    // Four adjacent keys under the left hand's resting fingers — easier to
-    // "drum" on quickly than the spread-out arrow cluster. Order follows
-    // the on-screen lane order (left, up, down, right) left to right.
-    keyToLane: { a: 'left', s: 'up', d: 'down', f: 'right' },
-    keyLegend: 'A S D F',
+    // Three adjacent keys under the left hand's resting fingers. Order
+    // follows the on-screen lane order (left, down, right) left to right.
+    // This is the ONLY place Player 1's keys are defined — the header
+    // legend and the column labels below are both derived from it (see
+    // DanceFloor), so they can't drift out of sync with each other again.
+    keyToLane: { a: 'left', s: 'down', d: 'right' },
   },
   {
     id: 'p2',
     name: 'Player 2',
     theme: 'synthwaveSunset',
-    // Arrow keys instead of WASD so the two local players' key clusters
-    // never overlap now that Player 1 uses A/S/D/F.
-    keyToLane: { ArrowLeft: 'left', ArrowUp: 'up', ArrowDown: 'down', ArrowRight: 'right' },
-    keyLegend: 'Arrow keys',
+    // Left/Down/Right arrows — same three-wide spatial layout as Player
+    // 1's A/S/D, on the other hand, so neither key cluster overlaps.
+    keyToLane: { ArrowLeft: 'left', ArrowDown: 'down', ArrowRight: 'right' },
   },
 ]
+
+/** e.g. { a: 'left', s: 'down' } -> "A S", or { ArrowLeft: 'left' } -> "Arrow keys" for the non-letter scheme. */
+function describeKeys(keyToLane: Record<string, Lane>): string {
+  const keys = Object.keys(keyToLane)
+  return keys.every((key) => key.length === 1)
+    ? keys.map((key) => key.toUpperCase()).join(' ')
+    : 'Arrow keys'
+}
+
+const ARROW_GLYPH: Record<string, string> = { ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→' }
+
+/** Column header label for each lane, derived from the same keyToLane map that drives input — never a second hardcoded source. */
+function laneKeyLabels(keyToLane: Record<string, Lane>): Record<Lane, string> {
+  return Object.fromEntries(
+    Object.entries(keyToLane).map(([key, lane]) => [
+      lane,
+      key.length === 1 ? key.toUpperCase() : (ARROW_GLYPH[key] ?? key),
+    ]),
+  ) as Record<Lane, string>
+}
 
 interface LiveEntry extends BeatmapEntry {
   consumed: boolean
@@ -96,9 +114,10 @@ interface DanceFloorProps {
 function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange }: DanceFloorProps) {
   const bgRef = useRef<BeatFractalHandle | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const flashRefs = useRef<Record<Lane, number>>({ up: 0, down: 0, left: 0, right: 0 })
+  const flashRefs = useRef<Record<Lane, number>>({ down: 0, left: 0, right: 0 })
   const liveEntriesRef = useRef<LiveEntry[]>([])
   const { score, combo, addJudgment, reset } = useDancerScore()
+  const laneLabels = useMemo(() => laneKeyLabels(dancer.keyToLane), [dancer.keyToLane])
 
   useEffect(() => {
     // Re-arm on every battle start (idle/ended -> running), not just when the
@@ -108,7 +127,9 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange }: Danc
     reset()
   }, [phase, clipEntries, reset])
 
-  useEffect(() => { onScoreChange(dancer.id, score) }, [dancer.id, score, onScoreChange])
+  useEffect(() => {
+    onScoreChange(dancer.id, score)
+  }, [dancer.id, score, onScoreChange])
 
   useEffect(() => {
     if (phase !== 'running') return
@@ -171,7 +192,10 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange }: Danc
         for (const entry of liveEntriesRef.current) {
           if (entry.lane !== lane || entry.consumed) continue
           const delta = entry.timeMs - nowMs
-          if (delta < -DANCE_OFF_GOOD_WINDOW_MS) { entry.consumed = true; continue }
+          if (delta < -DANCE_OFF_GOOD_WINDOW_MS) {
+            entry.consumed = true
+            continue
+          }
           if (delta > LOOKAHEAD_MS) continue
           const progress = 1 - delta / LOOKAHEAD_MS
           const y = progress * hitLineY
@@ -197,14 +221,14 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange }: Danc
       <div className={styles.panel}>
         <div className={styles.header}>
           <strong>{dancer.name}</strong>
-          <span>{dancer.keyLegend}</span>
+          <span>{describeKeys(dancer.keyToLane)}</span>
         </div>
         <div className={styles.hud}>
           <span>Score {score}</span>
           <span>Combo {combo}</span>
         </div>
         <div className={styles.laneLabels}>
-          {LANES.map((lane) => <span key={lane}>{LANE_LABEL[lane]}</span>)}
+          {LANES.map((lane) => <span key={lane}>{laneLabels[lane]}</span>)}
         </div>
         <canvas ref={canvasRef} width={280} height={420} className={styles.canvas} />
       </div>
@@ -214,7 +238,7 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange }: Danc
 
 /**
  * Story 09-01 — DEV-only playground (route `/tiebreaker`) for the DDR
- * dance-off: two local dancers (arrow keys vs WASD) battle against the same
+ * dance-off: two local dancers (A/S/D vs Left/Down/Right arrows) battle against the same
  * 20s clip of the real beatmap, no server involved. Validates the mechanic,
  * scoring, and fractal integration before Epic 09 wires it into the real
  * tiebreak flow at `/room/:code/tiebreaker`.
@@ -276,10 +300,12 @@ export function TiebreakerPlaygroundScreen() {
     }, DANCE_OFF_CLIP_MS / playbackRate)
   }
 
+  const scoreP1 = scores.p1 ?? 0
+  const scoreP2 = scores.p2 ?? 0
   const winnerText = phase === 'ended'
-    ? scores.p1 === scores.p2
+    ? scoreP1 === scoreP2
       ? 'It\'s a tie — run it again!'
-      : `${scores.p1 > scores.p2 ? DANCERS[0]?.name : DANCERS[1]?.name} wins!`
+      : `${scoreP1 > scoreP2 ? DANCERS[0]?.name : DANCERS[1]?.name} wins!`
     : null
 
   return (

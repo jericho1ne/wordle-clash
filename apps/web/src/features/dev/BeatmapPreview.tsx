@@ -5,7 +5,10 @@ import {
   useState,
 } from 'react'
 
-import type { Beatmap, Lane } from '@wordle-clash/shared'
+import type {
+  Beatmap,
+  Lane,
+} from '@wordle-clash/shared'
 
 import { DEFAULT_PLAYBACK_RATE } from '../../constants'
 import { PlaybackSpeedSlider } from '../../ui'
@@ -13,21 +16,22 @@ import styles from './BeatmapPreview.module.scss'
 
 const TRACK_SRC = '/audio/canto-de-ossanha.mp3'
 const BEATMAP_SRC = '/audio/canto-de-ossanha.beatmap.json'
-const LANES: readonly Lane[] = ['left', 'up', 'down', 'right']
-const LANE_LABEL: Record<Lane, string> = { up: '↑', down: '↓', left: '←', right: '→' }
+const LANES: readonly Lane[] = ['left', 'down', 'right']
+const LANE_LABEL: Record<Lane, string> = { down: '↓', left: '←', right: '→' }
 const LOOKAHEAD_MS = 2200
 const HIT_FLASH_MS = 120
 
 /**
  * Story 08-03 — dev-only preview (route `/beatmap-preview`, DEV builds only)
  * that plays the track and scrolls the generated beatmap toward a hit line,
- * so kick (up/down) and snare (left/right) onsets can be confirmed by ear
- * and eye before Epic 09 builds real dance-off gameplay on top of them.
+ * so kick (down), snare (left), and hi-hat/broadband (right) onsets can be
+ * confirmed by ear and eye before Epic 09 builds real dance-off gameplay on
+ * top of them.
  */
 export function BeatmapPreview() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const flashRefs = useRef<Record<Lane, number>>({ up: 0, down: 0, left: 0, right: 0 })
+  const flashRefs = useRef<Record<Lane, number>>({ down: 0, left: 0, right: 0 })
   const [beatmap, setBeatmap] = useState<Beatmap | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [playbackRate, setPlaybackRate] = useState(DEFAULT_PLAYBACK_RATE)
@@ -47,7 +51,7 @@ export function BeatmapPreview() {
   }, [playbackRate])
 
   const entriesByLane = useMemo(() => {
-    const grouped: Record<Lane, number[]> = { up: [], down: [], left: [], right: [] }
+    const grouped: Record<Lane, number[]> = { down: [], left: [], right: [] }
     for (const entry of beatmap?.entries ?? []) grouped[entry.lane].push(entry.timeMs)
     return grouped
   }, [beatmap])

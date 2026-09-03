@@ -24,7 +24,7 @@ const CLIENT_MESSAGES: ClientMessage[] = [
   { t: 'submitGuess', guess: 'CLASH' },
   { t: 'leave' },
   { t: 'ping' },
-  { t: 'submitDanceHit', lane: 'up', clientTimeMs: 1234 },
+  { t: 'submitDanceHit', lane: 'left', clientTimeMs: 1234 },
 ]
 
 const ROOM_STATE_MESSAGE: ServerMessage = {
@@ -139,7 +139,7 @@ describe('server protocol', () => {
       beatmap: {
         trackPath: 'audio/canto-de-ossanha.mp3',
         durationMs: 20_000,
-        entries: [{ timeMs: 500, lane: 'up' }],
+        entries: [{ timeMs: 500, lane: 'left' }],
       },
       startsAt: 1_000,
       playerIds: ['user-1', 'user-2'],

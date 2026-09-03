@@ -3,10 +3,13 @@ import { z } from 'zod'
 /** Minimum gap in milliseconds between any two beatmap entries, regardless of lane. */
 export const BEATMAP_MIN_GAP_MS = 120
 
+// Three lanes, not four — matches three independent frequency-band onset
+// detectors (kick/snare/hi-hat), and lets both real control schemes stay
+// physically adjacent: A/S/D for one hand, Left/Down/Right arrows for the
+// other (docs/stories/09-tiebreaker-battle).
 export const LANES = [
-  'up',
-  'down',
   'left',
+  'down',
   'right',
 ] as const
 

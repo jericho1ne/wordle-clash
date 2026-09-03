@@ -33,19 +33,19 @@ describe('judgeDanceHit', () => {
 
 describe('judgeSubmittedHit', () => {
   const entries = [
-    { timeMs: 1000, lane: 'up' as const },
+    { timeMs: 1000, lane: 'left' as const },
     { timeMs: 3000, lane: 'left' as const },
   ]
 
   it('matches and judges the nearest entry in the lane', () => {
-    expect(judgeSubmittedHit(entries, 'up', 1010)).toEqual({
+    expect(judgeSubmittedHit(entries, 'left', 1010)).toEqual({
       judgment: 'perfect',
-      matchedEntry: { timeMs: 1000, lane: 'up' },
+      matchedEntry: { timeMs: 1000, lane: 'left' },
     })
   })
 
   it('reports a miss with no matched entry when nothing is in range', () => {
-    expect(judgeSubmittedHit(entries, 'up', 5000)).toEqual({ judgment: 'miss', matchedEntry: null })
+    expect(judgeSubmittedHit(entries, 'left', 5000)).toEqual({ judgment: 'miss', matchedEntry: null })
   })
 
   it('reports a miss when the lane has no entries at all', () => {
@@ -59,13 +59,13 @@ describe('danceOffClip', () => {
       trackPath: 'audio/test.mp3',
       durationMs: 60_000,
       entries: [
-        { timeMs: 500, lane: 'up' },
+        { timeMs: 500, lane: 'left' },
         { timeMs: DANCE_OFF_CLIP_MS - 1, lane: 'down' },
         { timeMs: DANCE_OFF_CLIP_MS + 500, lane: 'left' },
       ],
     }
     expect(danceOffClip(beatmap)).toEqual([
-      { timeMs: 500, lane: 'up' },
+      { timeMs: 500, lane: 'left' },
       { timeMs: DANCE_OFF_CLIP_MS - 1, lane: 'down' },
     ])
   })

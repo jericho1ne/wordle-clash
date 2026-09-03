@@ -1,9 +1,12 @@
 /**
  * Story 08-02 — offline beat map generator.
  *
- * Decodes an audio file to mono PCM via ffmpeg, splits it into a kick band
- * (~<150Hz) and a snare/broadband band (>150Hz), detects onsets in each band
- * via energy-flux peak-picking, and writes a schema-valid Beatmap JSON.
+ * Decodes an audio file to mono PCM via ffmpeg and scans for exactly three
+ * independent waveform-spike types, one per lane — a kick band (~<150Hz ->
+ * down), a snare/mid band (~150-1000Hz -> left), and a hi-hat/broadband
+ * band (~>1000Hz -> right) — via energy-flux peak-picking per band, and
+ * writes a schema-valid Beatmap JSON. Each band maps straight to its own
+ * lane; there's no alternation to reason about.
  *
  * Run once per track; the output is checked into the repo, not regenerated
  * at build/deploy time — see docs/stories/08-beatmap-engine/00-beatmap-engine-plan.md.
@@ -38,6 +41,7 @@ const REPO_ROOT = path.resolve(__dirname, '../../..')
 
 const SAMPLE_RATE = 22_050
 const KICK_CUTOFF_HZ = 150
+const SNARE_CUTOFF_HZ = 1000
 const FRAME_SIZE = 512
 const HOP_SIZE = 256
 const DEFAULT_TARGET_NOTES_PER_SEC = 4
@@ -56,11 +60,16 @@ function parseArgs(argv: string[]): Map<string, string> {
 
 function decodeToMonoPcm(inputPath: string, sampleRate: number): Float32Array {
   const buffer = execFileSync('ffmpeg', [
-    '-i', inputPath,
-    '-f', 'f32le',
-    '-ar', String(sampleRate),
-    '-ac', '1',
-    '-loglevel', 'error',
+    '-i',
+    inputPath,
+    '-f',
+    'f32le',
+    '-ar',
+    String(sampleRate),
+    '-ac',
+    '1',
+    '-loglevel',
+    'error',
     'pipe:1',
   ], { maxBuffer: 1024 * 1024 * 256 })
   return new Float32Array(buffer.buffer, buffer.byteOffset, buffer.byteLength / 4)
@@ -121,7 +130,7 @@ function detectOnsets(
   energies: Float32Array,
   sampleRate: number,
   hopSize: number,
-  opts: { sensitivity?: number; windowFrames?: number; refractoryMs?: number } = {},
+  opts: { sensitivity?: number, windowFrames?: number, refractoryMs?: number } = {},
 ): OnsetCandidate[] {
   const sensitivity = opts.sensitivity ?? 1.5
   const windowFrames = opts.windowFrames ?? 43 // ~0.5s at 22050Hz / 256 hop
@@ -153,12 +162,9 @@ function detectOnsets(
   return onsets
 }
 
-/** Alternates a pair of lanes across successive onsets so the same key never repeats back to back. */
-function assignAlternatingLanes(onsets: OnsetCandidate[], lanes: readonly [Lane, Lane]): BeatmapEntry[] {
-  return onsets.map((onset, index) => ({
-    timeMs: onset.timeMs,
-    lane: lanes[index % 2] as Lane,
-  }))
+/** Every onset from a single band goes to that band's one fixed lane. */
+function assignLane(onsets: OnsetCandidate[], lane: Lane): BeatmapEntry[] {
+  return onsets.map((onset) => ({ timeMs: onset.timeMs, lane }))
 }
 
 /** Global debounce + density cap across the merged, sorted onset list. */
@@ -184,16 +190,25 @@ export function generateBeatmap(inputPath: string, targetNotesPerSec: number): B
   const samples = decodeToMonoPcm(inputPath, SAMPLE_RATE)
   const durationMs = Math.round((samples.length / SAMPLE_RATE) * 1000)
 
+  // Three independent bands, each feeding exactly one lane — no alternation.
   const kickBand = lowPass(samples, SAMPLE_RATE, KICK_CUTOFF_HZ)
-  const snareBand = highPass(samples, SAMPLE_RATE, KICK_CUTOFF_HZ)
+  const aboveKick = highPass(samples, SAMPLE_RATE, KICK_CUTOFF_HZ)
+  const snareBand = lowPass(aboveKick, SAMPLE_RATE, SNARE_CUTOFF_HZ)
+  const hiBand = highPass(aboveKick, SAMPLE_RATE, SNARE_CUTOFF_HZ)
 
   const kickOnsets = detectOnsets(frameEnergies(kickBand, FRAME_SIZE, HOP_SIZE), SAMPLE_RATE, HOP_SIZE)
   const snareOnsets = detectOnsets(frameEnergies(snareBand, FRAME_SIZE, HOP_SIZE), SAMPLE_RATE, HOP_SIZE)
+  const hiOnsets = detectOnsets(frameEnergies(hiBand, FRAME_SIZE, HOP_SIZE), SAMPLE_RATE, HOP_SIZE)
 
-  const kickEntries = assignAlternatingLanes(kickOnsets, ['up', 'down'])
-  const snareEntries = assignAlternatingLanes(snareOnsets, ['left', 'right'])
+  const kickEntries = assignLane(kickOnsets, 'down')
+  const snareEntries = assignLane(snareOnsets, 'left')
+  const hiEntries = assignLane(hiOnsets, 'right')
 
-  const entries = mergeAndThrottle([...kickEntries, ...snareEntries], BEATMAP_MIN_GAP_MS, targetNotesPerSec)
+  const entries = mergeAndThrottle(
+    [...kickEntries, ...snareEntries, ...hiEntries],
+    BEATMAP_MIN_GAP_MS,
+    targetNotesPerSec,
+  )
 
   return {
     trackPath: `audio/${path.basename(inputPath)}`,

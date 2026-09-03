@@ -29,6 +29,7 @@ import {
 } from './room-entry'
 import {
   getRandomAnimalId,
+  getRandomGuestName,
   isSetupSubmissionValid,
   type RoomEntryMode,
 } from './setup-form'
@@ -42,7 +43,7 @@ export function SetupScreen() {
   const inviteCode = normalizeRoomCode(inviteValue ?? '')
   const isInvite = inviteValue !== null
   const validInvite = isInvite && isValidRoomCode(inviteCode)
-  const [name, setName] = useState(profile.name)
+  const [name, setName] = useState(() => profile.name || getRandomGuestName())
   const [avatarId, setAvatarId] = useState(profile.avatarId)
   const [animalId, setAnimalId] = useState(() => getRandomAnimalId())
   const [mode, setMode] = useState<RoomEntryMode>(isInvite ? 'join' : 'create')

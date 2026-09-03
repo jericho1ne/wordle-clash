@@ -184,6 +184,12 @@ export function GameplayScreen() {
     if (room?.phase === 'lobby') navigate(`/room/${roomCode}`, { replace: true })
   }, [navigate, room?.phase, roomCode])
 
+  useEffect(() => {
+    // Everyone in the room — the tied players and every spectator — moves to
+    // the dance-off screen together as soon as the Room DO enters tiebreak.
+    if (match?.phase === 'tiebreak') navigate(`/room/${roomCode}/tiebreaker`, { replace: true })
+  }, [match?.phase, navigate, roomCode])
+
   const secondsRemaining = match?.roundEndsAt
     ? Math.max(0, Math.ceil((match.roundEndsAt - now) / 1_000))
     : null

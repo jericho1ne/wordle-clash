@@ -10,18 +10,21 @@ import { DesignSystem } from './features/dev/DesignSystem'
 import { BeatmapPreview } from './features/dev/BeatmapPreview'
 import { GameplayScreen } from './features/gameplay/GameplayScreen'
 import { TiebreakerPlaygroundScreen } from './features/tiebreaker/TiebreakerPlaygroundScreen'
+import { TiebreakerRoomScreen } from './features/tiebreaker/TiebreakerRoomScreen'
 
 /**
  * Routes (see docs/stories/00-app-scaffold/08-routing-react-router.md):
- *   /                title
- *   /setup           player setup + create/join room  (?join=<code> deep-link)
- *   /room/:code      invite-aware lobby entry
- *   /design-system   design-system showcase (DEV builds only)
- *   /beatmap-preview beat map visual/audio scrub tool (DEV builds only,
- *                    docs/stories/08-beatmap-engine)
- *   /tiebreaker      DDR dance-off playground (DEV builds only,
- *                    docs/stories/09-tiebreaker-battle) — the real, guarded
- *                    battle lives at /room/:code/tiebreaker (story 09-04)
+ *   /                    title
+ *   /setup               player setup + create/join room  (?join=<code> deep-link)
+ *   /room/:code          invite-aware lobby entry
+ *   /room/:code/play     active match (redirects here to /tiebreaker on a tie)
+ *   /room/:code/tiebreaker  the real DDR dance-off — tied players play,
+ *                        everyone else spectates (docs/stories/09-tiebreaker-battle)
+ *   /design-system       design-system showcase (DEV builds only)
+ *   /beatmap-preview     beat map visual/audio scrub tool (DEV builds only,
+ *                        docs/stories/08-beatmap-engine)
+ *   /tiebreaker          DDR dance-off playground (DEV builds only, no
+ *                        server involved — see docs/stories/09-tiebreaker-battle)
  *
  */
 export const router = createBrowserRouter([
@@ -29,6 +32,7 @@ export const router = createBrowserRouter([
   { path: '/setup', element: <SetupScreen /> },
   { path: '/room/:code', element: <InviteRoomRoute /> },
   { path: '/room/:code/play', element: <GameplayScreen /> },
+  { path: '/room/:code/tiebreaker', element: <TiebreakerRoomScreen /> },
   ...(import.meta.env.DEV
     ? [
         { path: '/design-system', element: <DesignSystem /> },

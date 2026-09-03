@@ -41,7 +41,7 @@ Replaces the "forthcoming" note in `docs/game-rules.md`:
 | # | Story | Testable outcome |
 |---|---|---|
 | [00](./00-tiebreaker-battle-plan.md) | **Done:** stack plan: scoring numbers, sudden-death rule, route shape, game-rules.md update | Reviewable implementation contract |
-| 01 | **Done:** move `docs/fractal/*` into `apps/web/src/features/tiebreaker/`; DEV-gated `/tiebreaker` playground with mock 2-player state, keyboard input, real beatmap | Verified in-browser — playable, fractals render, keyboard input scores |
+| 01 | **Done:** move `docs/fractal/*` into `apps/web/src/features/tiebreaker/`; `/tiebreaker` playground with mock 2-player state, keyboard input, real beatmap | Verified in-browser — playable, fractals render, keyboard input scores |
 | 02 | **Done:** protocol extension: `danceOff*` messages, shared judging helper | Round-trip protocol + judging unit tests written (not run this session — see Verification) |
 | 03 | **Done:** Room DO authority: start/score/end the dance-off on entering `tiebreak` | Unit tests written for scoring/consumption/winner logic (not run this session) |
 | 04 | **Done:** wire `/room/:code/tiebreaker` to `useRoomStore`; spectator mode; `GameplayScreen` handoff | Verified in-browser that the route renders cleanly with no server state; full live-tie walkthrough not yet run (see Verification) |
@@ -52,7 +52,9 @@ Replaces the "forthcoming" note in `docs/game-rules.md`:
 Baseline: [`../../verification.md`](../../verification.md), plus this epic's
 checklist below. **Confirmed this implementation session:**
 
-- `/tiebreaker` (DEV playground) renders both fractal-backed dance floors,
+- `/tiebreaker` (playground, deliberately shipped to production — not
+  DEV-gated — so people can test it on the deployed URL; re-add the DEV
+  gate before general release) renders both fractal-backed dance floors,
   loads the real generated beatmap, captures per-player keyboard input, and
   scores a mistimed press as a miss rather than crediting a hit — verified
   live in-browser with screenshots and simulated key presses.

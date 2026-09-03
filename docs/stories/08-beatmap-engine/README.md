@@ -25,7 +25,7 @@ Epic 09 exists.
 | [00](./00-beatmap-engine-plan.md) | **Done:** stack plan, onset-detection approach, JSON schema | Reviewable implementation contract |
 | 01 | **Done:** `packages/shared/src/beatmap.ts` — `Lane`/`BeatmapEntry`/`Beatmap` zod schema, gap/lane-balance validators | Unit tests pass with no audio dependency |
 | 02 | **Done:** offline Node analysis script decodes `canto-de-ossanha.mp3`, detects kick/snare onsets, writes `apps/web/public/audio/canto-de-ossanha.beatmap.json` (796 entries, ~3 notes/sec avg) | Script run produces a schema-valid, deterministic JSON file |
-| 03 | **Done:** DEV-gated `/beatmap-preview` route: plays the track, scrolls the generated beatmap in sync | Verified in-browser — beatmap loads and lanes flash on their notes |
+| 03 | **Done:** `/beatmap-preview` route: plays the track, scrolls the generated beatmap in sync, with a playback-speed slider (defaults 60%) | Verified in-browser — beatmap loads and lanes flash on their notes |
 
 ## Beat detection approach
 
@@ -46,5 +46,9 @@ Baseline: [`../../verification.md`](../../verification.md), plus:
 - schema validation and min-gap enforcement unit tests;
 - deterministic output — re-running the script against the same audio file
   produces byte-identical JSON;
-- manual: `/beatmap-preview` (DEV build only) played back with the track
-  audibly confirms Up/Down land on kicks and Left/Right land on snares.
+- manual: `/beatmap-preview` played back with the track audibly confirms
+  Up/Down land on kicks and Left/Right land on snares.
+
+**Note:** `/beatmap-preview` is deliberately shipped to production (not
+DEV-gated) so people can test it on the deployed URL — see the note in
+`apps/web/src/router.tsx`. Re-add the DEV gate before general release.

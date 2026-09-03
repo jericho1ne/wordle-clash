@@ -7,6 +7,8 @@ import {
 
 import type { Beatmap, Lane } from '@wordle-clash/shared'
 
+import { DEFAULT_PLAYBACK_RATE } from '../../constants'
+import { PlaybackSpeedSlider } from '../../ui'
 import styles from './BeatmapPreview.module.scss'
 
 const TRACK_SRC = '/audio/canto-de-ossanha.mp3'
@@ -15,9 +17,6 @@ const LANES: readonly Lane[] = ['left', 'up', 'down', 'right']
 const LANE_LABEL: Record<Lane, string> = { up: '↑', down: '↓', left: '←', right: '→' }
 const LOOKAHEAD_MS = 2200
 const HIT_FLASH_MS = 120
-const DEFAULT_PLAYBACK_RATE = 0.6
-const MIN_PLAYBACK_RATE = 0.25
-const MAX_PLAYBACK_RATE = 1
 
 /**
  * Story 08-03 — dev-only preview (route `/beatmap-preview`, DEV builds only)
@@ -107,18 +106,7 @@ export function BeatmapPreview() {
 
       <audio ref={audioRef} src={TRACK_SRC} controls className={styles.audio} />
 
-      <div className={styles.speedControl}>
-        <label htmlFor="playback-rate">Speed {Math.round(playbackRate * 100)}%</label>
-        <input
-          id="playback-rate"
-          type="range"
-          min={MIN_PLAYBACK_RATE}
-          max={MAX_PLAYBACK_RATE}
-          step={0.05}
-          value={playbackRate}
-          onChange={(event) => setPlaybackRate(Number(event.target.value))}
-        />
-      </div>
+      <PlaybackSpeedSlider value={playbackRate} onChange={setPlaybackRate} />
 
       <div className={styles.laneLabels}>
         {LANES.map((lane) => <span key={lane}>{LANE_LABEL[lane]}</span>)}

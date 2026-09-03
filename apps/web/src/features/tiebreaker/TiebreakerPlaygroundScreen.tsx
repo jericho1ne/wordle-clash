@@ -1,4 +1,8 @@
-import type { Beatmap, BeatmapEntry, Lane } from '@wordle-clash/shared'
+import type {
+  Beatmap,
+  BeatmapEntry,
+  Lane,
+} from '@wordle-clash/shared'
 import {
   DANCE_OFF_CLIP_MS,
   DANCE_OFF_GOOD_WINDOW_MS,
@@ -15,7 +19,11 @@ import {
   useState,
 } from 'react'
 
-import { Button } from '../../ui'
+import { DEFAULT_PLAYBACK_RATE } from '../../constants'
+import {
+  Button,
+  PlaybackSpeedSlider,
+} from '../../ui'
 import type { BeatFractalHandle } from './BeatFractalBackground'
 import { BeatFractalBackground } from './BeatFractalBackground'
 import type { ThemeName } from './beatFractalEngine'
@@ -207,10 +215,15 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange }: Danc
 export function TiebreakerPlaygroundScreen() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const startedAtRef = useRef(0)
+  // Snapshot of playbackRate at battle start — the slider locks once
+  // `phase !== 'idle'`, but a ref (rather than reading state mid-battle)
+  // keeps the running battle's timing math decoupled from the control.
+  const battleRateRef = useRef(DEFAULT_PLAYBACK_RATE)
   const [beatmap, setBeatmap] = useState<Beatmap | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [phase, setPhase] = useState<BattlePhase>('idle')
   const [scores, setScores] = useState<Record<string, number>>({ p1: 0, p2: 0 })
+  const [playbackRate, setPlaybackRate] = useState(DEFAULT_PLAYBACK_RATE)
 
   useEffect(() => {
     fetch(BEATMAP_SRC)
@@ -227,9 +240,14 @@ export function TiebreakerPlaygroundScreen() {
     [beatmap],
   )
 
+  // Track-time (beatmap ms), not wall-clock ms: scaling elapsed real time by
+  // the chosen rate is what makes a slower speed actually slow the game
+  // down, the same way HTMLMediaElement.currentTime tracks content position
+  // regardless of playbackRate. Kept independent of the <audio> element's
+  // own clock so the battle still runs correctly if autoplay is blocked.
   const clockMs = useCallback(() => {
     if (phase !== 'running') return 0
-    return performance.now() - startedAtRef.current
+    return (performance.now() - startedAtRef.current) * battleRateRef.current
   }, [phase])
 
   const handleScoreChange = useCallback((dancerId: string, score: number) => {
@@ -237,31 +255,35 @@ export function TiebreakerPlaygroundScreen() {
   }, [])
 
   function startBattle() {
+    battleRateRef.current = playbackRate
     startedAtRef.current = performance.now()
     setScores({ p1: 0, p2: 0 })
     setPhase('running')
+    if (audioRef.current) audioRef.current.playbackRate = playbackRate
     audioRef.current?.play().catch(() => {})
+    // Real time to cover the full clip at this rate: at 60% speed, 20s of
+    // track content takes 20s / 0.6 ≈ 33.3s of wall-clock time to play through.
     window.setTimeout(() => {
       setPhase('ended')
       audioRef.current?.pause()
-    }, DANCE_OFF_CLIP_MS)
+    }, DANCE_OFF_CLIP_MS / playbackRate)
   }
 
   const winnerText = phase === 'ended'
     ? scores.p1 === scores.p2
-      ? "It's a tie — run it again!"
+      ? 'It\'s a tie — run it again!'
       : `${scores.p1 > scores.p2 ? DANCERS[0]?.name : DANCERS[1]?.name} wins!`
     : null
 
   return (
     <div className="app-stage">
       <main className={`app-stage__inner ${styles.tiebreakerPlayground}`}>
-        <h1>Tiebreaker Battle — playground</h1>
-        <p>DEV-only. No server involved — both dancers judged against the same local audio clock.</p>
+        <h1>Tiebreaker Battle</h1>
         {error && <p className={styles.error}>Failed to load beatmap: {error}</p>}
         <audio ref={audioRef} src={TRACK_SRC} className={styles.audio} />
 
         <div className={styles.controls}>
+          <PlaybackSpeedSlider value={playbackRate} onChange={setPlaybackRate} disabled={phase === 'running'} />
           <Button appearance="primary" onClick={startBattle} disabled={!beatmap || phase === 'running'}>
             {phase === 'idle' ? 'Start battle' : phase === 'running' ? 'Dancing…' : 'Dance again'}
           </Button>

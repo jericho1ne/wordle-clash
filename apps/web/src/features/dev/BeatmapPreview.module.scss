@@ -17,6 +17,24 @@
     margin: var(--space-4) 0;
   }
 
+  .speed-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    max-width: 480px;
+    margin: 0 auto var(--space-4);
+
+    label {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    input[type='range'] {
+      flex: 1;
+    }
+  }
+
   .lane-labels {
     display: flex;
     justify-content: center;

@@ -15,6 +15,9 @@ const LANES: readonly Lane[] = ['left', 'up', 'down', 'right']
 const LANE_LABEL: Record<Lane, string> = { up: '↑', down: '↓', left: '←', right: '→' }
 const LOOKAHEAD_MS = 2200
 const HIT_FLASH_MS = 120
+const DEFAULT_PLAYBACK_RATE = 0.6
+const MIN_PLAYBACK_RATE = 0.25
+const MAX_PLAYBACK_RATE = 1
 
 /**
  * Story 08-03 — dev-only preview (route `/beatmap-preview`, DEV builds only)
@@ -28,6 +31,7 @@ export function BeatmapPreview() {
   const flashRefs = useRef<Record<Lane, number>>({ up: 0, down: 0, left: 0, right: 0 })
   const [beatmap, setBeatmap] = useState<Beatmap | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [playbackRate, setPlaybackRate] = useState(DEFAULT_PLAYBACK_RATE)
 
   useEffect(() => {
     fetch(BEATMAP_SRC)
@@ -38,6 +42,10 @@ export function BeatmapPreview() {
       .then((data: Beatmap) => setBeatmap(data))
       .catch((err: Error) => setError(err.message))
   }, [])
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.playbackRate = playbackRate
+  }, [playbackRate])
 
   const entriesByLane = useMemo(() => {
     const grouped: Record<Lane, number[]> = { up: [], down: [], left: [], right: [] }
@@ -98,6 +106,19 @@ export function BeatmapPreview() {
       {error && <p className={styles.error}>Failed to load beatmap: {error}</p>}
 
       <audio ref={audioRef} src={TRACK_SRC} controls className={styles.audio} />
+
+      <div className={styles.speedControl}>
+        <label htmlFor="playback-rate">Speed {Math.round(playbackRate * 100)}%</label>
+        <input
+          id="playback-rate"
+          type="range"
+          min={MIN_PLAYBACK_RATE}
+          max={MAX_PLAYBACK_RATE}
+          step={0.05}
+          value={playbackRate}
+          onChange={(event) => setPlaybackRate(Number(event.target.value))}
+        />
+      </div>
 
       <div className={styles.laneLabels}>
         {LANES.map((lane) => <span key={lane}>{LANE_LABEL[lane]}</span>)}

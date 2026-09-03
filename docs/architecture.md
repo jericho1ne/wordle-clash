@@ -273,15 +273,20 @@ after every epic; verification is a gate on each epic, not a separate one.
 
 ## Out of scope for Phase 1
 
-Account-owned match-history persistence, the leaderboard API and UI, and the
-actual bboy dance-off minigame remain deferred. Gameplay implements only the
-authoritative transition to a tiebreak when a synchronous round has multiple
-correct players.
+Account-owned match-history persistence and the leaderboard API and UI
+remain deferred.
 
 The gameplay rules are captured in [`game-rules.md`](./game-rules.md), with its
 implementation tracked in
 [`docs/stories/07-gameplay-leaderboard`](./docs/stories/07-gameplay-leaderboard/).
-The dance-off rules are still forthcoming, so Epic 07 owns only its persisted
-state and protocol boundary. The `Room` Durable Object now owns the secret word,
-guesses, round timer, winner selection, and terminal state. Its public snapshots
-contain only renderable guesses and never expose the answer during active play.
+The `Room` Durable Object owns the secret word, guesses, round timer, winner
+selection, and terminal state. Its public snapshots contain only renderable
+guesses and never expose the answer during active play.
+
+The bboy dance-off minigame that resolves a synchronous-round tie is
+implemented in
+[`docs/stories/08-beatmap-engine`](./docs/stories/08-beatmap-engine/) (the
+offline kick/snare beat map generator) and
+[`docs/stories/09-tiebreaker-battle`](./docs/stories/09-tiebreaker-battle/)
+(the DDR-style battle itself, at `/room/:code/tiebreaker`) — see that epic's
+README for the current verification status.

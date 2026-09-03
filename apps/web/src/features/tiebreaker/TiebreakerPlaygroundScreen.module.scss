@@ -1,0 +1,84 @@
+// DEV-only tiebreaker battle playground (route `/tiebreaker`).
+
+.tiebreaker-playground {
+  max-width: 720px;
+  text-align: center;
+
+  .error {
+    color: var(--color-danger-600);
+  }
+
+  .audio {
+    display: none;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    margin-block: var(--space-4);
+  }
+
+  .winner {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .floors {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .dance-floor {
+    position: relative;
+    width: 300px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+
+    .panel {
+      position: relative;
+      z-index: 1;
+      padding: var(--space-3);
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: var(--radius-lg);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: var(--space-2);
+
+      span {
+        font-size: 0.75rem;
+        color: var(--color-neutral-500);
+      }
+    }
+
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: var(--space-2);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .lane-labels {
+      display: flex;
+      justify-content: center;
+
+      span {
+        flex: 1;
+      }
+    }
+
+    .canvas {
+      display: block;
+      width: 100%;
+      border-radius: var(--radius-md);
+    }
+  }
+}

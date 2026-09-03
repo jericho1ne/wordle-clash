@@ -1,5 +1,6 @@
 export * from './avatars.js'
 export * from './beatmap.js'
+export * from './dance-off.js'
 export * from './game-modes.js'
 export * from './gameplay.js'
 export * from './room-code.js'

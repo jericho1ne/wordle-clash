@@ -18,7 +18,7 @@ and the approved phase plan (`~/.claude/plans/hi-i-have-a-sunny-rossum.md`).
 | [`05-room-invites`](./05-room-invites/) | complete | native share/clipboard invite links and invited-player setup/join flow |
 | [`06-lobby-screen`](./06-lobby-screen/) | implemented | RoomServer-backed lobby: players, ready, mode, favorite, start dialog |
 | [`07-gameplay-leaderboard`](./07-gameplay-leaderboard/) | gameplay implemented | authoritative Wordle modes and gameplay UI; account leaderboard deferred |
-| [`08-beatmap-engine`](./08-beatmap-engine/) | not started | offline kick/snare onset detection producing a checked-in beatmap JSON |
+| [`08-beatmap-engine`](./08-beatmap-engine/) | done | offline kick/snare onset detection producing a checked-in beatmap JSON |
 | [`09-tiebreaker-battle`](./09-tiebreaker-battle/) | not started | DDR-style dance-off resolving a sync-mode tie, spectatable, fractal-backed |
 
 ## Verification

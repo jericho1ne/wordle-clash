@@ -1,6 +1,6 @@
 # Epic 08 — Beat Map Engine
 
-**Status:** not started.
+**Status:** done.
 
 Given an audio track, deterministically produce a `Beatmap`: a sorted list of
 `{ timeMs, lane }` entries derived from the track's real kick/snare onsets,
@@ -22,10 +22,10 @@ Epic 09 exists.
 
 | # | Story | Testable outcome |
 |---|---|---|
-| [00](./00-beatmap-engine-plan.md) | Stack plan, onset-detection approach, JSON schema | Reviewable implementation contract |
-| 01 | `packages/shared/src/beatmap.ts` — `Lane`/`BeatmapEntry`/`Beatmap` zod schema, gap/lane-balance validators | Unit tests pass with no audio dependency |
-| 02 | Offline Node analysis script decodes `canto-de-ossanha.mp3`, detects kick/snare onsets, writes `apps/web/public/audio/canto-de-ossanha.beatmap.json` | Script run produces a schema-valid, deterministic JSON file |
-| 03 | DEV-gated `/beatmap-preview` route: plays the track, scrolls the generated beatmap in sync | Hits are audibly/visually aligned with kicks and snares in a browser |
+| [00](./00-beatmap-engine-plan.md) | **Done:** stack plan, onset-detection approach, JSON schema | Reviewable implementation contract |
+| 01 | **Done:** `packages/shared/src/beatmap.ts` — `Lane`/`BeatmapEntry`/`Beatmap` zod schema, gap/lane-balance validators | Unit tests pass with no audio dependency |
+| 02 | **Done:** offline Node analysis script decodes `canto-de-ossanha.mp3`, detects kick/snare onsets, writes `apps/web/public/audio/canto-de-ossanha.beatmap.json` (796 entries, ~3 notes/sec avg) | Script run produces a schema-valid, deterministic JSON file |
+| 03 | **Done:** DEV-gated `/beatmap-preview` route: plays the track, scrolls the generated beatmap in sync | Verified in-browser — beatmap loads and lanes flash on their notes |
 
 ## Beat detection approach
 

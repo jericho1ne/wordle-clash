@@ -11,7 +11,8 @@
     "cf-typegen": "wrangler types",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply wordle-clash --local",
-    "db:migrate:remote": "wrangler d1 migrations apply wordle-clash --remote"
+    "db:migrate:remote": "wrangler d1 migrations apply wordle-clash --remote",
+    "beatmap:generate": "node scripts/generate-beatmap.ts"
   },
   "dependencies": {
     "@wordle-clash/shared": "workspace:*",

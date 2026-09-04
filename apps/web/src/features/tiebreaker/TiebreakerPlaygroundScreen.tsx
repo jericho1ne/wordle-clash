@@ -38,6 +38,7 @@ import {
   Button,
   PlaybackSpeedSlider,
 } from '../../ui'
+import { DanceOffResultDialog } from './DanceOffResultDialog'
 import type { TiebreakerStageHandle } from './TiebreakerStage'
 import { TiebreakerStage } from './TiebreakerStage'
 import styles from './TiebreakerPlaygroundScreen.module.scss'
@@ -313,11 +314,7 @@ export function TiebreakerPlaygroundScreen() {
 
   const scoreP1 = scores.p1 ?? 0
   const scoreP2 = scores.p2 ?? 0
-  const winnerText = phase === 'ended'
-    ? scoreP1 === scoreP2
-      ? 'It\'s a tie — run it again!'
-      : `${scoreP1 > scoreP2 ? DANCERS[0]?.name : DANCERS[1]?.name} wins!`
-    : null
+  const winnerSide = phase === 'ended' && scoreP1 !== scoreP2 ? (scoreP1 > scoreP2 ? 'left' : 'right') : null
 
   return (
     <TiebreakerStage ref={stageRef} word={word}>
@@ -329,7 +326,6 @@ export function TiebreakerPlaygroundScreen() {
         <Button appearance="primary" onClick={startBattle} disabled={!beatmap || phase === 'running'}>
           {phase === 'idle' ? 'Start battle' : phase === 'running' ? 'Dancing…' : 'Dance again'}
         </Button>
-        {winnerText && <p className={styles.winner}>{winnerText}</p>}
       </div>
 
       <div className={styles.floors}>
@@ -345,6 +341,21 @@ export function TiebreakerPlaygroundScreen() {
           />
         ))}
       </div>
+
+      {phase === 'ended' && (
+        <DanceOffResultDialog
+          open
+          onOpenChange={() => {}}
+          left={{ name: DANCERS[0]?.name ?? 'Player 1', score: scoreP1 }}
+          right={{ name: DANCERS[1]?.name ?? 'Player 2', score: scoreP2 }}
+          winnerSide={winnerSide}
+          actions={(
+            <Button appearance="primary" onClick={startBattle}>
+              Dance again
+            </Button>
+          )}
+        />
+      )}
     </TiebreakerStage>
   )
 }

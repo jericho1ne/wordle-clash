@@ -31,6 +31,7 @@ import {
 } from '../../constants'
 import { useRoomStore } from '../../realtime'
 import { Button } from '../../ui'
+import { DanceOffResultDialog } from './DanceOffResultDialog'
 import type { TiebreakerStageHandle } from './TiebreakerStage'
 import { TiebreakerStage } from './TiebreakerStage'
 import styles from './TiebreakerRoomScreen.module.scss'
@@ -194,8 +195,11 @@ export function TiebreakerRoomScreen() {
 
   const dancerIds = danceOff?.playerIds ?? match?.tiebreakPlayerIds ?? []
   const isDancer = !!selfId && dancerIds.includes(selfId)
-  const winner = room?.players.find(({ id }) => id === match?.winnerId)
   const battleOver = match?.phase === 'finished'
+  const [leftId, rightId] = dancerIds
+  const leftPlayer = room?.players.find(({ id }) => id === leftId)
+  const rightPlayer = room?.players.find(({ id }) => id === rightId)
+  const winnerSide = match?.winnerId === leftId ? 'left' : match?.winnerId === rightId ? 'right' : null
 
   return (
     <TiebreakerStage ref={stageRef} roomLabel={`Room ${roomCode}`} word={match?.answer ?? null}>
@@ -203,7 +207,6 @@ export function TiebreakerRoomScreen() {
 
       {danceOff && (
         <>
-          {battleOver && winner && <p className={styles.winner}>{winner.name} wins the dance-off!</p>}
           {!isDancer && !battleOver && (
             <p className={styles.spectatorNote}>You&apos;re spectating — {dancerIds.length} players are battling it out.</p>
           )}
@@ -225,17 +228,26 @@ export function TiebreakerRoomScreen() {
               )
             })}
           </div>
-        </>
-      )}
 
-      {battleOver && (
-        <Button
-          appearance="secondary"
-          disabled={!room?.players.find(({ id }) => id === selfId)?.isHost}
-          onClick={returnToLobby}
-        >
-          Return to lobby
-        </Button>
+          {battleOver && (
+            <DanceOffResultDialog
+              open
+              onOpenChange={() => {}}
+              left={{ name: leftPlayer?.name ?? 'Dancer', score: leftId ? danceOff.scores[leftId] ?? 0 : 0 }}
+              right={{ name: rightPlayer?.name ?? 'Dancer', score: rightId ? danceOff.scores[rightId] ?? 0 : 0 }}
+              winnerSide={winnerSide}
+              actions={(
+                <Button
+                  appearance="secondary"
+                  disabled={!room?.players.find(({ id }) => id === selfId)?.isHost}
+                  onClick={returnToLobby}
+                >
+                  Return to lobby
+                </Button>
+              )}
+            />
+          )}
+        </>
       )}
     </TiebreakerStage>
   )

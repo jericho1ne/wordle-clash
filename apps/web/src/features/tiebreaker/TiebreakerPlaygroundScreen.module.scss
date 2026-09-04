@@ -18,12 +18,6 @@
   margin-block: var(--space-4);
 }
 
-.winner {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-accent);
-}
-
 .floors {
   display: flex;
   gap: var(--space-4);
@@ -55,7 +49,7 @@
     margin-bottom: var(--space-2);
 
     span {
-      font-size: 0.75rem;
+      font-size: var(--font-size-200);
       color: var(--color-neutral-900);
     }
   }

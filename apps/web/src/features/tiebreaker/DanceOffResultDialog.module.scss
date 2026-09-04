@@ -1,25 +1,29 @@
 .scoreboard {
   display: flex;
-  justify-content: space-around;
-  align-items: flex-start;
-  gap: var(--space-6);
+  flex-direction: column;
+  gap: var(--space-2);
   padding-block: var(--space-4);
   text-align: center;
 
-  .column {
+  .names,
+  .scores {
     display: flex;
-    flex-direction: column;
+    justify-content: space-around;
+    gap: var(--space-6);
+  }
+
+  .scores {
     align-items: center;
-    gap: var(--space-2);
-    flex: 1;
   }
 
   .name {
+    flex: 1;
     font-size: var(--font-size-300);
     color: var(--color-neutral-500);
   }
 
   .score {
+    flex: 1;
     font-family: var(--font-heading);
     font-weight: var(--font-heading-weight);
     font-size: var(--font-size-1000);

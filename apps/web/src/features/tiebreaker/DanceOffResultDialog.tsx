@@ -32,12 +32,12 @@ export function DanceOffResultDialog({ open, onOpenChange, left, right, winnerSi
       actions={actions}
     >
       <div className={styles.scoreboard}>
-        <div className={styles.column}>
+        <div className={styles.names}>
           <div className={styles.name}>{left.name}</div>
-          <div className={`${styles.score} ${winnerSide === 'left' ? styles.winnerScore : ''}`}>{left.score}</div>
-        </div>
-        <div className={styles.column}>
           <div className={styles.name}>{right.name}</div>
+        </div>
+        <div className={styles.scores}>
+          <div className={`${styles.score} ${winnerSide === 'left' ? styles.winnerScore : ''}`}>{left.score}</div>
           <div className={`${styles.score} ${winnerSide === 'right' ? styles.winnerScore : ''}`}>{right.score}</div>
         </div>
       </div>

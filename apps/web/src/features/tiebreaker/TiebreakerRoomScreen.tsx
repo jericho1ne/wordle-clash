@@ -20,17 +20,12 @@ import {
 
 import { useRoomStore } from '../../realtime'
 import { Button } from '../../ui'
-import type { BeatFractalHandle } from './BeatFractalBackground'
-import { BeatFractalBackground } from './BeatFractalBackground'
-import type { ThemeName } from './beatFractalEngine'
+import type { TiebreakerStageHandle } from './TiebreakerStage'
+import { TiebreakerStage } from './TiebreakerStage'
 import styles from './TiebreakerRoomScreen.module.scss'
 
 const LANES: readonly Lane[] = ['left', 'down', 'right']
-// A/S/D — three adjacent keys under the left hand's resting fingers, easier
-// to "drum" on quickly than a four-key spread. Order follows the on-screen
-// lane order (left, down, right) left to right. This is the ONLY place the
-// key scheme is defined — the column headers and the legend text below are
-// both derived from it, so they can't drift out of sync with each other again.
+// The only place the A/S/D keys are set. Everything else on screen reads from here.
 const KEY_TO_LANE: Record<string, Lane> = {
   a: 'left',
   s: 'down',
@@ -40,21 +35,20 @@ const LANE_KEY_LABEL = Object.fromEntries(
   Object.entries(KEY_TO_LANE).map(([key, lane]) => [lane, key.toUpperCase()]),
 ) as Record<Lane, string>
 const KEY_LEGEND = Object.keys(KEY_TO_LANE).map((key) => key.toUpperCase()).join(' ')
-const DANCER_THEMES: ThemeName[] = ['neonArcade', 'synthwaveSunset', 'cyberIce', 'inferno']
 const LOOKAHEAD_MS = 1800
 
 interface DanceFloorProps {
   name: string
-  theme: ThemeName
+  avatarId: number
   score: number
   entries: BeatmapEntry[]
   startsAt: number
   canPlay: boolean
   onHit: (lane: Lane, clientTimeMs: number) => void
+  pulse: (strength?: number) => void
 }
 
-function DanceFloor({ name, theme, score, entries, startsAt, canPlay, onHit }: DanceFloorProps) {
-  const bgRef = useRef<BeatFractalHandle | null>(null)
+function DanceFloor({ name, avatarId, score, entries, startsAt, canPlay, onHit, pulse }: DanceFloorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const flashRefs = useRef<Record<Lane, number>>({ down: 0, left: 0, right: 0 })
 
@@ -68,13 +62,13 @@ function DanceFloor({ name, theme, score, entries, startsAt, canPlay, onHit }: D
       // against its own receipt time today (see docs/stories/09-tiebreaker-battle).
       const clientTimeMs = Date.now() - startsAt
       flashRefs.current[lane] = clientTimeMs + 120
-      bgRef.current?.pulse(1.0)
+      pulse(1.0)
       onHit(lane, clientTimeMs)
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [canPlay, startsAt, onHit])
+  }, [canPlay, startsAt, onHit, pulse])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -118,18 +112,13 @@ function DanceFloor({ name, theme, score, entries, startsAt, canPlay, onHit }: D
   }, [entries, startsAt])
 
   return (
-    <div className={styles.danceFloor}>
-      <BeatFractalBackground
-        ref={bgRef}
-        theme={theme}
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 0, borderRadius: 'var(--radius-lg)' }}
-      />
+    <div className={styles.danceFloor} data-avatar-id={avatarId}>
       <div className={styles.panel}>
         <div className={styles.dancerHeader}>
-          <strong>{name}</strong>
+          <strong className={styles.textTilt}>{name}</strong>
           {canPlay && <span>{KEY_LEGEND}</span>}
         </div>
-        <div className={styles.hud}>Score {score}</div>
+        <div className={`${styles.hud} ${styles.textTilt}`}>Score {score}</div>
         <div className={styles.laneLabels}>
           {LANES.map((lane) => <span key={lane}>{LANE_KEY_LABEL[lane]}</span>)}
         </div>
@@ -139,18 +128,12 @@ function DanceFloor({ name, theme, score, entries, startsAt, canPlay, onHit }: D
   )
 }
 
-/**
- * Story 09-04 — the real, guarded Tiebreaker Battle (route
- * `/room/:code/tiebreaker`). Tied players (room.match.tiebreakPlayerIds)
- * get interactive A/S/D input; every other connected player lands here
- * too, in read-only spectator mode. All scoring comes from the Room DO's
- * broadcast danceOffScore/danceOffEnded messages — this screen never
- * judges a hit locally.
- */
+/** The real dance-off (`/room/:code/tiebreaker`). Tied players play with A/S/D; everyone else just watches. */
 export function TiebreakerRoomScreen() {
   const { code = '' } = useParams()
   const navigate = useNavigate()
   const roomCode = normalizeRoomCode(code)
+  const stageRef = useRef<TiebreakerStageHandle | null>(null)
 
   const connect = useRoomStore(({ connect }) => connect)
   const disconnect = useRoomStore(({ disconnect }) => disconnect)
@@ -178,6 +161,10 @@ export function TiebreakerRoomScreen() {
     submitDanceHit(lane, clientTimeMs)
   }, [submitDanceHit])
 
+  const pulse = useCallback((strength?: number) => {
+    stageRef.current?.pulse(strength)
+  }, [])
+
   if (!isValidRoomCode(roomCode)) return <Navigate to="/setup" replace />
 
   const dancerIds = danceOff?.playerIds ?? match?.tiebreakPlayerIds ?? []
@@ -186,49 +173,46 @@ export function TiebreakerRoomScreen() {
   const battleOver = match?.phase === 'finished'
 
   return (
-    <div className="app-stage">
-      <main className={`app-stage__inner ${styles.tiebreakerRoom}`}>
-        <header className={styles.header}>
-          <div className="card-kicker">Room {roomCode}</div>
-          <h1>Tiebreaker Battle</h1>
-        </header>
+    <TiebreakerStage ref={stageRef} roomLabel={`Room ${roomCode}`} word={match?.answer ?? null}>
+      {!danceOff && <div className="card">Waiting for the dance-off to start…</div>}
 
-        {!danceOff && <div className="card">Waiting for the dance-off to start…</div>}
+      {danceOff && (
+        <>
+          {battleOver && winner && <p className={styles.winner}>{winner.name} wins the dance-off!</p>}
+          {!isDancer && !battleOver && (
+            <p className={styles.spectatorNote}>You&apos;re spectating — {dancerIds.length} players are battling it out.</p>
+          )}
 
-        {danceOff && (
-          <>
-            {battleOver && winner && <p className={styles.winner}>{winner.name} wins the dance-off!</p>}
-            {!isDancer && !battleOver && (
-              <p className={styles.spectatorNote}>You&apos;re spectating — {dancerIds.length} players are battling it out.</p>
-            )}
-
-            <div className={styles.floors}>
-              {dancerIds.map((playerId, index) => (
+          <div className={styles.floors}>
+            {dancerIds.map((playerId) => {
+              const player = room?.players.find(({ id }) => id === playerId)
+              return (
                 <DanceFloor
                   key={playerId}
-                  name={room?.players.find(({ id }) => id === playerId)?.name ?? 'Dancer'}
-                  theme={DANCER_THEMES[index % DANCER_THEMES.length] ?? 'neonArcade'}
+                  name={player?.name ?? 'Dancer'}
+                  avatarId={player?.avatarId ?? 0}
                   score={danceOff.scores[playerId] ?? 0}
                   entries={danceOff.beatmap.entries}
                   startsAt={danceOff.startsAt}
                   canPlay={!battleOver && playerId === selfId}
                   onHit={handleHit}
+                  pulse={pulse}
                 />
-              ))}
-            </div>
-          </>
-        )}
+              )
+            })}
+          </div>
+        </>
+      )}
 
-        {battleOver && (
-          <Button
-            appearance="secondary"
-            disabled={!room?.players.find(({ id }) => id === selfId)?.isHost}
-            onClick={returnToLobby}
-          >
-            Return to lobby
-          </Button>
-        )}
-      </main>
-    </div>
+      {battleOver && (
+        <Button
+          appearance="secondary"
+          disabled={!room?.players.find(({ id }) => id === selfId)?.isHost}
+          onClick={returnToLobby}
+        >
+          Return to lobby
+        </Button>
+      )}
+    </TiebreakerStage>
   )
 }

@@ -10,9 +10,7 @@ import {
   parseBeatmap,
 } from '@wordle-clash/shared'
 
-// Imported from the web app's public assets (not duplicated) — the client
-// fetches this same file over HTTP, so both sides judge hits against
-// byte-identical data. See docs/stories/08-beatmap-engine.
+// Same file the client fetches over HTTP, so both sides see the same beat map.
 import trackBeatmapJson from '../../../web/public/audio/canto-de-ossanha.beatmap.json'
 
 export const DANCE_OFF_STORAGE_KEY = 'danceOff'
@@ -43,11 +41,7 @@ export function danceOffBeatmapForClip(danceOff: AuthoritativeDanceOff): Beatmap
   return { trackPath: TRACK_BEATMAP.trackPath, durationMs: DANCE_OFF_CLIP_MS, entries: danceOff.clip }
 }
 
-/**
- * Authoritatively judges a hit and updates the dance-off's score in place.
- * Only entries not yet consumed by this player can be matched, so the same
- * note can't be scored twice.
- */
+/** Judges a hit and adds points to the score. A note can't be scored twice. */
 export function judgeAndScoreHit(
   danceOff: AuthoritativeDanceOff,
   playerId: string,

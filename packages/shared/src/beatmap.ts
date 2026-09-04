@@ -3,10 +3,7 @@ import { z } from 'zod'
 /** Minimum gap in milliseconds between any two beatmap entries, regardless of lane. */
 export const BEATMAP_MIN_GAP_MS = 120
 
-// Three lanes, not four — matches three independent frequency-band onset
-// detectors (kick/snare/hi-hat), and lets both real control schemes stay
-// physically adjacent: A/S/D for one hand, Left/Down/Right arrows for the
-// other (docs/stories/09-tiebreaker-battle).
+// Three lanes: kick, snare, and hi-hat. Matches the A/S/D and Left/Down/Right key schemes.
 export const LANES = [
   'left',
   'down',
@@ -46,11 +43,7 @@ export function isSortedByTime(entries: BeatmapEntry[]): boolean {
   return true
 }
 
-/**
- * True when every consecutive pair of entries (regardless of lane) is at
- * least `BEATMAP_MIN_GAP_MS` apart. Assumes `entries` is already sorted by
- * timeMs — call `isSortedByTime` first if that isn't guaranteed.
- */
+/** True when no two entries are closer together than `BEATMAP_MIN_GAP_MS`. Entries must already be sorted by time. */
 export function hasPlayableGaps(entries: BeatmapEntry[], minGapMs = BEATMAP_MIN_GAP_MS): boolean {
   for (let index = 1; index < entries.length; index += 1) {
     const previous = entries[index - 1]
@@ -89,12 +82,7 @@ export function sliceBeatmapClip(beatmap: Beatmap, startMs: number, clipMs: numb
     .map((entry) => ({ timeMs: entry.timeMs - startMs, lane: entry.lane }))
 }
 
-/**
- * Finds the single closest entry to `timeMs` in the given lane, if any exists
- * within `windowMs`. Used by the dance-off's hit-judging logic (client
- * optimistic feedback and, authoritatively, the Room DO) — never returns an
- * entry outside the window so a wildly mistimed press never counts as a hit.
- */
+/** Finds the closest entry to `timeMs` in `lane`, or null if the closest one is farther away than `windowMs`. */
 export function findNearestEntryInLane(
   entries: BeatmapEntry[],
   lane: Lane,

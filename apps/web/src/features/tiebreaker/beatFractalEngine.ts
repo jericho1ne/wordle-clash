@@ -401,15 +401,7 @@ export class BeatFractalEngine {
     if (this.rafId !== null) cancelAnimationFrame(this.rafId)
   }
 
-  /**
-   * Stop timers/audio/rendering and release non-GL resources. Call on unmount.
-   * Deliberately does NOT force-lose the WebGL context (WEBGL_lose_context):
-   * React StrictMode's dev-mode mount->unmount->remount cycle calls this
-   * synchronously, and an explicit lost context isn't guaranteed to finish
-   * restoring before the remount tries to render on the same canvas — that
-   * left compileShader() silently failing with a null info log. The browser
-   * reclaims a canvas's GL context on its own once the element is discarded.
-   */
+  /** Call on unmount. Doesn't force-close the WebGL context — that broke React's dev mode. The browser cleans it up on its own. */
   destroy() {
     this.stop()
     this.stopBPM()

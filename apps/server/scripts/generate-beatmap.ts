@@ -1,18 +1,6 @@
 /**
- * Story 08-02 — offline beat map generator.
- *
- * Decodes an audio file to mono PCM via ffmpeg and scans for exactly three
- * independent waveform-spike types, one per lane — a kick band (~<150Hz ->
- * down), a snare/mid band (~150-1000Hz -> left), and a hi-hat/broadband
- * band (~>1000Hz -> right) — via energy-flux peak-picking per band, and
- * writes a schema-valid Beatmap JSON. Each band maps straight to its own
- * lane; there's no alternation to reason about.
- *
- * Run once per track; the output is checked into the repo, not regenerated
- * at build/deploy time — see docs/stories/08-beatmap-engine/00-beatmap-engine-plan.md.
- *
- * Usage: node scripts/generate-beatmap.ts [--input <mp3>] [--out <json>] [--rate <notes/sec>]
- * Requires ffmpeg on PATH.
+ * Story 08-02 — turns a song into a beat map: kick -> down, snare -> left,
+ * hi-hat -> right. Run with: node scripts/generate-beatmap.ts
  */
 
 import { execFileSync } from 'node:child_process'
@@ -120,12 +108,7 @@ interface OnsetCandidate {
   strength: number
 }
 
-/**
- * Peak-picks onsets from a frame-energy envelope: a frame is an onset when
- * its positive energy flux (rise over the previous frame) exceeds an
- * adaptive threshold (rolling mean + sensitivity * rolling stddev), is a
- * local maximum, and clears a refractory period so one hit doesn't fire twice.
- */
+/** Finds the sudden loud moments (onsets) in the sound and returns when each one happened. */
 function detectOnsets(
   energies: Float32Array,
   sampleRate: number,

@@ -21,13 +21,7 @@ const LANE_LABEL: Record<Lane, string> = { down: '↓', left: '←', right: '→
 const LOOKAHEAD_MS = 2200
 const HIT_FLASH_MS = 120
 
-/**
- * Story 08-03 — dev-only preview (route `/beatmap-preview`, DEV builds only)
- * that plays the track and scrolls the generated beatmap toward a hit line,
- * so kick (down), snare (left), and hi-hat/broadband (right) onsets can be
- * confirmed by ear and eye before Epic 09 builds real dance-off gameplay on
- * top of them.
- */
+/** Lets you watch and listen to the beat map line up with the song: kick -> down, snare -> left, hi-hat -> right. */
 export function BeatmapPreview() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)

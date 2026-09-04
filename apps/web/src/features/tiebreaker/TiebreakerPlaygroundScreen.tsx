@@ -18,26 +18,27 @@ import {
   useRef,
   useState,
 } from 'react'
+import { useSearchParams } from 'react-router'
 
 import { DEFAULT_PLAYBACK_RATE } from '../../constants'
 import {
   Button,
   PlaybackSpeedSlider,
 } from '../../ui'
-import type { BeatFractalHandle } from './BeatFractalBackground'
-import { BeatFractalBackground } from './BeatFractalBackground'
-import type { ThemeName } from './beatFractalEngine'
+import type { TiebreakerStageHandle } from './TiebreakerStage'
+import { TiebreakerStage } from './TiebreakerStage'
 import styles from './TiebreakerPlaygroundScreen.module.scss'
 
 const TRACK_SRC = '/audio/canto-de-ossanha.mp3'
 const BEATMAP_SRC = '/audio/canto-de-ossanha.beatmap.json'
 const LANES: readonly Lane[] = ['left', 'down', 'right']
 const LOOKAHEAD_MS = 1800
+const DEFAULT_WORD = 'CLASH'
 
 interface DancerConfig {
   id: 'p1' | 'p2'
   name: string
-  theme: ThemeName
+  avatarId: number
   keyToLane: Record<string, Lane>
 }
 
@@ -45,20 +46,17 @@ const DANCERS: DancerConfig[] = [
   {
     id: 'p1',
     name: 'Player 1',
-    theme: 'neonArcade',
-    // Three adjacent keys under the left hand's resting fingers. Order
-    // follows the on-screen lane order (left, down, right) left to right.
-    // This is the ONLY place Player 1's keys are defined — the header
-    // legend and the column labels below are both derived from it (see
-    // DanceFloor), so they can't drift out of sync with each other again.
+    avatarId: 0,
+    // Player 1's keys: A, S, D. Everything else on screen for Player 1
+    // (the labels above each lane, the "A S D" text) reads this same map,
+    // so it always matches what the keys actually do.
     keyToLane: { a: 'left', s: 'down', d: 'right' },
   },
   {
     id: 'p2',
     name: 'Player 2',
-    theme: 'synthwaveSunset',
-    // Left/Down/Right arrows — same three-wide spatial layout as Player
-    // 1's A/S/D, on the other hand, so neither key cluster overlaps.
+    avatarId: 1,
+    // Player 2's keys: the Left, Down, Right arrows.
     keyToLane: { ArrowLeft: 'left', ArrowDown: 'down', ArrowRight: 'right' },
   },
 ]
@@ -73,7 +71,7 @@ function describeKeys(keyToLane: Record<string, Lane>): string {
 
 const ARROW_GLYPH: Record<string, string> = { ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→' }
 
-/** Column header label for each lane, derived from the same keyToLane map that drives input — never a second hardcoded source. */
+/** Column header label for each lane, read from the same keyToLane map that drives input. */
 function laneKeyLabels(keyToLane: Record<string, Lane>): Record<Lane, string> {
   return Object.fromEntries(
     Object.entries(keyToLane).map(([key, lane]) => [
@@ -109,10 +107,10 @@ interface DanceFloorProps {
   phase: BattlePhase
   clockMs: () => number
   onScoreChange: (dancerId: string, score: number) => void
+  pulse: (strength?: number) => void
 }
 
-function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange }: DanceFloorProps) {
-  const bgRef = useRef<BeatFractalHandle | null>(null)
+function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, pulse }: DanceFloorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const flashRefs = useRef<Record<Lane, number>>({ down: 0, left: 0, right: 0 })
   const liveEntriesRef = useRef<LiveEntry[]>([])
@@ -120,8 +118,7 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange }: Danc
   const laneLabels = useMemo(() => laneKeyLabels(dancer.keyToLane), [dancer.keyToLane])
 
   useEffect(() => {
-    // Re-arm on every battle start (idle/ended -> running), not just when the
-    // clip itself changes, so "Dance again" resets consumed notes and score.
+    // Runs every time a new battle starts, so "Dance again" starts clean.
     if (phase !== 'running') return
     liveEntriesRef.current = clipEntries.map((entry) => ({ ...entry, consumed: false }))
     reset()
@@ -135,8 +132,7 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange }: Danc
     if (phase !== 'running') return
 
     function onKeyDown(event: KeyboardEvent) {
-      // Exact match first for "ArrowLeft" etc., falling back to a
-      // lowercased lookup so Shift/CapsLock doesn't break the letter keys.
+      // Try the key as typed first (for "ArrowLeft"), then lowercase (for letters).
       const lane = dancer.keyToLane[event.key] ?? dancer.keyToLane[event.key.toLowerCase()]
       if (!lane) return
       const nowMs = clockMs()
@@ -159,12 +155,12 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange }: Danc
 
       addJudgment(judgment)
       flashRefs.current[lane] = nowMs + 120
-      bgRef.current?.pulse(judgment === 'perfect' ? 1.4 : judgment === 'good' ? 0.9 : 0.3)
+      pulse(judgment === 'perfect' ? 1.4 : judgment === 'good' ? 0.9 : 0.3)
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [phase, dancer.keyToLane, clockMs, addJudgment])
+  }, [phase, dancer.keyToLane, clockMs, addJudgment, pulse])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -212,18 +208,13 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange }: Danc
   }, [clockMs])
 
   return (
-    <div className={styles.danceFloor}>
-      <BeatFractalBackground
-        ref={bgRef}
-        theme={dancer.theme}
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 0, borderRadius: 'var(--radius-lg)' }}
-      />
+    <div className={styles.danceFloor} data-avatar-id={dancer.avatarId}>
       <div className={styles.panel}>
         <div className={styles.header}>
-          <strong>{dancer.name}</strong>
+          <strong className={styles.textTilt}>{dancer.name}</strong>
           <span>{describeKeys(dancer.keyToLane)}</span>
         </div>
-        <div className={styles.hud}>
+        <div className={`${styles.hud} ${styles.textTilt}`}>
           <span>Score {score}</span>
           <span>Combo {combo}</span>
         </div>
@@ -237,18 +228,17 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange }: Danc
 }
 
 /**
- * Story 09-01 — DEV-only playground (route `/tiebreaker`) for the DDR
- * dance-off: two local dancers (A/S/D vs Left/Down/Right arrows) battle against the same
- * 20s clip of the real beatmap, no server involved. Validates the mechanic,
- * scoring, and fractal integration before Epic 09 wires it into the real
- * tiebreak flow at `/room/:code/tiebreaker`.
+ * Story 09-01 — DEV playground (route `/tiebreaker`) for the DDR dance-off.
+ * Two local dancers battle the same 20s clip, no server involved. Good for
+ * trying out the look and feel before touching the real game.
  */
 export function TiebreakerPlaygroundScreen() {
+  const [searchParams] = useSearchParams()
+  const word = searchParams.get('word') ?? DEFAULT_WORD
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const stageRef = useRef<TiebreakerStageHandle | null>(null)
   const startedAtRef = useRef(0)
-  // Snapshot of playbackRate at battle start — the slider locks once
-  // `phase !== 'idle'`, but a ref (rather than reading state mid-battle)
-  // keeps the running battle's timing math decoupled from the control.
+  // The speed picked before the battle starts, locked in for that whole battle.
   const battleRateRef = useRef(DEFAULT_PLAYBACK_RATE)
   const [beatmap, setBeatmap] = useState<Beatmap | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -271,11 +261,7 @@ export function TiebreakerPlaygroundScreen() {
     [beatmap],
   )
 
-  // Track-time (beatmap ms), not wall-clock ms: scaling elapsed real time by
-  // the chosen rate is what makes a slower speed actually slow the game
-  // down, the same way HTMLMediaElement.currentTime tracks content position
-  // regardless of playbackRate. Kept independent of the <audio> element's
-  // own clock so the battle still runs correctly if autoplay is blocked.
+  // Time is scaled by speed, so slower playback also slows the notes down.
   const clockMs = useCallback(() => {
     if (phase !== 'running') return 0
     return (performance.now() - startedAtRef.current) * battleRateRef.current
@@ -285,6 +271,10 @@ export function TiebreakerPlaygroundScreen() {
     setScores((prev) => (prev[dancerId] === score ? prev : { ...prev, [dancerId]: score }))
   }, [])
 
+  const pulse = useCallback((strength?: number) => {
+    stageRef.current?.pulse(strength)
+  }, [])
+
   function startBattle() {
     battleRateRef.current = playbackRate
     startedAtRef.current = performance.now()
@@ -292,8 +282,6 @@ export function TiebreakerPlaygroundScreen() {
     setPhase('running')
     if (audioRef.current) audioRef.current.playbackRate = playbackRate
     audioRef.current?.play().catch(() => {})
-    // Real time to cover the full clip at this rate: at 60% speed, 20s of
-    // track content takes 20s / 0.6 ≈ 33.3s of wall-clock time to play through.
     window.setTimeout(() => {
       setPhase('ended')
       audioRef.current?.pause()
@@ -309,33 +297,31 @@ export function TiebreakerPlaygroundScreen() {
     : null
 
   return (
-    <div className="app-stage">
-      <main className={`app-stage__inner ${styles.tiebreakerPlayground}`}>
-        <h1>Tiebreaker Battle</h1>
-        {error && <p className={styles.error}>Failed to load beatmap: {error}</p>}
-        <audio ref={audioRef} src={TRACK_SRC} className={styles.audio} />
+    <TiebreakerStage ref={stageRef} word={word}>
+      {error && <p className={styles.error}>Failed to load beatmap: {error}</p>}
+      <audio ref={audioRef} src={TRACK_SRC} className={styles.audio} />
 
-        <div className={styles.controls}>
-          <PlaybackSpeedSlider value={playbackRate} onChange={setPlaybackRate} disabled={phase === 'running'} />
-          <Button appearance="primary" onClick={startBattle} disabled={!beatmap || phase === 'running'}>
-            {phase === 'idle' ? 'Start battle' : phase === 'running' ? 'Dancing…' : 'Dance again'}
-          </Button>
-          {winnerText && <p className={styles.winner}>{winnerText}</p>}
-        </div>
+      <div className={styles.controls}>
+        <PlaybackSpeedSlider value={playbackRate} onChange={setPlaybackRate} disabled={phase === 'running'} />
+        <Button appearance="primary" onClick={startBattle} disabled={!beatmap || phase === 'running'}>
+          {phase === 'idle' ? 'Start battle' : phase === 'running' ? 'Dancing…' : 'Dance again'}
+        </Button>
+        {winnerText && <p className={styles.winner}>{winnerText}</p>}
+      </div>
 
-        <div className={styles.floors}>
-          {DANCERS.map((dancer) => (
-            <DanceFloor
-              key={dancer.id}
-              dancer={dancer}
-              clipEntries={clipEntries}
-              phase={phase}
-              clockMs={clockMs}
-              onScoreChange={handleScoreChange}
-            />
-          ))}
-        </div>
-      </main>
-    </div>
+      <div className={styles.floors}>
+        {DANCERS.map((dancer) => (
+          <DanceFloor
+            key={dancer.id}
+            dancer={dancer}
+            clipEntries={clipEntries}
+            phase={phase}
+            clockMs={clockMs}
+            onScoreChange={handleScoreChange}
+            pulse={pulse}
+          />
+        ))}
+      </div>
+    </TiebreakerStage>
   )
 }

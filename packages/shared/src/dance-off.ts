@@ -8,11 +8,7 @@ import {
   sliceBeatmapClip,
 } from './beatmap.js'
 
-/**
- * Tiebreaker Battle scoring contract (Epic 09). Shared by the playground,
- * the real client gameplay, and the Room DO's authoritative judging so a
- * hit is scored identically everywhere.
- */
+/** Scoring rules for the Tiebreaker Battle. Shared by the playground, the real game, and the server, so scoring is the same everywhere. */
 
 /** Fixed clip length every dance-off battle runs — same slice of the beatmap for every player. */
 export const DANCE_OFF_CLIP_MS = 20_000
@@ -45,13 +41,7 @@ export interface DanceHitResult {
   matchedEntry: BeatmapEntry | null
 }
 
-/**
- * The single judging call both the Room DO (authoritative) and any
- * client-side optimistic feedback should use: finds the nearest unconsumed
- * entry in `lane` within the good-hit window and judges it, or reports a
- * miss when nothing is close enough. Callers are responsible for excluding
- * already-consumed entries from `entries` so one note can't be hit twice.
- */
+/** Judges a hit against the nearest note in `lane`. Pass in only unused notes, so one note can't be hit twice. */
 export function judgeSubmittedHit(entries: BeatmapEntry[], lane: Lane, timeMs: number): DanceHitResult {
   const nearest = findNearestEntryInLane(entries, lane, timeMs, DANCE_OFF_GOOD_WINDOW_MS)
   if (!nearest) return { judgment: 'miss', matchedEntry: null }

@@ -1,77 +1,73 @@
 // Real, guarded Tiebreaker Battle (route `/room/:code/tiebreaker`).
 
-.tiebreaker-room {
-  max-width: 720px;
-  text-align: center;
+@use '../../styles/mixins' as mixins;
 
-  .header {
-    margin-bottom: var(--space-4);
+.winner {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  margin-bottom: var(--space-2);
+}
+
+.spectator-note {
+  color: var(--color-neutral-500);
+  margin-bottom: var(--space-2);
+}
+
+.floors {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+}
+
+.text-tilt {
+  display: inline-block;
+
+  @include mixins.text-tilt($angle: 6deg);
+}
+
+.dance-floor {
+  @include mixins.avatar-panel-tint;
+
+  width: 280px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+
+  .panel {
+    padding: var(--space-3);
   }
 
-  .winner {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-accent);
-    margin-bottom: var(--space-2);
-  }
-
-  .spectator-note {
-    color: var(--color-neutral-500);
-    margin-bottom: var(--space-2);
-  }
-
-  .floors {
+  .dancer-header {
     display: flex;
-    gap: var(--space-4);
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: var(--space-4);
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--space-2);
+
+    span {
+      font-size: 0.75rem;
+      color: var(--color-neutral-900);
+    }
   }
 
-  .dance-floor {
-    position: relative;
-    width: 280px;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
+  .hud {
+    margin-bottom: var(--space-2);
+    font-variant-numeric: tabular-nums;
+  }
 
-    .panel {
-      position: relative;
-      z-index: 1;
-      padding: var(--space-3);
-      background: rgba(0, 0, 0, 0.35);
-      border-radius: var(--radius-lg);
+  .lane-labels {
+    display: flex;
+    justify-content: center;
+
+    span {
+      flex: 1;
     }
+  }
 
-    .dancer-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: var(--space-2);
-
-      span {
-        font-size: 0.75rem;
-        color: var(--color-neutral-500);
-      }
-    }
-
-    .hud {
-      margin-bottom: var(--space-2);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .lane-labels {
-      display: flex;
-      justify-content: center;
-
-      span {
-        flex: 1;
-      }
-    }
-
-    .canvas {
-      display: block;
-      width: 100%;
-      border-radius: var(--radius-md);
-    }
+  .canvas {
+    display: block;
+    width: 100%;
+    border-radius: var(--radius-md);
   }
 }

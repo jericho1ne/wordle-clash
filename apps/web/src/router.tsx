@@ -12,24 +12,9 @@ import { GameplayScreen } from './features/gameplay/GameplayScreen'
 import { TiebreakerPlaygroundScreen } from './features/tiebreaker/TiebreakerPlaygroundScreen'
 import { TiebreakerRoomScreen } from './features/tiebreaker/TiebreakerRoomScreen'
 
-/**
- * Routes (see docs/stories/00-app-scaffold/08-routing-react-router.md):
- *   /                    title
- *   /setup               player setup + create/join room  (?join=<code> deep-link)
- *   /room/:code          invite-aware lobby entry
- *   /room/:code/play     active match (redirects here to /tiebreaker on a tie)
- *   /room/:code/tiebreaker  the real DDR dance-off — tied players play,
- *                        everyone else spectates (docs/stories/09-tiebreaker-battle)
- *   /design-system       design-system showcase (DEV builds only)
- *   /beatmap-preview     beat map visual/audio scrub tool — deliberately
- *                        shipped to production for now so people can test
- *                        it on the deployed URL; DEV-gate it again before
- *                        general release (docs/stories/08-beatmap-engine)
- *   /tiebreaker          DDR dance-off playground, no server involved —
- *                        same deliberate temporary production exposure as
- *                        /beatmap-preview above (docs/stories/09-tiebreaker-battle)
- *
- */
+// All app routes. /beatmap-preview and /tiebreaker are dev tools that are
+// live in production for now — see docs/stories/08-beatmap-engine and
+// docs/stories/09-tiebreaker-battle.
 export const router = createBrowserRouter([
   { path: '/', element: <TitleScreen /> },
   { path: '/setup', element: <SetupScreen /> },

@@ -20,11 +20,14 @@ import {
 
 import {
   DANCE_FLOOR_LOOKAHEAD_MS,
-  DANCE_FLOOR_NOTE_TRAIL_MS,
   HIT_FLASH_MS,
   KEYSTROKE_WINDOW,
   KEYSTROKE_WINDOW_OPACITY,
   KEYSTROKE_WINDOW_OUTLINE,
+  NOTE_FADE_IN_OPACITY,
+  NOTE_FADE_OUT_OPACITY,
+  NOTE_FADE_OUT_ZONE,
+  NOTE_HITLINE_OPACITY,
 } from '../../constants'
 import { useRoomStore } from '../../realtime'
 import { Button } from '../../ui'
@@ -43,6 +46,17 @@ const LANE_KEY_LABEL = Object.fromEntries(
   Object.entries(KEY_TO_LANE).map(([key, lane]) => [lane, key.toUpperCase()]),
 ) as Record<Lane, string>
 const KEY_LEGEND = Object.keys(KEY_TO_LANE).map((key) => key.toUpperCase()).join(' ')
+
+/** A note fades in on the way down, peaks at the hit line, then quickly fades out right before it leaves the board. */
+function noteOpacity(y: number, hitLineY: number, boardHeight: number): number {
+  if (y <= hitLineY) {
+    return NOTE_FADE_IN_OPACITY + (NOTE_HITLINE_OPACITY - NOTE_FADE_IN_OPACITY) * (y / hitLineY)
+  }
+  const fadeOutStart = boardHeight * (1 - NOTE_FADE_OUT_ZONE)
+  if (y < fadeOutStart) return NOTE_HITLINE_OPACITY
+  const t = (y - fadeOutStart) / (boardHeight - fadeOutStart)
+  return NOTE_HITLINE_OPACITY + (NOTE_FADE_OUT_OPACITY - NOTE_HITLINE_OPACITY) * Math.min(1, t)
+}
 
 interface DanceFloorProps {
   name: string
@@ -102,10 +116,11 @@ function DanceFloor({ name, avatarId, score, entries, startsAt, canPlay, onHit }
         for (const entry of entries) {
           if (entry.lane !== lane) continue
           const delta = entry.timeMs - nowMs
-          if (delta < -DANCE_FLOOR_NOTE_TRAIL_MS || delta > DANCE_FLOOR_LOOKAHEAD_MS) continue
+          if (delta > DANCE_FLOOR_LOOKAHEAD_MS) continue
           const progress = 1 - delta / DANCE_FLOOR_LOOKAHEAD_MS
           const y = progress * hitLineY
-          ctx.fillStyle = '#F0803C'
+          if (y > canvas.height) continue
+          ctx.fillStyle = `rgba(240, 128, 60, ${noteOpacity(y, hitLineY, canvas.height)})`
           ctx.fillRect(x + laneWidth / 2 - 16, y - 7, 32, 14)
         }
       })

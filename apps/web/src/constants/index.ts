@@ -30,8 +30,17 @@ export const DANCE_FLOOR_LOOKAHEAD_MS = 1800
 /** How far ahead (ms) upcoming notes become visible on the /beatmap-preview scrub tool (wider, since it's just for scrubbing, not play). */
 export const BEATMAP_PREVIEW_LOOKAHEAD_MS = 2200
 
-/** How long (ms) past the hit line a note keeps rendering on the real gameplay canvases before it's dropped. */
-export const DANCE_FLOOR_NOTE_TRAIL_MS = 160
+/** Opacity of a note when it first appears at the top of the board. */
+export const NOTE_FADE_IN_OPACITY = 0.6
+
+/** Opacity of a note right at the keystroke window (its brightest point). */
+export const NOTE_HITLINE_OPACITY = 1.0
+
+/** Opacity a note quickly fades down to right before it runs off the bottom of the board. */
+export const NOTE_FADE_OUT_OPACITY = 0.3
+
+/** How much of the board's height (as a fraction, from the bottom) the quick fade-out happens over. */
+export const NOTE_FADE_OUT_ZONE = 0.08
 
 /** Pixel height of the white hit-line box at the bottom of each lane, on the real gameplay canvases. */
 export const KEYSTROKE_WINDOW = 45

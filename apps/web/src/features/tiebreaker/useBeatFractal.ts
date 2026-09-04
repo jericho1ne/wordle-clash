@@ -30,13 +30,18 @@ export function useBeatFractal(options: BeatFractalOptions = {}) {
     return () => {
       engine.destroy()
       // Wait a tick before freeing the WebGL context: React's dev-mode
-      // double-mount would already have made a new engine on this same
-      // canvas by then. If engineRef still points at this one, nothing
-      // took over, so it's safe to actually free the context.
+      // double-mount would already have made a new engine by then. Only
+      // skip releasing if that new engine reuses this SAME canvas (the
+      // browser hands back the same context for the same canvas, so
+      // freeing it would break the new engine too). A new engine on a
+      // *different* canvas doesn't save this context, so it still has to
+      // be freed here or it leaks for good.
       window.setTimeout(() => {
-        if (engineRef.current !== engine) return
+        const replacedBySameCanvas = engineRef.current !== null && engineRef.current !== engine &&
+          engineRef.current.canvas === engine.canvas
+        if (replacedBySameCanvas) return
         engine.releaseContext()
-        engineRef.current = null
+        if (engineRef.current === engine) engineRef.current = null
       }, 0)
     }
     // engine is created once; use engineRef.current.setTheme() etc. to change it later

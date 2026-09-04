@@ -162,7 +162,9 @@ type UniformName =
   | 'u_baseBrightness' | 'u_baseSaturation' | 'u_flashColor' | 'u_flashEnergy'
 
 export class BeatFractalEngine {
-  private canvas: HTMLCanvasElement
+  // Public (not private) so callers can tell whether two engine instances
+  // share the same canvas — see useBeatFractal.ts's releaseContext guard.
+  readonly canvas: HTMLCanvasElement
   private gl: WebGLRenderingContext
   private program!: WebGLProgram
   // Keyed by the literal UniformName union (not Record<string, ...>) so

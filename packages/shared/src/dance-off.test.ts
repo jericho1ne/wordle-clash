@@ -6,28 +6,28 @@ import {
 
 import type { Beatmap } from './beatmap'
 import {
+  CORRECT_TIME_WINDOWS,
   DANCE_OFF_CLIP_MS,
-  DANCE_OFF_GOOD_WINDOW_MS,
-  DANCE_OFF_PERFECT_WINDOW_MS,
+  DANCE_OFF_MAX_WINDOW_MS,
   danceOffClip,
   judgeDanceHit,
   judgeSubmittedHit,
 } from './dance-off'
 
 describe('judgeDanceHit', () => {
-  it('is perfect within the perfect window, on either side', () => {
-    expect(judgeDanceHit(0)).toBe('perfect')
-    expect(judgeDanceHit(DANCE_OFF_PERFECT_WINDOW_MS)).toBe('perfect')
-    expect(judgeDanceHit(-DANCE_OFF_PERFECT_WINDOW_MS)).toBe('perfect')
+  it('matches each named tier at its window boundary, on either side', () => {
+    for (const { tier, windowMs } of CORRECT_TIME_WINDOWS) {
+      expect(judgeDanceHit(windowMs)).toBe(tier)
+      expect(judgeDanceHit(-windowMs)).toBe(tier)
+    }
   })
 
-  it('is good just outside the perfect window and within the good window', () => {
-    expect(judgeDanceHit(DANCE_OFF_PERFECT_WINDOW_MS + 1)).toBe('good')
-    expect(judgeDanceHit(DANCE_OFF_GOOD_WINDOW_MS)).toBe('good')
+  it('picks the closest (smallest) tier when a delta fits more than one window', () => {
+    expect(judgeDanceHit(0)).toBe('marvelous')
   })
 
-  it('is a miss beyond the good window', () => {
-    expect(judgeDanceHit(DANCE_OFF_GOOD_WINDOW_MS + 1)).toBe('miss')
+  it('is a miss just beyond the widest window', () => {
+    expect(judgeDanceHit(DANCE_OFF_MAX_WINDOW_MS + 1)).toBe('miss')
   })
 })
 
@@ -39,7 +39,7 @@ describe('judgeSubmittedHit', () => {
 
   it('matches and judges the nearest entry in the lane', () => {
     expect(judgeSubmittedHit(entries, 'left', 1010)).toEqual({
-      judgment: 'perfect',
+      judgment: 'marvelous',
       matchedEntry: { timeMs: 1000, lane: 'left' },
     })
   })

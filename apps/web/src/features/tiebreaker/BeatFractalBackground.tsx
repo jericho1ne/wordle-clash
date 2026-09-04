@@ -14,12 +14,15 @@ import {
 
 export interface BeatFractalBackgroundProps {
   theme?: ThemeName
+  baseBrightness?: number
+  baseSaturation?: number
   className?: string
   style?: CSSProperties
 }
 
 export interface BeatFractalHandle {
   pulse: (strength?: number) => void
+  flash: (colorRgb: [number, number, number], strength?: number) => void
   setBPM: (bpm: number) => void
   stopBPM: () => void
   setTheme: (theme: ThemeName) => void
@@ -41,12 +44,13 @@ export interface BeatFractalHandle {
  * beatFractalStore.ts).
  */
 export const BeatFractalBackground = forwardRef<BeatFractalHandle, BeatFractalBackgroundProps>(
-  ({ theme = 'neonArcade', className, style }, ref) => {
-    const { canvasRef, engineRef } = useBeatFractal({ theme })
+  ({ theme = 'neonArcade', baseBrightness, baseSaturation, className, style }, ref) => {
+    const { canvasRef, engineRef } = useBeatFractal({ theme, baseBrightness, baseSaturation })
     useBeatFractalTheme(engineRef, theme)
 
     useImperativeHandle(ref, () => ({
       pulse: (strength = 1.0) => engineRef.current?.pulse(strength),
+      flash: (colorRgb: [number, number, number], strength = 1.0) => engineRef.current?.flash(colorRgb, strength),
       setBPM: (bpm: number) => engineRef.current?.setBPM(bpm),
       stopBPM: () => engineRef.current?.stopBPM(),
       setTheme: (t: ThemeName) => engineRef.current?.setTheme(t),

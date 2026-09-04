@@ -20,6 +20,10 @@ export interface BeatFractalOptions {
   dprCap?: number
   beatDecay?: number
   rotationSpeed?: number
+  /** How dim the fractal sits at rest, before any beat/flash brightens it. Lower = darker. */
+  baseBrightness?: number
+  /** How colorful the fractal sits at rest. 1 = full color, 0 = grayscale. */
+  baseSaturation?: number
 }
 
 export const THEMES: Record<ThemeName, Theme> = {
@@ -93,6 +97,10 @@ const FRAGMENT_SRC = `
   uniform vec3  u_colB;
   uniform vec3  u_colC;
   uniform vec3  u_colD;
+  uniform float u_baseBrightness;
+  uniform float u_baseSaturation;
+  uniform vec3  u_flashColor;
+  uniform float u_flashEnergy;
 
   const int MAX_ITER_CAP = 500;
 
@@ -138,9 +146,12 @@ const FRAGMENT_SRC = `
       float nu = float(iter) - log2(log2(dot(z, z))) + 4.0;
       float t = nu * 0.025 + u_time * 0.03 + u_beat * 0.25;
       color = palette(t, u_colA, u_colB, u_colC, u_colD);
-      color *= 0.85 + u_beat * 0.6;
+      float gray = dot(color, vec3(0.299, 0.587, 0.114));
+      color = mix(vec3(gray), color, u_baseSaturation);
+      color *= u_baseBrightness + u_beat * 0.6;
     }
 
+    color = mix(color, u_flashColor, u_flashEnergy);
     gl_FragColor = vec4(color, 1.0);
   }
 `
@@ -148,6 +159,7 @@ const FRAGMENT_SRC = `
 type UniformName =
   | 'u_resolution' | 'u_center' | 'u_zoom' | 'u_time' | 'u_beat' | 'u_rotation'
   | 'u_juliaMix' | 'u_juliaC' | 'u_maxIter' | 'u_colA' | 'u_colB' | 'u_colC' | 'u_colD'
+  | 'u_baseBrightness' | 'u_baseSaturation' | 'u_flashColor' | 'u_flashEnergy'
 
 export class BeatFractalEngine {
   private canvas: HTMLCanvasElement
@@ -164,6 +176,10 @@ export class BeatFractalEngine {
 
   beatEnergy = 0
   private beatDecay: number
+  private baseBrightness: number
+  private baseSaturation: number
+  private flashColor: [number, number, number] = [0, 0, 0]
+  private flashEnergy = 0
 
   center: { x: number, y: number }
   private targetCenter: { x: number, y: number }
@@ -205,6 +221,8 @@ export class BeatFractalEngine {
 
     this.beatDecay = opts.beatDecay ?? 3.2
     this.rotationSpeed = opts.rotationSpeed ?? 0.015
+    this.baseBrightness = opts.baseBrightness ?? 0.85
+    this.baseSaturation = opts.baseSaturation ?? 1.0
 
     this.center = { ...this.theme.center }
     this.targetCenter = { ...this.theme.center }
@@ -282,6 +300,10 @@ export class BeatFractalEngine {
       'u_colB',
       'u_colC',
       'u_colD',
+      'u_baseBrightness',
+      'u_baseSaturation',
+      'u_flashColor',
+      'u_flashEnergy',
     ]
     uniformNames.forEach((name) => {
       this.uniforms[name] = gl.getUniformLocation(prog, name)
@@ -302,6 +324,12 @@ export class BeatFractalEngine {
   /** Call this on every beat / note-hit. strength: roughly 0–1.5. */
   pulse(strength = 1.0) {
     this.beatEnergy = Math.min(2.5, Math.max(this.beatEnergy, strength))
+  }
+
+  /** Tints the whole fractal toward `colorRgb` for a moment, then fades back. Use for hit/miss feedback. */
+  flash(colorRgb: [number, number, number], strength = 1.0) {
+    this.flashColor = colorRgb
+    this.flashEnergy = Math.min(1.0, Math.max(this.flashEnergy, strength))
   }
 
   setBPM(bpm: number, opts: { strength?: number } = {}) {
@@ -413,6 +441,8 @@ export class BeatFractalEngine {
 
     const dt = dtMs / 1000
     this.beatEnergy = Math.max(0, this.beatEnergy - this.beatDecay * dt * this.beatEnergy - 0.15 * dt)
+    // Faster, flat decay than beatEnergy — a flash should read as a quick blip, not a lingering glow.
+    this.flashEnergy = Math.max(0, this.flashEnergy - 3.0 * dt)
 
     this.rotation += this.rotationSpeed * dt
 
@@ -457,6 +487,10 @@ export class BeatFractalEngine {
     gl.uniform3fv(this.uniforms.u_colB, t.colB)
     gl.uniform3fv(this.uniforms.u_colC, t.colC)
     gl.uniform3fv(this.uniforms.u_colD, t.colD)
+    gl.uniform1f(this.uniforms.u_baseBrightness, this.baseBrightness)
+    gl.uniform1f(this.uniforms.u_baseSaturation, this.baseSaturation)
+    gl.uniform3fv(this.uniforms.u_flashColor, this.flashColor)
+    gl.uniform1f(this.uniforms.u_flashEnergy, this.flashEnergy)
     gl.drawArrays(gl.TRIANGLES, 0, 6)
   }
 }

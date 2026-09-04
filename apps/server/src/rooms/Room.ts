@@ -690,9 +690,10 @@ export class Room extends Server<Env> {
     }
 
     const serverTimeMs = Date.now() - this.danceOff.startedAt
-    judgeAndScoreHit(this.danceOff, userId, lane, serverTimeMs)
+    const judgment = judgeAndScoreHit(this.danceOff, userId, lane, serverTimeMs)
 
     await this.#save()
+    this.#broadcast({ t: 'danceOffHit', playerId: userId, judgment })
     this.#broadcast({ t: 'danceOffScore', scores: this.danceOff.scores })
   }
 

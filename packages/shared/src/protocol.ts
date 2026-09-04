@@ -8,6 +8,7 @@ import {
   beatmapSchema,
   laneSchema,
 } from './beatmap.js'
+import { DANCE_HIT_JUDGMENTS } from './dance-off.js'
 import { GAME_MODE_IDS } from './game-modes.js'
 import {
   SYNC_ROUND_DURATION_MINUTES,
@@ -209,6 +210,11 @@ export const serverMessageSchema = z.discriminatedUnion('t', [
     scores: z.record(idSchema, z.number().int().nonnegative()),
   }).strict(),
   z.object({
+    t: z.literal('danceOffHit'),
+    playerId: idSchema,
+    judgment: z.enum(DANCE_HIT_JUDGMENTS),
+  }).strict(),
+  z.object({
     t: z.literal('danceOffEnded'),
     winnerId: idSchema,
   }).strict(),
@@ -236,6 +242,7 @@ export type MatchStateMessage = Extract<ServerMessage, { t: 'matchState' }>
 export type GuessAcceptedMessage = Extract<ServerMessage, { t: 'guessAccepted' }>
 export type DanceOffStartedMessage = Extract<ServerMessage, { t: 'danceOffStarted' }>
 export type DanceOffScoreMessage = Extract<ServerMessage, { t: 'danceOffScore' }>
+export type DanceOffHitMessage = Extract<ServerMessage, { t: 'danceOffHit' }>
 export type DanceOffEndedMessage = Extract<ServerMessage, { t: 'danceOffEnded' }>
 export type ErrorMessage = Extract<ServerMessage, { t: 'error' }>
 export type PongMessage = Extract<ServerMessage, { t: 'pong' }>

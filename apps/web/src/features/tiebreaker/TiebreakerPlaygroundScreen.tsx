@@ -1,11 +1,12 @@
 import type {
   Beatmap,
   BeatmapEntry,
+  DanceHitJudgment,
   Lane,
 } from '@wordle-clash/shared'
 import {
   DANCE_OFF_CLIP_MS,
-  DANCE_OFF_GOOD_WINDOW_MS,
+  DANCE_OFF_MAX_WINDOW_MS,
   DANCE_OFF_POINTS,
   judgeDanceHit,
   sliceBeatmapClip,
@@ -20,7 +21,12 @@ import {
 } from 'react'
 import { useSearchParams } from 'react-router'
 
-import { DEFAULT_PLAYBACK_RATE } from '../../constants'
+import {
+  DANCE_FLOOR_LOOKAHEAD_MS,
+  DEFAULT_MOCK_WORD,
+  DEFAULT_PLAYBACK_RATE,
+  HIT_FLASH_MS,
+} from '../../constants'
 import {
   Button,
   PlaybackSpeedSlider,
@@ -32,8 +38,6 @@ import styles from './TiebreakerPlaygroundScreen.module.scss'
 const TRACK_SRC = '/audio/canto-de-ossanha.mp3'
 const BEATMAP_SRC = '/audio/canto-de-ossanha.beatmap.json'
 const LANES: readonly Lane[] = ['left', 'down', 'right']
-const LOOKAHEAD_MS = 1800
-const DEFAULT_WORD = 'CLASH'
 
 interface DancerConfig {
   id: 'p1' | 'p2'
@@ -90,7 +94,7 @@ type BattlePhase = 'idle' | 'running' | 'ended'
 function useDancerScore() {
   const [score, setScore] = useState(0)
   const [combo, setCombo] = useState(0)
-  const addJudgment = useCallback((judgment: 'perfect' | 'good' | 'miss') => {
+  const addJudgment = useCallback((judgment: DanceHitJudgment) => {
     setScore((s) => s + DANCE_OFF_POINTS[judgment])
     setCombo((c) => (judgment === 'miss' ? 0 : c + 1))
   }, [])
@@ -107,10 +111,10 @@ interface DanceFloorProps {
   phase: BattlePhase
   clockMs: () => number
   onScoreChange: (dancerId: string, score: number) => void
-  pulse: (strength?: number) => void
+  flash: (kind: 'correct' | 'miss', strength?: number) => void
 }
 
-function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, pulse }: DanceFloorProps) {
+function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, flash }: DanceFloorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const flashRefs = useRef<Record<Lane, number>>({ down: 0, left: 0, right: 0 })
   const liveEntriesRef = useRef<LiveEntry[]>([])
@@ -148,19 +152,20 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, pulse 
         }
       }
 
-      const judgment = best && Math.abs(bestDelta) <= DANCE_OFF_GOOD_WINDOW_MS
+      const judgment = best && Math.abs(bestDelta) <= DANCE_OFF_MAX_WINDOW_MS
         ? judgeDanceHit(bestDelta)
         : 'miss'
       if (best && judgment !== 'miss') best.consumed = true
 
       addJudgment(judgment)
-      flashRefs.current[lane] = nowMs + 120
-      pulse(judgment === 'perfect' ? 1.4 : judgment === 'good' ? 0.9 : 0.3)
+      flashRefs.current[lane] = nowMs + HIT_FLASH_MS
+      const strength = judgment === 'miss' ? 1.0 : 0.6 + (DANCE_OFF_POINTS[judgment] / 5) * 0.8
+      flash(judgment === 'miss' ? 'miss' : 'correct', strength)
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [phase, dancer.keyToLane, clockMs, addJudgment, pulse])
+  }, [phase, dancer.keyToLane, clockMs, addJudgment, flash])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -188,12 +193,12 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, pulse 
         for (const entry of liveEntriesRef.current) {
           if (entry.lane !== lane || entry.consumed) continue
           const delta = entry.timeMs - nowMs
-          if (delta < -DANCE_OFF_GOOD_WINDOW_MS) {
+          if (delta < -DANCE_OFF_MAX_WINDOW_MS) {
             entry.consumed = true
             continue
           }
-          if (delta > LOOKAHEAD_MS) continue
-          const progress = 1 - delta / LOOKAHEAD_MS
+          if (delta > DANCE_FLOOR_LOOKAHEAD_MS) continue
+          const progress = 1 - delta / DANCE_FLOOR_LOOKAHEAD_MS
           const y = progress * hitLineY
           ctx.fillStyle = '#F0803C'
           ctx.fillRect(x + laneWidth / 2 - 16, y - 7, 32, 14)
@@ -234,7 +239,7 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, pulse 
  */
 export function TiebreakerPlaygroundScreen() {
   const [searchParams] = useSearchParams()
-  const word = searchParams.get('word') ?? DEFAULT_WORD
+  const word = searchParams.get('word') ?? DEFAULT_MOCK_WORD
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const stageRef = useRef<TiebreakerStageHandle | null>(null)
   const startedAtRef = useRef(0)
@@ -271,8 +276,8 @@ export function TiebreakerPlaygroundScreen() {
     setScores((prev) => (prev[dancerId] === score ? prev : { ...prev, [dancerId]: score }))
   }, [])
 
-  const pulse = useCallback((strength?: number) => {
-    stageRef.current?.pulse(strength)
+  const flash = useCallback((kind: 'correct' | 'miss', strength?: number) => {
+    stageRef.current?.flash(kind, strength)
   }, [])
 
   function startBattle() {
@@ -318,7 +323,7 @@ export function TiebreakerPlaygroundScreen() {
             phase={phase}
             clockMs={clockMs}
             onScoreChange={handleScoreChange}
-            pulse={pulse}
+            flash={flash}
           />
         ))}
       </div>

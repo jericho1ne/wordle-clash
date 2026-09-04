@@ -35,7 +35,7 @@ describe('authoritative dance-off', () => {
     if (!firstEntry) throw new Error('fixture beatmap has no entries')
 
     const firstJudgment = judgeAndScoreHit(danceOff, 'a', firstEntry.lane, firstEntry.timeMs)
-    expect(firstJudgment).toBe('perfect')
+    expect(firstJudgment).toBe('marvelous')
     expect(danceOff.consumedIndices.a).toEqual([0])
 
     // Same instant, same lane — the note is already consumed, so this is a miss, not a double perfect.

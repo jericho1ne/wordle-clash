@@ -10,7 +10,11 @@ import type {
   Lane,
 } from '@wordle-clash/shared'
 
-import { DEFAULT_PLAYBACK_RATE } from '../../constants'
+import {
+  BEATMAP_PREVIEW_LOOKAHEAD_MS,
+  DEFAULT_PLAYBACK_RATE,
+  HIT_FLASH_MS,
+} from '../../constants'
 import { PlaybackSpeedSlider } from '../../ui'
 import styles from './BeatmapPreview.module.scss'
 
@@ -18,8 +22,6 @@ const TRACK_SRC = '/audio/canto-de-ossanha.mp3'
 const BEATMAP_SRC = '/audio/canto-de-ossanha.beatmap.json'
 const LANES: readonly Lane[] = ['left', 'down', 'right']
 const LANE_LABEL: Record<Lane, string> = { down: '↓', left: '←', right: '→' }
-const LOOKAHEAD_MS = 2200
-const HIT_FLASH_MS = 120
 
 /** Lets you watch and listen to the beat map line up with the song: kick -> down, snare -> left, hi-hat -> right. */
 export function BeatmapPreview() {
@@ -80,9 +82,9 @@ export function BeatmapPreview() {
 
         for (const timeMs of entriesByLane[lane]) {
           const delta = timeMs - nowMs
-          if (delta < -HIT_FLASH_MS || delta > LOOKAHEAD_MS) continue
+          if (delta < -HIT_FLASH_MS || delta > BEATMAP_PREVIEW_LOOKAHEAD_MS) continue
           if (delta <= HIT_FLASH_MS && delta > -HIT_FLASH_MS) flashRefs.current[lane] = Math.max(flashUntil, nowMs + HIT_FLASH_MS)
-          const progress = 1 - delta / LOOKAHEAD_MS
+          const progress = 1 - delta / BEATMAP_PREVIEW_LOOKAHEAD_MS
           const y = progress * hitLineY
           ctx.fillStyle = '#F0803C'
           ctx.fillRect(x + laneWidth / 2 - 18, y - 8, 36, 16)

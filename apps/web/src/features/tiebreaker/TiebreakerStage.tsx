@@ -6,6 +6,12 @@ import {
   useState,
 } from 'react'
 
+import {
+  FRACTAL_BASE_BRIGHTNESS,
+  FRACTAL_BASE_SATURATION,
+  FRACTAL_FLASH_COLOR_CORRECT,
+  FRACTAL_FLASH_COLOR_MISS,
+} from '../../constants'
 import type { BeatFractalHandle } from './BeatFractalBackground'
 import { BeatFractalBackground } from './BeatFractalBackground'
 import {
@@ -17,6 +23,8 @@ import styles from './TiebreakerStage.module.scss'
 export interface TiebreakerStageHandle {
   /** Pulses the single shared page background — call on either dancer's hit. */
   pulse: (strength?: number) => void
+  /** Flashes the shared background green ("correct") or red ("miss"). */
+  flash: (kind: 'correct' | 'miss', strength?: number) => void
 }
 
 export interface TiebreakerStageProps {
@@ -39,11 +47,20 @@ export const TiebreakerStage = forwardRef<TiebreakerStageHandle, TiebreakerStage
 
     useImperativeHandle(ref, () => ({
       pulse: (strength = 1.0) => bgRef.current?.pulse(strength),
+      flash: (kind, strength = 1.0) => {
+        const color = kind === 'correct' ? FRACTAL_FLASH_COLOR_CORRECT : FRACTAL_FLASH_COLOR_MISS
+        bgRef.current?.flash(color, strength)
+      },
     }), [])
 
     return (
       <div className={styles.stageRoot}>
-        <BeatFractalBackground ref={bgRef} theme={theme} />
+        <BeatFractalBackground
+          ref={bgRef}
+          theme={theme}
+          baseBrightness={FRACTAL_BASE_BRIGHTNESS}
+          baseSaturation={FRACTAL_BASE_SATURATION}
+        />
         <main className={styles.tiebreakerStage}>
           {roomLabel && <div className={`card-kicker ${styles.kicker}`}>{roomLabel}</div>}
           <h1 className={styles.textTilt}>Tiebreaker!</h1>

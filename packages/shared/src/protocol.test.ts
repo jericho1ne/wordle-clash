@@ -148,10 +148,12 @@ describe('server protocol', () => {
       t: 'danceOffScore',
       scores: { 'user-1': 6, 'user-2': 3 },
     }
+    const hit: ServerMessage = { t: 'danceOffHit', playerId: 'user-1', judgment: 'marvelous' }
     const ended: ServerMessage = { t: 'danceOffEnded', winnerId: 'user-1' }
 
     expect(parseServerMessage(serializeServerMessage(started))).toEqual(started)
     expect(parseServerMessage(serializeServerMessage(score))).toEqual(score)
+    expect(parseServerMessage(serializeServerMessage(hit))).toEqual(hit)
     expect(parseServerMessage(serializeServerMessage(ended))).toEqual(ended)
   })
 })

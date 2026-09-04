@@ -13,25 +13,49 @@ import {
 /** Fixed clip length every dance-off battle runs — same slice of the beatmap for every player. */
 export const DANCE_OFF_CLIP_MS = 20_000
 
-/** Absolute ms distance from a beatmap entry's timeMs within which a hit counts as "perfect". */
-export const DANCE_OFF_PERFECT_WINDOW_MS = 60
+export type DanceTier = 'marvelous' | 'perfect' | 'great' | 'good' | 'boo'
+export type DanceHitJudgment = DanceTier | 'miss'
 
-/** Absolute ms distance within which a hit that missed "perfect" still counts as "good". Beyond this, or unmatched, it's a miss. */
-export const DANCE_OFF_GOOD_WINDOW_MS = 140
+export interface TimingWindow {
+  tier: DanceTier
+  /** How far off (in ms) a hit can be and still count as this tier. */
+  windowMs: number
+  points: number
+}
 
-export type DanceHitJudgment = 'perfect' | 'good' | 'miss'
+/** Named timing tiers, closest to farthest. A hit outside every window is a miss (0 points). */
+export const CORRECT_TIME_WINDOWS: TimingWindow[] = [
+  { tier: 'marvelous', windowMs: 16.7, points: 5 },
+  { tier: 'perfect', windowMs: 33, points: 4 },
+  { tier: 'great', windowMs: 92, points: 3 },
+  { tier: 'good', windowMs: 142, points: 2 },
+  { tier: 'boo', windowMs: 225, points: 1 },
+]
 
 export const DANCE_OFF_POINTS: Record<DanceHitJudgment, number> = {
-  perfect: 3,
-  good: 1,
+  ...Object.fromEntries(CORRECT_TIME_WINDOWS.map(({ tier, points }) => [tier, points])),
   miss: 0,
-}
+} as Record<DanceHitJudgment, number>
+
+/** The widest timing window — how far the code looks for a note to match a hit against at all. */
+export const DANCE_OFF_MAX_WINDOW_MS = CORRECT_TIME_WINDOWS[CORRECT_TIME_WINDOWS.length - 1]!.windowMs
+
+/** Every possible judgment, tiers first then miss. Used to build the protocol's danceOffHit schema. */
+export const DANCE_HIT_JUDGMENTS: [DanceHitJudgment, ...DanceHitJudgment[]] = [
+  'marvelous',
+  'perfect',
+  'great',
+  'good',
+  'boo',
+  'miss',
+]
 
 /** Judges a hit by its distance (ms) from the beatmap entry it was matched against. */
 export function judgeDanceHit(deltaMs: number): DanceHitJudgment {
   const distance = Math.abs(deltaMs)
-  if (distance <= DANCE_OFF_PERFECT_WINDOW_MS) return 'perfect'
-  if (distance <= DANCE_OFF_GOOD_WINDOW_MS) return 'good'
+  for (const window of CORRECT_TIME_WINDOWS) {
+    if (distance <= window.windowMs) return window.tier
+  }
   return 'miss'
 }
 
@@ -43,7 +67,7 @@ export interface DanceHitResult {
 
 /** Judges a hit against the nearest note in `lane`. Pass in only unused notes, so one note can't be hit twice. */
 export function judgeSubmittedHit(entries: BeatmapEntry[], lane: Lane, timeMs: number): DanceHitResult {
-  const nearest = findNearestEntryInLane(entries, lane, timeMs, DANCE_OFF_GOOD_WINDOW_MS)
+  const nearest = findNearestEntryInLane(entries, lane, timeMs, DANCE_OFF_MAX_WINDOW_MS)
   if (!nearest) return { judgment: 'miss', matchedEntry: null }
   return { judgment: judgeDanceHit(nearest.timeMs - timeMs), matchedEntry: nearest }
 }

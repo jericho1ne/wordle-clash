@@ -3,6 +3,7 @@ import { create } from 'zustand'
 import {
   type Beatmap,
   type ClientMessage,
+  type DanceOffHitMessage,
   type ErrorMessage,
   type GameMode,
   type Lane,
@@ -37,6 +38,8 @@ interface RoomStoreState {
   matchStarting: MatchStartingMessage | null
   match: MatchSnapshot | null
   danceOff: DanceOffState | null
+  /** The most recent per-hit judgment broadcast, so a screen can flash on it once. Not cumulative — read via a useEffect keyed on this. */
+  danceOffHit: DanceOffHitMessage | null
   pendingActions: ClientMessage[]
   connect: (roomCode: string) => void
   disconnect: () => void
@@ -179,6 +182,7 @@ export function reduceRoomMessage(
     case 'guessAccepted':
     case 'danceOffStarted':
     case 'danceOffScore':
+    case 'danceOffHit':
     case 'danceOffEnded':
       return state
 
@@ -203,6 +207,7 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
   matchStarting: null,
   match: null,
   danceOff: null,
+  danceOffHit: null,
   pendingActions: [],
 
   connect(roomCode) {
@@ -218,6 +223,7 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       matchStarting: null,
       match: null,
       danceOff: null,
+      danceOffHit: null,
       pendingActions: [],
     })
 
@@ -276,6 +282,7 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       socket.on('danceOffScore', (message) => set((state) => (
         state.danceOff ? { danceOff: { ...state.danceOff, scores: message.scores } } : state
       ))),
+      socket.on('danceOffHit', (message) => set({ danceOffHit: message })),
       socket.on('danceOffEnded', () => undefined),
       socket.on('error', reduce),
       socket.on('terminalError', (error) => set({
@@ -298,6 +305,7 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       matchStarting: null,
       match: null,
       danceOff: null,
+      danceOffHit: null,
       pendingActions: [],
     })
   },

@@ -18,6 +18,11 @@ import {
   useParams,
 } from 'react-router'
 
+import {
+  DANCE_FLOOR_LOOKAHEAD_MS,
+  DANCE_FLOOR_NOTE_TRAIL_MS,
+  HIT_FLASH_MS,
+} from '../../constants'
 import { useRoomStore } from '../../realtime'
 import { Button } from '../../ui'
 import type { TiebreakerStageHandle } from './TiebreakerStage'
@@ -35,7 +40,6 @@ const LANE_KEY_LABEL = Object.fromEntries(
   Object.entries(KEY_TO_LANE).map(([key, lane]) => [lane, key.toUpperCase()]),
 ) as Record<Lane, string>
 const KEY_LEGEND = Object.keys(KEY_TO_LANE).map((key) => key.toUpperCase()).join(' ')
-const LOOKAHEAD_MS = 1800
 
 interface DanceFloorProps {
   name: string
@@ -45,10 +49,9 @@ interface DanceFloorProps {
   startsAt: number
   canPlay: boolean
   onHit: (lane: Lane, clientTimeMs: number) => void
-  pulse: (strength?: number) => void
 }
 
-function DanceFloor({ name, avatarId, score, entries, startsAt, canPlay, onHit, pulse }: DanceFloorProps) {
+function DanceFloor({ name, avatarId, score, entries, startsAt, canPlay, onHit }: DanceFloorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const flashRefs = useRef<Record<Lane, number>>({ down: 0, left: 0, right: 0 })
 
@@ -61,14 +64,13 @@ function DanceFloor({ name, avatarId, score, entries, startsAt, canPlay, onHit, 
       // Sent for a future latency-compensation story; the Room DO judges
       // against its own receipt time today (see docs/stories/09-tiebreaker-battle).
       const clientTimeMs = Date.now() - startsAt
-      flashRefs.current[lane] = clientTimeMs + 120
-      pulse(1.0)
+      flashRefs.current[lane] = clientTimeMs + HIT_FLASH_MS
       onHit(lane, clientTimeMs)
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [canPlay, startsAt, onHit, pulse])
+  }, [canPlay, startsAt, onHit])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -96,8 +98,8 @@ function DanceFloor({ name, avatarId, score, entries, startsAt, canPlay, onHit, 
         for (const entry of entries) {
           if (entry.lane !== lane) continue
           const delta = entry.timeMs - nowMs
-          if (delta < -160 || delta > LOOKAHEAD_MS) continue
-          const progress = 1 - delta / LOOKAHEAD_MS
+          if (delta < -DANCE_FLOOR_NOTE_TRAIL_MS || delta > DANCE_FLOOR_LOOKAHEAD_MS) continue
+          const progress = 1 - delta / DANCE_FLOOR_LOOKAHEAD_MS
           const y = progress * hitLineY
           ctx.fillStyle = '#F0803C'
           ctx.fillRect(x + laneWidth / 2 - 16, y - 7, 32, 14)
@@ -141,6 +143,7 @@ export function TiebreakerRoomScreen() {
   const selfId = useRoomStore(({ selfId }) => selfId)
   const match = useRoomStore(({ match }) => match)
   const danceOff = useRoomStore(({ danceOff }) => danceOff)
+  const danceOffHit = useRoomStore(({ danceOffHit }) => danceOffHit)
   const submitDanceHit = useRoomStore(({ submitDanceHit }) => submitDanceHit)
   const returnToLobby = useRoomStore(({ returnToLobby }) => returnToLobby)
 
@@ -157,13 +160,16 @@ export function TiebreakerRoomScreen() {
     if (!cameFromTiebreak) navigate(`/room/${roomCode}/play`, { replace: true })
   }, [match, navigate, roomCode])
 
+  // The server is the only judge of a hit — this flashes the shared
+  // fractal once it says so, for whichever player it was about.
+  useEffect(() => {
+    if (!danceOffHit) return
+    stageRef.current?.flash(danceOffHit.judgment === 'miss' ? 'miss' : 'correct')
+  }, [danceOffHit])
+
   const handleHit = useCallback((lane: Lane, clientTimeMs: number) => {
     submitDanceHit(lane, clientTimeMs)
   }, [submitDanceHit])
-
-  const pulse = useCallback((strength?: number) => {
-    stageRef.current?.pulse(strength)
-  }, [])
 
   if (!isValidRoomCode(roomCode)) return <Navigate to="/setup" replace />
 
@@ -196,7 +202,6 @@ export function TiebreakerRoomScreen() {
                   startsAt={danceOff.startsAt}
                   canPlay={!battleOver && playerId === selfId}
                   onHit={handleHit}
-                  pulse={pulse}
                 />
               )
             })}

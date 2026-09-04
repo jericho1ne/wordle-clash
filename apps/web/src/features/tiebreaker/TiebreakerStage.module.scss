@@ -27,7 +27,7 @@
     display: inline-block;
     margin-bottom: var(--space-4);
 
-    @include mixins.text-tilt($angle: 4deg);
+    @include mixins.text-tilt($angle: 10deg);
   }
 
   .text-tilt {

@@ -51,9 +51,15 @@
 
 /** Tilts text back in real 3D space, like a sign leaning away from you. Use a smaller $angle for tiny text. */
 
-@mixin text-tilt($angle: 10deg, $depth: 600px) {
+@mixin text-tilt($angle: 10deg, $depth: 80px) {
   transform: perspective($depth) rotateX($angle);
   transform-origin: center bottom;
+  text-shadow:
+    calc(var(--space-1) / 2) calc(var(--space-1) / 2) 0 var(--color-neutral-900),
+    var(--space-1) var(--space-1) 0 var(--color-neutral-900),
+    calc(var(--space-1) + (var(--space-1) / 2)) calc(var(--space-1) + (var(--space-1) / 2)) 0
+      var(--color-neutral-900),
+    var(--space-2) var(--space-2) 0 var(--color-neutral-900);
 }
 
 @mixin stack($gap: var(--space-3)) {

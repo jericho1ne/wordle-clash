@@ -2,6 +2,9 @@
 node_modules/
 .pnpm-store/
 
+/docs/fractal
+NEXT_STEPS.md
+
 # builds
 dist/
 build/

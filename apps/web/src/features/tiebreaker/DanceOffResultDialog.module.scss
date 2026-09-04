@@ -1,0 +1,37 @@
+.scoreboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-block: var(--space-4);
+
+  .names,
+  .scores {
+    display: flex;
+    justify-content: space-around;
+    gap: var(--space-6);
+  }
+
+  .scores {
+    align-items: center;
+  }
+
+  .name {
+    flex: 1;
+    font-size: var(--font-size-300);
+    color: var(--color-neutral-500);
+  }
+
+  .score {
+    flex: 1;
+    font-family: var(--font-heading);
+    font-weight: var(--font-heading-weight);
+    font-size: var(--font-size-1000);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .winner-score {
+    font-size: calc(var(--font-size-1000) * 2.5);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-accent);
+  }
+}

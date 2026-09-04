@@ -1,0 +1,39 @@
+@use '../../styles/mixins' as mixins;
+
+// Shared shell for both Tiebreaker screens — see TiebreakerStage.tsx.
+// No background here on purpose: the single BeatFractalBackground behind
+// this needs to show through, unlike the global .app-stage gradient.
+
+.stage-root {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+}
+
+.tiebreaker-stage {
+  max-width: 720px;
+  width: 100%;
+  text-align: center;
+
+  .word {
+    margin-bottom: var(--space-4);
+    color: var(--color-neutral-200);
+  }
+
+  .kicker {
+    display: inline-block;
+    margin-bottom: var(--space-4);
+
+    @include mixins.text-tilt($angle: 10deg);
+  }
+
+  .text-tilt {
+    display: inline-block;
+    margin-bottom: var(--space-2);
+
+    @include mixins.text-tilt;
+  }
+}

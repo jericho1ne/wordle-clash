@@ -50,6 +50,12 @@ describe('authoritative match', () => {
     expect(createMatchSnapshot(match, players).answer).toBeNull()
   })
 
+  it('reveals the answer once a tie sends the match to tiebreak', () => {
+    const match = createMatch('sync', 'CLASH', players, 1, 1_000)
+    match.phase = 'tiebreak'
+    expect(createMatchSnapshot(match, players).answer).toBe('CLASH')
+  })
+
   it('evaluates correctness against the server-only answer', () => {
     const match = createMatch('realtime', 'CLASH', players, 1, 1_000)
     expect(isCorrectGuess(evaluateForMatch(match, 'CLASH'))).toBe(true)

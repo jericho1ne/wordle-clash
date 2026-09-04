@@ -21,4 +21,16 @@ Real-time mode — Rules
 - If every player exhausts 10 guesses with no winner, the game ends with no winner (or reveals the word, per host setting).
 
 
-NOTE: rules for timed tap/rhythm minigame are forthcoming
+Dance-off (bboy tap/rhythm minigame) — Rules
+
+- Only the players who guessed the word within the tie window battle; every
+  other connected player spectates (sees both dancers' fractals and live
+  scores, no input).
+- The battle runs against a fixed 20-second clip of the real track's
+  generated beat map — the same clip and start offset for every player.
+- Arrow-key hits (Up/Down/Left/Right) are judged against the nearest beat
+  map entry in that lane: within 60ms is "perfect" (3 points), within 140ms
+  is "good" (1 point), otherwise it's a miss (0 points). The server is the
+  sole judge of every hit.
+- Winner = highest score when the clip ends. An exact score tie re-runs one
+  more clip (sudden death) rather than an invented tiebreaker rule.

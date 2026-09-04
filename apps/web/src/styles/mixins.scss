@@ -25,6 +25,43 @@
   }
 }
 
+/** Same colors as `avatar-color`, but see-through (80% strength) instead of solid. */
+
+@mixin avatar-panel-tint {
+  &[data-avatar-id='0'] {
+    background-color: color-mix(in oklch, var(--color-accent-500) 80%, transparent);
+  }
+
+  &[data-avatar-id='1'] {
+    background-color: color-mix(in oklch, var(--color-accent-2-500) 80%, transparent);
+  }
+
+  &[data-avatar-id='2'] {
+    background-color: color-mix(in oklch, var(--color-neutral-500) 80%, transparent);
+  }
+
+  &[data-avatar-id='3'] {
+    background-color: color-mix(in oklch, var(--color-danger-600) 80%, transparent);
+  }
+
+  &[data-avatar-id='4'] {
+    background-color: color-mix(in oklch, var(--color-accent-900) 80%, transparent);
+  }
+}
+
+/** Tilts text back in real 3D space, like a sign leaning away from you. Use a smaller $angle for tiny text. */
+
+@mixin text-tilt($angle: 10deg, $depth: 80px) {
+  transform: perspective($depth) rotateX($angle);
+  transform-origin: center bottom;
+  text-shadow:
+    calc(var(--space-1) / 2) calc(var(--space-1) / 2) 0 var(--color-neutral-900),
+    var(--space-1) var(--space-1) 0 var(--color-neutral-900),
+    calc(var(--space-1) + (var(--space-1) / 2)) calc(var(--space-1) + (var(--space-1) / 2)) 0
+      var(--color-neutral-900),
+    var(--space-2) var(--space-2) 0 var(--color-neutral-900);
+}
+
 @mixin stack($gap: var(--space-3)) {
   display: grid;
   gap: $gap;

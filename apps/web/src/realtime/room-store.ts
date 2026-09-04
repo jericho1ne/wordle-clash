@@ -1,9 +1,12 @@
 import { create } from 'zustand'
 
 import {
+  type Beatmap,
   type ClientMessage,
+  type DanceOffHitMessage,
   type ErrorMessage,
   type GameMode,
+  type Lane,
   type MatchStartingMessage,
   type MatchSnapshot,
   type RoomState,
@@ -12,6 +15,13 @@ import {
 } from '@wordle-clash/shared'
 
 import { RoomSocket } from './room-socket'
+
+export interface DanceOffState {
+  beatmap: Beatmap
+  startsAt: number
+  playerIds: string[]
+  scores: Record<string, number>
+}
 
 export type RoomConnectionStatus =
   | 'idle'
@@ -27,6 +37,9 @@ interface RoomStoreState {
   error: ErrorMessage | Error | null
   matchStarting: MatchStartingMessage | null
   match: MatchSnapshot | null
+  danceOff: DanceOffState | null
+  /** The most recent per-hit judgment broadcast, so a screen can flash on it once. Not cumulative — read via a useEffect keyed on this. */
+  danceOffHit: DanceOffHitMessage | null
   pendingActions: ClientMessage[]
   connect: (roomCode: string) => void
   disconnect: () => void
@@ -36,6 +49,7 @@ interface RoomStoreState {
   setSyncRoundDuration: (minutes: SyncRoundDurationMinutes) => void
   startMatch: () => void
   submitGuess: (guess: string) => void
+  submitDanceHit: (lane: Lane, clientTimeMs: number) => void
   returnToLobby: () => void
   dismissMatchStarting: () => void
 }
@@ -166,6 +180,10 @@ export function reduceRoomMessage(
 
     case 'matchState':
     case 'guessAccepted':
+    case 'danceOffStarted':
+    case 'danceOffScore':
+    case 'danceOffHit':
+    case 'danceOffEnded':
       return state
 
     case 'error':
@@ -188,6 +206,8 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
   error: null,
   matchStarting: null,
   match: null,
+  danceOff: null,
+  danceOffHit: null,
   pendingActions: [],
 
   connect(roomCode) {
@@ -202,6 +222,8 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       error: null,
       matchStarting: null,
       match: null,
+      danceOff: null,
+      danceOffHit: null,
       pendingActions: [],
     })
 
@@ -249,6 +271,19 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
         error: null,
       })),
       socket.on('guessAccepted', () => undefined),
+      socket.on('danceOffStarted', (message) => set({
+        danceOff: {
+          beatmap: message.beatmap,
+          startsAt: message.startsAt,
+          playerIds: message.playerIds,
+          scores: Object.fromEntries(message.playerIds.map((id) => [id, 0])),
+        },
+      })),
+      socket.on('danceOffScore', (message) => set((state) => (
+        state.danceOff ? { danceOff: { ...state.danceOff, scores: message.scores } } : state
+      ))),
+      socket.on('danceOffHit', (message) => set({ danceOffHit: message })),
+      socket.on('danceOffEnded', () => undefined),
       socket.on('error', reduce),
       socket.on('terminalError', (error) => set({
         status: 'terminal',
@@ -269,6 +304,8 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
       error: null,
       matchStarting: null,
       match: null,
+      danceOff: null,
+      danceOffHit: null,
       pendingActions: [],
     })
   },
@@ -315,6 +352,10 @@ export const useRoomStore = create<RoomStoreState>((set, get) => ({
   submitGuess(guess) {
     set({ error: null })
     activeSocket?.send({ t: 'submitGuess', guess })
+  },
+
+  submitDanceHit(lane, clientTimeMs) {
+    activeSocket?.send({ t: 'submitDanceHit', lane, clientTimeMs })
   },
 
   returnToLobby() {

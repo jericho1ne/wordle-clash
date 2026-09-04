@@ -6,6 +6,7 @@ export { DialogBox } from './DialogBox'
 export { Field } from './Field'
 export { IconButton } from './IconButton'
 export { Input } from './Input'
+export { PlaybackSpeedSlider } from './PlaybackSpeedSlider'
 export { RadioGroup } from './RadioGroup'
 export { SegmentedControl } from './SegmentedControl'
 export { Tag } from './Tag'
@@ -24,6 +25,7 @@ export type { DialogBoxProps } from './DialogBox'
 export type { FieldProps } from './Field'
 export type { IconButtonProps } from './IconButton'
 export type { InputProps } from './Input'
+export type { PlaybackSpeedSliderProps } from './PlaybackSpeedSlider'
 export type {
   RadioGroupProps,
   RadioOption,

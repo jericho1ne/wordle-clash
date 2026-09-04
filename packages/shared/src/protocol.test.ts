@@ -24,6 +24,7 @@ const CLIENT_MESSAGES: ClientMessage[] = [
   { t: 'submitGuess', guess: 'CLASH' },
   { t: 'leave' },
   { t: 'ping' },
+  { t: 'submitDanceHit', lane: 'left', clientTimeMs: 1234 },
 ]
 
 const ROOM_STATE_MESSAGE: ServerMessage = {
@@ -130,6 +131,30 @@ describe('server protocol', () => {
     }
 
     expect(parseServerMessage(serializeServerMessage(message))).toEqual(message)
+  })
+
+  it('round-trips a dance-off start, score, and end', () => {
+    const started: ServerMessage = {
+      t: 'danceOffStarted',
+      beatmap: {
+        trackPath: 'audio/canto-de-ossanha.mp3',
+        durationMs: 20_000,
+        entries: [{ timeMs: 500, lane: 'left' }],
+      },
+      startsAt: 1_000,
+      playerIds: ['user-1', 'user-2'],
+    }
+    const score: ServerMessage = {
+      t: 'danceOffScore',
+      scores: { 'user-1': 6, 'user-2': 3 },
+    }
+    const hit: ServerMessage = { t: 'danceOffHit', playerId: 'user-1', judgment: 'marvelous' }
+    const ended: ServerMessage = { t: 'danceOffEnded', winnerId: 'user-1' }
+
+    expect(parseServerMessage(serializeServerMessage(started))).toEqual(started)
+    expect(parseServerMessage(serializeServerMessage(score))).toEqual(score)
+    expect(parseServerMessage(serializeServerMessage(hit))).toEqual(hit)
+    expect(parseServerMessage(serializeServerMessage(ended))).toEqual(ended)
   })
 })
 

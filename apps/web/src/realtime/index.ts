@@ -12,4 +12,7 @@ export type {
   RoomSocketEventType,
   RoomSocketListener,
 } from './room-socket'
-export type { RoomConnectionStatus } from './room-store'
+export type {
+  DanceOffState,
+  RoomConnectionStatus,
+} from './room-store'

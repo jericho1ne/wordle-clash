@@ -9,6 +9,7 @@ import {
 import {
   FRACTAL_BASE_BRIGHTNESS,
   FRACTAL_BASE_SATURATION,
+  FRACTAL_FLASH_BRIGHTNESS,
   FRACTAL_FLASH_COLOR_CORRECT,
   FRACTAL_FLASH_COLOR_MISS,
 } from '../../constants'
@@ -48,7 +49,12 @@ export const TiebreakerStage = forwardRef<TiebreakerStageHandle, TiebreakerStage
     useImperativeHandle(ref, () => ({
       pulse: (strength = 1.0) => bgRef.current?.pulse(strength),
       flash: (kind, strength = 1.0) => {
-        const color = kind === 'correct' ? FRACTAL_FLASH_COLOR_CORRECT : FRACTAL_FLASH_COLOR_MISS
+        const [r, g, b] = kind === 'correct' ? FRACTAL_FLASH_COLOR_CORRECT : FRACTAL_FLASH_COLOR_MISS
+        const color: [number, number, number] = [
+          r * FRACTAL_FLASH_BRIGHTNESS,
+          g * FRACTAL_FLASH_BRIGHTNESS,
+          b * FRACTAL_FLASH_BRIGHTNESS,
+        ]
         bgRef.current?.flash(color, strength)
       },
     }), [])

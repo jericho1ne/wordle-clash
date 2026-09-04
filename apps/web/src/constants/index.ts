@@ -6,11 +6,14 @@ export const DEFAULT_PLAYBACK_RATE = 0.8
 // (CORRECT_TIME_WINDOWS) since the server needs them too. Everything below
 // is purely how the dance-off looks and feels in the browser.
 
-/** Fractal tint when a hit lands in any scoring tier. */
+/** Fractal tint (hue only) when a hit lands in any scoring tier. Adjust FRACTAL_FLASH_BRIGHTNESS to dim/brighten, not these values. */
 export const FRACTAL_FLASH_COLOR_CORRECT: [number, number, number] = [0.3, 1.0, 0.4]
 
-/** Fractal tint when a hit misses every tier. */
+/** Fractal tint (hue only) when a hit misses every tier. Adjust FRACTAL_FLASH_BRIGHTNESS to dim/brighten, not these values. */
 export const FRACTAL_FLASH_COLOR_MISS: [number, number, number] = [1.0, 0.25, 0.25]
+
+/** How bright the flash colors above are, independent of their hue. 1 = as defined, 0.5 = half as bright, 2 = twice as bright. */
+export const FRACTAL_FLASH_BRIGHTNESS = 1.0
 
 /** How dim the fractal sits at rest (before any beat/flash brightens it). Lower = darker. */
 export const FRACTAL_BASE_BRIGHTNESS = 0.5

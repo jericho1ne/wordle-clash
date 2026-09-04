@@ -25,6 +25,7 @@ import {
   DANCE_FLOOR_LOOKAHEAD_MS,
   DEFAULT_MOCK_WORD,
   DEFAULT_PLAYBACK_RATE,
+  FALLING_NOTE_COLOR,
   FRACTAL_SPIN_MULTIPLIER_PLAYING,
   HIT_FLASH_MS,
   KEYSTROKE_WINDOW,
@@ -220,7 +221,8 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, flash 
           const progress = 1 - delta / DANCE_FLOOR_LOOKAHEAD_MS
           const y = progress * hitLineY
           if (y > canvas.height) continue
-          ctx.fillStyle = `rgba(240, 128, 60, ${noteOpacity(y, hitLineY, canvas.height)})`
+          const [noteR, noteG, noteB] = FALLING_NOTE_COLOR
+          ctx.fillStyle = `rgba(${noteR}, ${noteG}, ${noteB}, ${noteOpacity(y, hitLineY, canvas.height)})`
           ctx.fillRect(x + laneWidth / 2 - 16, y - 7, 32, 14)
         }
       })

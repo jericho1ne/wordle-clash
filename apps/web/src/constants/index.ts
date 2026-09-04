@@ -30,6 +30,9 @@ export const FRACTAL_SIZE_INCREASE = 0.15
 /** How much faster the fractal spins while a dance-off is actively playing, vs. its idle default. Multiplied by the chosen playback speed. */
 export const FRACTAL_SPIN_MULTIPLIER_PLAYING = 6
 
+/** Color of every falling note on the dance-off canvases, as canvas-style [r, g, b] (0-255). Opacity is controlled separately via NOTE_FADE_*. */
+export const FALLING_NOTE_COLOR: [number, number, number] = [250, 250, 250]
+
 /** How far ahead (ms) upcoming notes become visible on the real gameplay canvases. */
 export const DANCE_FLOOR_LOOKAHEAD_MS = 1800
 

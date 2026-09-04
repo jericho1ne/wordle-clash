@@ -20,6 +20,7 @@ import {
 
 import {
   DANCE_FLOOR_LOOKAHEAD_MS,
+  FALLING_NOTE_COLOR,
   FRACTAL_SPIN_MULTIPLIER_PLAYING,
   HIT_FLASH_MS,
   KEYSTROKE_WINDOW,
@@ -122,7 +123,8 @@ function DanceFloor({ name, avatarId, score, entries, startsAt, canPlay, onHit }
           const progress = 1 - delta / DANCE_FLOOR_LOOKAHEAD_MS
           const y = progress * hitLineY
           if (y > canvas.height) continue
-          ctx.fillStyle = `rgba(240, 128, 60, ${noteOpacity(y, hitLineY, canvas.height)})`
+          const [noteR, noteG, noteB] = FALLING_NOTE_COLOR
+          ctx.fillStyle = `rgba(${noteR}, ${noteG}, ${noteB}, ${noteOpacity(y, hitLineY, canvas.height)})`
           ctx.fillRect(x + laneWidth / 2 - 16, y - 7, 32, 14)
         }
       })

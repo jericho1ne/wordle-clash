@@ -429,11 +429,23 @@ export class BeatFractalEngine {
     if (this.rafId !== null) cancelAnimationFrame(this.rafId)
   }
 
-  /** Call on unmount. Doesn't force-close the WebGL context — that broke React's dev mode. The browser cleans it up on its own. */
+  /** Call on unmount. Stops everything, but doesn't touch the WebGL context — see releaseContext(). */
   destroy() {
     this.stop()
     this.stopBPM()
     if (this.audioCtx) this.audioCtx.close().catch(() => {})
+  }
+
+  /**
+   * Frees the WebGL context so the browser can reuse the slot (browsers only
+   * allow so many at once — reusing a canvas without this eventually breaks
+   * every fractal on the page). Call this only once you're sure nothing else
+   * is about to reuse the same canvas — see useBeatFractal.ts for why that
+   * check has to happen a tick later, not right here in destroy().
+   */
+  releaseContext() {
+    const ext = this.gl.getExtension('WEBGL_lose_context')
+    if (ext) ext.loseContext()
   }
 
   private tick(dtMs: number, now: number) {

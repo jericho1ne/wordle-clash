@@ -29,7 +29,15 @@ export function useBeatFractal(options: BeatFractalOptions = {}) {
     engine.start()
     return () => {
       engine.destroy()
-      engineRef.current = null
+      // Wait a tick before freeing the WebGL context: React's dev-mode
+      // double-mount would already have made a new engine on this same
+      // canvas by then. If engineRef still points at this one, nothing
+      // took over, so it's safe to actually free the context.
+      window.setTimeout(() => {
+        if (engineRef.current !== engine) return
+        engine.releaseContext()
+        engineRef.current = null
+      }, 0)
     }
     // engine is created once; use engineRef.current.setTheme() etc. to change it later
     // eslint-disable-next-line react-hooks/exhaustive-deps

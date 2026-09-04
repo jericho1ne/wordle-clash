@@ -33,5 +33,14 @@ export const BEATMAP_PREVIEW_LOOKAHEAD_MS = 2200
 /** How long (ms) past the hit line a note keeps rendering on the real gameplay canvases before it's dropped. */
 export const DANCE_FLOOR_NOTE_TRAIL_MS = 160
 
+/** Pixel height of the white hit-line box at the bottom of each lane, on the real gameplay canvases. */
+export const KEYSTROKE_WINDOW = 45
+
+/** Line width (px) of the hit-line box's outline, at rest (not flashing). */
+export const KEYSTROKE_WINDOW_OUTLINE = 2
+
+/** Opacity (0-1) of the hit-line box's outline, at rest (not flashing). */
+export const KEYSTROKE_WINDOW_OPACITY = 0.25
+
 /** The playground's mock tied word when no `?word=` is given, matching this repo's usual deterministic test answer. */
 export const DEFAULT_MOCK_WORD = 'CLASH'

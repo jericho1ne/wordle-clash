@@ -22,6 +22,9 @@ import {
   DANCE_FLOOR_LOOKAHEAD_MS,
   DANCE_FLOOR_NOTE_TRAIL_MS,
   HIT_FLASH_MS,
+  KEYSTROKE_WINDOW,
+  KEYSTROKE_WINDOW_OPACITY,
+  KEYSTROKE_WINDOW_OUTLINE,
 } from '../../constants'
 import { useRoomStore } from '../../realtime'
 import { Button } from '../../ui'
@@ -80,7 +83,8 @@ function DanceFloor({ name, avatarId, score, entries, startsAt, canPlay, onHit }
 
     let rafId: number
     const laneWidth = canvas.width / LANES.length
-    const hitLineY = canvas.height - 32
+    // 30% up from the bottom edge, so the (taller) hit-line box stays fully on screen.
+    const hitLineY = canvas.height * 0.7
 
     const draw = () => {
       const nowMs = Date.now() - startsAt
@@ -91,9 +95,9 @@ function DanceFloor({ name, avatarId, score, entries, startsAt, canPlay, onHit }
         const flashing = nowMs < flashRefs.current[lane]
         ctx.fillStyle = flashing ? 'rgba(132, 220, 198, 0.35)' : 'rgba(255, 255, 255, 0.04)'
         ctx.fillRect(x, 0, laneWidth - 3, canvas.height)
-        ctx.strokeStyle = flashing ? '#84DCC6' : 'rgba(255, 255, 255, 0.25)'
-        ctx.lineWidth = flashing ? 3 : 2
-        ctx.strokeRect(x + 1, hitLineY, laneWidth - 5, 5)
+        ctx.strokeStyle = flashing ? '#84DCC6' : `rgba(255, 255, 255, ${KEYSTROKE_WINDOW_OPACITY})`
+        ctx.lineWidth = flashing ? 3 : KEYSTROKE_WINDOW_OUTLINE
+        ctx.strokeRect(x + 1, hitLineY, laneWidth - 5, KEYSTROKE_WINDOW)
 
         for (const entry of entries) {
           if (entry.lane !== lane) continue

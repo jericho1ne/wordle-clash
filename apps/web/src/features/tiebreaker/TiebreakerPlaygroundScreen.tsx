@@ -26,6 +26,9 @@ import {
   DEFAULT_MOCK_WORD,
   DEFAULT_PLAYBACK_RATE,
   HIT_FLASH_MS,
+  KEYSTROKE_WINDOW,
+  KEYSTROKE_WINDOW_OPACITY,
+  KEYSTROKE_WINDOW_OUTLINE,
 } from '../../constants'
 import {
   Button,
@@ -175,7 +178,8 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, flash 
 
     let rafId: number
     const laneWidth = canvas.width / LANES.length
-    const hitLineY = canvas.height - 32
+    // 30% up from the bottom edge, so the (taller) hit-line box stays fully on screen.
+    const hitLineY = canvas.height * 0.7
 
     const draw = () => {
       const nowMs = clockMs()
@@ -186,9 +190,9 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, flash 
         const flashing = nowMs < flashRefs.current[lane]
         ctx.fillStyle = flashing ? 'rgba(132, 220, 198, 0.35)' : 'rgba(255, 255, 255, 0.04)'
         ctx.fillRect(x, 0, laneWidth - 3, canvas.height)
-        ctx.strokeStyle = flashing ? '#84DCC6' : 'rgba(255, 255, 255, 0.25)'
-        ctx.lineWidth = flashing ? 3 : 2
-        ctx.strokeRect(x + 1, hitLineY, laneWidth - 5, 5)
+        ctx.strokeStyle = flashing ? '#84DCC6' : `rgba(255, 255, 255, ${KEYSTROKE_WINDOW_OPACITY})`
+        ctx.lineWidth = flashing ? 3 : KEYSTROKE_WINDOW_OUTLINE
+        ctx.strokeRect(x + 1, hitLineY, laneWidth - 5, KEYSTROKE_WINDOW)
 
         for (const entry of liveEntriesRef.current) {
           if (entry.lane !== lane || entry.consumed) continue

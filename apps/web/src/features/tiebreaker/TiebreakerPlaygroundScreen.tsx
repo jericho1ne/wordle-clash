@@ -25,6 +25,7 @@ import {
   DANCE_FLOOR_LOOKAHEAD_MS,
   DEFAULT_MOCK_WORD,
   DEFAULT_PLAYBACK_RATE,
+  FRACTAL_SPIN_MULTIPLIER_PLAYING,
   HIT_FLASH_MS,
   KEYSTROKE_WINDOW,
   KEYSTROKE_WINDOW_OPACITY,
@@ -306,9 +307,11 @@ export function TiebreakerPlaygroundScreen() {
     setPhase('running')
     if (audioRef.current) audioRef.current.playbackRate = playbackRate
     audioRef.current?.play().catch(() => {})
+    stageRef.current?.setSpinSpeed(FRACTAL_SPIN_MULTIPLIER_PLAYING * playbackRate)
     window.setTimeout(() => {
       setPhase('ended')
       audioRef.current?.pause()
+      stageRef.current?.setSpinSpeed(1)
     }, DANCE_OFF_CLIP_MS / playbackRate)
   }
 

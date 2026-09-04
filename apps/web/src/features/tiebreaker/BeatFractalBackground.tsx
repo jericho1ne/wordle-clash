@@ -16,6 +16,7 @@ export interface BeatFractalBackgroundProps {
   theme?: ThemeName
   baseBrightness?: number
   baseSaturation?: number
+  sizeIncrease?: number
   className?: string
   style?: CSSProperties
 }
@@ -27,6 +28,7 @@ export interface BeatFractalHandle {
   stopBPM: () => void
   setTheme: (theme: ThemeName) => void
   setJulia: (on: boolean) => void
+  setRotationSpeedMultiplier: (multiplier: number) => void
   retarget: () => void
   connectAudio: (audioEl: HTMLAudioElement) => Promise<void> | void
 }
@@ -44,8 +46,8 @@ export interface BeatFractalHandle {
  * beatFractalStore.ts).
  */
 export const BeatFractalBackground = forwardRef<BeatFractalHandle, BeatFractalBackgroundProps>(
-  ({ theme = 'neonArcade', baseBrightness, baseSaturation, className, style }, ref) => {
-    const { canvasRef, engineRef } = useBeatFractal({ theme, baseBrightness, baseSaturation })
+  ({ theme = 'neonArcade', baseBrightness, baseSaturation, sizeIncrease, className, style }, ref) => {
+    const { canvasRef, engineRef } = useBeatFractal({ theme, baseBrightness, baseSaturation, sizeIncrease })
     useBeatFractalTheme(engineRef, theme)
 
     useImperativeHandle(ref, () => ({
@@ -55,6 +57,7 @@ export const BeatFractalBackground = forwardRef<BeatFractalHandle, BeatFractalBa
       stopBPM: () => engineRef.current?.stopBPM(),
       setTheme: (t: ThemeName) => engineRef.current?.setTheme(t),
       setJulia: (on: boolean) => engineRef.current?.setJulia(on),
+      setRotationSpeedMultiplier: (multiplier: number) => engineRef.current?.setRotationSpeedMultiplier(multiplier),
       retarget: () => engineRef.current?.retarget(),
       connectAudio: (audioEl: HTMLAudioElement) => engineRef.current?.connectAudio(audioEl),
     }), [engineRef])

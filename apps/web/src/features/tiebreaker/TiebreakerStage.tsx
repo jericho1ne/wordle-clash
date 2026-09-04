@@ -12,6 +12,7 @@ import {
   FRACTAL_FLASH_BRIGHTNESS,
   FRACTAL_FLASH_COLOR_CORRECT,
   FRACTAL_FLASH_COLOR_MISS,
+  FRACTAL_SIZE_INCREASE,
 } from '../../constants'
 import type { BeatFractalHandle } from './BeatFractalBackground'
 import { BeatFractalBackground } from './BeatFractalBackground'
@@ -26,6 +27,8 @@ export interface TiebreakerStageHandle {
   pulse: (strength?: number) => void
   /** Flashes the shared background green ("correct") or red ("miss"). */
   flash: (kind: 'correct' | 'miss', strength?: number) => void
+  /** Scales how fast the background spins — call with a higher number while music is playing. */
+  setSpinSpeed: (multiplier: number) => void
 }
 
 export interface TiebreakerStageProps {
@@ -56,7 +59,10 @@ export const TiebreakerStage = forwardRef<TiebreakerStageHandle, TiebreakerStage
           b * FRACTAL_FLASH_BRIGHTNESS,
         ]
         bgRef.current?.flash(color, strength)
+        // A correct hit also makes the fractal appear to zoom in for a moment.
+        if (kind === 'correct') bgRef.current?.pulse(strength)
       },
+      setSpinSpeed: (multiplier: number) => bgRef.current?.setRotationSpeedMultiplier(multiplier),
     }), [])
 
     return (
@@ -66,6 +72,7 @@ export const TiebreakerStage = forwardRef<TiebreakerStageHandle, TiebreakerStage
           theme={theme}
           baseBrightness={FRACTAL_BASE_BRIGHTNESS}
           baseSaturation={FRACTAL_BASE_SATURATION}
+          sizeIncrease={FRACTAL_SIZE_INCREASE}
         />
         <main className={styles.tiebreakerStage}>
           {roomLabel && <div className={`card-kicker ${styles.kicker}`}>{roomLabel}</div>}

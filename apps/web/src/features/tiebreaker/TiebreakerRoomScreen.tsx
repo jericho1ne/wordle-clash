@@ -20,6 +20,7 @@ import {
 
 import {
   DANCE_FLOOR_LOOKAHEAD_MS,
+  FRACTAL_SPIN_MULTIPLIER_PLAYING,
   HIT_FLASH_MS,
   KEYSTROKE_WINDOW,
   KEYSTROKE_WINDOW_OPACITY,
@@ -186,6 +187,11 @@ export function TiebreakerRoomScreen() {
     if (!danceOffHit) return
     stageRef.current?.flash(danceOffHit.judgment === 'miss' ? 'miss' : 'correct')
   }, [danceOffHit])
+
+  // Spin faster while the music/dance-off is actually playing.
+  useEffect(() => {
+    stageRef.current?.setSpinSpeed(danceOff && match?.phase !== 'finished' ? FRACTAL_SPIN_MULTIPLIER_PLAYING : 1)
+  }, [danceOff, match?.phase])
 
   const handleHit = useCallback((lane: Lane, clientTimeMs: number) => {
     submitDanceHit(lane, clientTimeMs)

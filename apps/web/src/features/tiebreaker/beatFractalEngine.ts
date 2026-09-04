@@ -24,6 +24,8 @@ export interface BeatFractalOptions {
   baseBrightness?: number
   /** How colorful the fractal sits at rest. 1 = full color, 0 = grayscale. */
   baseSaturation?: number
+  /** How much the fractal appears to zoom in per unit of beat energy (e.g. on a correct hit). */
+  sizeIncrease?: number
 }
 
 export const THEMES: Record<ThemeName, Theme> = {
@@ -99,6 +101,7 @@ const FRAGMENT_SRC = `
   uniform vec3  u_colD;
   uniform float u_baseBrightness;
   uniform float u_baseSaturation;
+  uniform float u_sizeIncrease;
   uniform vec3  u_flashColor;
   uniform float u_flashEnergy;
 
@@ -115,7 +118,7 @@ const FRAGMENT_SRC = `
     float sa = sin(u_rotation);
     uv = mat2(ca, -sa, sa, ca) * uv;
 
-    float zoomPulse = 1.0 + u_beat * 0.15;
+    float zoomPulse = 1.0 + u_beat * u_sizeIncrease;
     vec2 c = u_center + uv * (u_zoom / zoomPulse);
 
     vec2 z;
@@ -159,7 +162,7 @@ const FRAGMENT_SRC = `
 type UniformName =
   | 'u_resolution' | 'u_center' | 'u_zoom' | 'u_time' | 'u_beat' | 'u_rotation'
   | 'u_juliaMix' | 'u_juliaC' | 'u_maxIter' | 'u_colA' | 'u_colB' | 'u_colC' | 'u_colD'
-  | 'u_baseBrightness' | 'u_baseSaturation' | 'u_flashColor' | 'u_flashEnergy'
+  | 'u_baseBrightness' | 'u_baseSaturation' | 'u_sizeIncrease' | 'u_flashColor' | 'u_flashEnergy'
 
 export class BeatFractalEngine {
   // Public (not private) so callers can tell whether two engine instances
@@ -180,6 +183,7 @@ export class BeatFractalEngine {
   private beatDecay: number
   private baseBrightness: number
   private baseSaturation: number
+  private sizeIncrease: number
   private flashColor: [number, number, number] = [0, 0, 0]
   private flashEnergy = 0
 
@@ -189,6 +193,7 @@ export class BeatFractalEngine {
   private baseZoom: number
   private rotation = 0
   private rotationSpeed: number
+  private rotationSpeedMultiplier = 1
   julia: boolean
   juliaC: { x: number, y: number }
 
@@ -225,6 +230,7 @@ export class BeatFractalEngine {
     this.rotationSpeed = opts.rotationSpeed ?? 0.015
     this.baseBrightness = opts.baseBrightness ?? 0.85
     this.baseSaturation = opts.baseSaturation ?? 1.0
+    this.sizeIncrease = opts.sizeIncrease ?? 0.15
 
     this.center = { ...this.theme.center }
     this.targetCenter = { ...this.theme.center }
@@ -304,6 +310,7 @@ export class BeatFractalEngine {
       'u_colD',
       'u_baseBrightness',
       'u_baseSaturation',
+      'u_sizeIncrease',
       'u_flashColor',
       'u_flashEnergy',
     ]
@@ -412,6 +419,9 @@ export class BeatFractalEngine {
 
   setJulia(on: boolean) { this.julia = on }
 
+  /** Scales the idle spin speed — e.g. pass a higher number while music is playing. */
+  setRotationSpeedMultiplier(multiplier: number) { this.rotationSpeedMultiplier = multiplier }
+
   start() {
     if (this.running) return
     this.running = true
@@ -458,7 +468,7 @@ export class BeatFractalEngine {
     // Faster, flat decay than beatEnergy — a flash should read as a quick blip, not a lingering glow.
     this.flashEnergy = Math.max(0, this.flashEnergy - 3.0 * dt)
 
-    this.rotation += this.rotationSpeed * dt
+    this.rotation += this.rotationSpeed * this.rotationSpeedMultiplier * dt
 
     if (this.retargetDur > 0) {
       this.retargetT += dtMs
@@ -501,6 +511,7 @@ export class BeatFractalEngine {
     gl.uniform3fv(this.uniforms.u_colB, t.colB)
     gl.uniform3fv(this.uniforms.u_colC, t.colC)
     gl.uniform3fv(this.uniforms.u_colD, t.colD)
+    gl.uniform1f(this.uniforms.u_sizeIncrease, this.sizeIncrease)
     gl.uniform1f(this.uniforms.u_baseBrightness, this.baseBrightness)
     gl.uniform1f(this.uniforms.u_baseSaturation, this.baseSaturation)
     gl.uniform3fv(this.uniforms.u_flashColor, this.flashColor)

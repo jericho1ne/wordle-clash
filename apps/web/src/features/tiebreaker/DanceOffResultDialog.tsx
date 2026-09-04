@@ -30,6 +30,8 @@ export function DanceOffResultDialog({ open, onOpenChange, left, right, winnerSi
       onOpenChange={onOpenChange}
       title={winner ? `${winner.name} Wins!` : 'It\'s a tie!'}
       actions={actions}
+      alignment="center"
+      widthPercent={40}
     >
       <div className={styles.scoreboard}>
         <div className={styles.names}>

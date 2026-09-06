@@ -49,6 +49,42 @@
   }
 }
 
+/** Room-assigned board colors; unlike avatar colors, these are unique within a room. */
+
+@mixin player-board-tint {
+  &[data-player-color-id='0'] {
+    background-color: color-mix(in oklch, var(--color-player-0) var(--player-board-opacity), transparent);
+  }
+
+  &[data-player-color-id='1'] {
+    background-color: color-mix(in oklch, var(--color-player-1) var(--player-board-opacity), transparent);
+  }
+
+  &[data-player-color-id='2'] {
+    background-color: color-mix(in oklch, var(--color-player-2) var(--player-board-opacity), transparent);
+  }
+
+  &[data-player-color-id='3'] {
+    background-color: color-mix(in oklch, var(--color-player-3) var(--player-board-opacity), transparent);
+  }
+
+  &[data-player-color-id='4'] {
+    background-color: color-mix(in oklch, var(--color-player-4) var(--player-board-opacity), transparent);
+  }
+
+  &[data-player-color-id='5'] {
+    background-color: color-mix(in oklch, var(--color-player-5) var(--player-board-opacity), transparent);
+  }
+
+  &[data-player-color-id='6'] {
+    background-color: color-mix(in oklch, var(--color-player-6) var(--player-board-opacity), transparent);
+  }
+
+  &[data-player-color-id='7'] {
+    background-color: color-mix(in oklch, var(--color-player-7) var(--player-board-opacity), transparent);
+  }
+}
+
 /** Tilts text back in real 3D space, like a sign leaning away from you. Use a smaller $angle for tiny text. */
 
 @mixin text-tilt($angle: 10deg, $depth: 80px) {

@@ -15,6 +15,7 @@ const SELF: Player = {
   id: 'self',
   name: 'Ember',
   avatarId: 0,
+  playerColorId: 0,
   animalId: 0,
   isHost: true,
   ready: false,
@@ -57,6 +58,7 @@ describe('reduceRoomMessage', () => {
       ...SELF,
       id: 'guest',
       name: 'Cinder',
+      playerColorId: 1,
       isHost: false,
       joinedAt: 2,
     }
@@ -102,6 +104,7 @@ describe('reduceRoomMessage', () => {
       ...SELF,
       id: 'guest',
       name: 'Cinder',
+      playerColorId: 1,
       isHost: false,
       joinedAt: 2,
     }

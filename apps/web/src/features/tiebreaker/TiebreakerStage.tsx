@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import {
   forwardRef,
+  useCallback,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -47,11 +49,31 @@ function randomTheme(): ThemeName {
 export const TiebreakerStage = forwardRef<TiebreakerStageHandle, TiebreakerStageProps>(
   ({ roomLabel, word, children }, ref) => {
     const bgRef = useRef<BeatFractalHandle | null>(null)
+    const lightRef = useRef<HTMLDivElement | null>(null)
+    const lightAnimationRef = useRef<Animation | null>(null)
     const [theme] = useState(randomTheme)
+    const [isWebglUnavailable, setIsWebglUnavailable] = useState(false)
+
+    useEffect(() => () => lightAnimationRef.current?.cancel(), [])
+
+    const illuminate = useCallback((kind: 'correct' | 'miss', strength: number) => {
+      const light = lightRef.current
+      if (!light || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+      light.dataset.kind = kind
+      lightAnimationRef.current?.cancel()
+      lightAnimationRef.current = light.animate(
+        [{ opacity: Math.min(0.3, Math.max(0, strength) * 0.2) }, { opacity: 0 }],
+        { duration: 650, easing: 'ease-out' },
+      )
+    }, [])
 
     useImperativeHandle(ref, () => ({
-      pulse: (strength = 1.0) => bgRef.current?.pulse(strength),
+      pulse: (strength = 1.0) => {
+        bgRef.current?.pulse(strength)
+        illuminate('correct', strength)
+      },
       flash: (kind, strength = 1.0) => {
+        illuminate(kind, strength)
         const [r, g, b] = kind === 'correct' ? FRACTAL_FLASH_COLOR_CORRECT : FRACTAL_FLASH_COLOR_MISS
         const color: [number, number, number] = [
           r * FRACTAL_FLASH_BRIGHTNESS,
@@ -63,23 +85,30 @@ export const TiebreakerStage = forwardRef<TiebreakerStageHandle, TiebreakerStage
         if (kind === 'correct') bgRef.current?.pulse(strength)
       },
       setSpinSpeed: (multiplier: number) => bgRef.current?.setRotationSpeedMultiplier(multiplier),
-    }), [])
+    }), [illuminate])
 
     return (
-      <div className={styles.stageRoot}>
+      <div className={`${styles.tiebreakerStage} ${isWebglUnavailable ? styles.webglUnavailable : ''}`}>
         <BeatFractalBackground
           ref={bgRef}
           theme={theme}
           baseBrightness={FRACTAL_BASE_BRIGHTNESS}
           baseSaturation={FRACTAL_BASE_SATURATION}
           sizeIncrease={FRACTAL_SIZE_INCREASE}
+          onUnavailable={() => setIsWebglUnavailable(true)}
         />
-        <main className={styles.tiebreakerStage}>
+        <main className={styles.plane}>
+          <div ref={lightRef} className={styles.beatLight} aria-hidden="true" />
           {roomLabel && <div className={`card-kicker ${styles.kicker}`}>{roomLabel}</div>}
           <h1 className={styles.textTilt}>Tiebreaker!</h1>
           {word && (
             <p className={styles.word}>
               Tied on <strong className={styles.textTilt}>{word}</strong>
+            </p>
+          )}
+          {isWebglUnavailable && (
+            <p className={`card ${styles.webglNotice}`} role="status">
+              Animated background unavailable. Enable browser hardware acceleration to restore it.
             </p>
           )}
           {children}

@@ -41,6 +41,14 @@ describe('authoritative dance-off', () => {
     // Same instant, same lane — the note is already consumed, so this is a miss, not a double perfect.
     const secondJudgment = judgeAndScoreHit(danceOff, 'a', firstEntry.lane, firstEntry.timeMs)
     expect(secondJudgment).toBe('miss')
+    expect(danceOff.scores.a).toBe(4)
+  })
+
+  it('deducts a point for an off-target hit', () => {
+    const danceOff = createDanceOff(['a'], 0)
+
+    expect(judgeAndScoreHit(danceOff, 'a', 'left', -1_000)).toBe('miss')
+    expect(danceOff.scores.a).toBe(-1)
   })
 
   it('declares the higher score the winner', () => {

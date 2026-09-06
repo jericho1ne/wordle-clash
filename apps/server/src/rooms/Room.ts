@@ -68,6 +68,7 @@ const LIFECYCLE_STORAGE_KEY = 'lifecycle'
 const DISCONNECT_GRACE_MS = 30_000
 const HEARTBEAT_TIMEOUT_MS = 90_000
 const RESERVATION_TTL_MS = 2 * 60_000
+const DANCE_OFF_MIN_HIT_INTERVAL_MS = 30
 
 interface RoomLifecycle {
   disconnectDeadlines: Record<string, number>
@@ -119,6 +120,7 @@ export class Room extends Server<Env> {
   match: AuthoritativeMatch | null = null
   danceOff: AuthoritativeDanceOff | null = null
   #mutations = new MutationQueue()
+  #lastDanceHitAtByPlayer = new Map<string, number>()
 
   override async onStart(): Promise<void> {
     const [storedState, storedLifecycle, storedMatch, storedDanceOff] = await Promise.all([
@@ -689,7 +691,14 @@ export class Room extends Server<Env> {
       return
     }
 
-    const serverTimeMs = Date.now() - this.danceOff.startedAt
+    const receivedAt = Date.now()
+    const lastHitAt = this.#lastDanceHitAtByPlayer.get(userId)
+    // Keyboard repeat is suppressed client-side, but a client can still send
+    // raw WebSocket frames. Ignore bursts without adding extra penalties.
+    if (lastHitAt !== undefined && receivedAt - lastHitAt < DANCE_OFF_MIN_HIT_INTERVAL_MS) return
+    this.#lastDanceHitAtByPlayer.set(userId, receivedAt)
+
+    const serverTimeMs = receivedAt - this.danceOff.startedAt
     const judgment = judgeAndScoreHit(this.danceOff, userId, lane, serverTimeMs)
 
     await this.#save()
@@ -780,6 +789,7 @@ export class Room extends Server<Env> {
       id: identity.userId,
       name: identity.name,
       avatarId: identity.avatarId,
+      playerColorId: this.#nextPlayerColorId(),
       animalId: identity.animalId,
       isHost,
       ready: false,
@@ -790,6 +800,14 @@ export class Room extends Server<Env> {
     state.players.push(player)
     if (isHost) applyHost(state, player.id)
     return player
+  }
+
+  #nextPlayerColorId(): number {
+    const assigned = new Set(this.state?.players.map(({ playerColorId }) => playerColorId))
+    for (let colorId = 0; colorId < MAX_PLAYERS; colorId += 1) {
+      if (!assigned.has(colorId)) return colorId
+    }
+    return 0
   }
 
   #reconnectPlayer(

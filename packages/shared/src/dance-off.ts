@@ -23,7 +23,7 @@ export interface TimingWindow {
   points: number
 }
 
-/** Named timing tiers, closest to farthest. A hit outside every window is a miss (0 points). */
+/** Named timing tiers, closest to farthest. A hit outside every window is a miss (-1 point). */
 export const CORRECT_TIME_WINDOWS: TimingWindow[] = [
   { tier: 'marvelous', windowMs: 16.7, points: 5 },
   { tier: 'perfect', windowMs: 33, points: 4 },
@@ -34,7 +34,7 @@ export const CORRECT_TIME_WINDOWS: TimingWindow[] = [
 
 export const DANCE_OFF_POINTS: Record<DanceHitJudgment, number> = {
   ...Object.fromEntries(CORRECT_TIME_WINDOWS.map(({ tier, points }) => [tier, points])),
-  miss: 0,
+  miss: -1,
 } as Record<DanceHitJudgment, number>
 
 /** The widest timing window — how far the code looks for a note to match a hit against at all. */

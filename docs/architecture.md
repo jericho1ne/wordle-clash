@@ -24,6 +24,12 @@ room codes.
 
 ## Stack
 
+The tiebreaker stage keeps interactive DOM and its note canvases on a CSS
+perspective plane above the independent WebGL fractal background. CSS ambient
+lighting/shadows and imperative hit-light opacity animations provide simulated
+depth; no DOM-to-texture rendering is used. Reduced motion disables plane drift
+and hit-light pulses. Native modal dialogs remain in the browser top layer.
+
 | Layer | Choice | Notes |
 |---|---|---|
 | Client | **React 19** SPA, **Vite**, **TypeScript** | All UI and animation in React. No SSR. |
@@ -74,6 +80,12 @@ ships in the SPA. The Durable Object normalizes and validates each guess before
 evaluating or persisting it.
 
 ### Guest-first, invisible identity
+
+Profile `avatarId` is selected by the player and may repeat. The Room Durable
+Object assigns every player a separate `playerColorId` from 0 through 7 when
+they join; it stays stable across reconnects and is reused only after a player
+leaves. Competitive board surfaces use this seat color, while avatar UI keeps
+the player's selected palette.
 First visit silently mints an anonymous identity (better-auth `anonymous`
 plugin). It is plumbing — a signed token for socket auth plus the player's
 name, avatar color, and animal — never surfaced as "an account", and there is no login step in the

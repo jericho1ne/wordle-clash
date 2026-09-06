@@ -17,6 +17,7 @@ import {
 import {
   MAX_NAME_LENGTH,
   MAX_PLAYERS,
+  PLAYER_COLOR_COUNT,
 } from './room.js'
 import { ROOM_CODE_REGEX } from './room-code.js'
 
@@ -57,6 +58,7 @@ export const playerSchema = z.object({
   id: idSchema,
   name: z.string().min(1).max(MAX_NAME_LENGTH),
   avatarId: z.number().int().min(0).max(AVATAR_COUNT - 1),
+  playerColorId: z.number().int().min(0).max(PLAYER_COLOR_COUNT - 1).default(0),
   animalId: z.number().int().min(0).max(ANIMAL_COUNT - 1).default(0),
   isHost: z.boolean(),
   ready: z.boolean(),
@@ -207,7 +209,7 @@ export const serverMessageSchema = z.discriminatedUnion('t', [
   }).strict(),
   z.object({
     t: z.literal('danceOffScore'),
-    scores: z.record(idSchema, z.number().int().nonnegative()),
+    scores: z.record(idSchema, z.number().int()),
   }).strict(),
   z.object({
     t: z.literal('danceOffHit'),

@@ -68,6 +68,17 @@
   --color-danger-800: #5f0010;
   --color-danger-900: #3a020b;
 
+  /* Room-assigned board colors. These are distinct from a player's selected
+     avatar color, so all eight active seats remain visually identifiable. */
+  --color-player-0: var(--color-accent-500);
+  --color-player-1: var(--color-accent-2-500);
+  --color-player-2: var(--color-neutral-500);
+  --color-player-3: var(--color-danger-500);
+  --color-player-4: var(--color-accent-300);
+  --color-player-5: var(--color-accent-2-300);
+  --color-player-6: var(--color-neutral-300);
+  --color-player-7: var(--color-danger-300);
+
   /* Wordle tile roles (gameplay lands later; seeded so the title tiles + any
      early previews use the system, not magic values). */
   --tile-correct-bg: var(--color-accent-700);

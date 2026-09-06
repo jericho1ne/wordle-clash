@@ -28,9 +28,10 @@ Dance-off (bboy tap/rhythm minigame) — Rules
   scores, no input).
 - The battle runs against a fixed 20-second clip of the real track's
   generated beat map — the same clip and start offset for every player.
-- Arrow-key hits (Up/Down/Left/Right) are judged against the nearest beat
-  map entry in that lane: within 60ms is "perfect" (3 points), within 140ms
-  is "good" (1 point), otherwise it's a miss (0 points). The server is the
-  sole judge of every hit.
+- Lane-key hits are judged against the nearest unused beat map entry in that
+  lane. Marvelous (within 16.7ms) earns 5 points; perfect (33ms), great
+  (92ms), good (142ms), and boo (225ms) earn progressively fewer points. A
+  press with no eligible note within 225ms is an off-target miss and deducts
+  1 point. The server is the sole judge of every hit.
 - Winner = highest score when the clip ends. An exact score tie re-runs one
   more clip (sudden death) rather than an invented tiebreaker rule.

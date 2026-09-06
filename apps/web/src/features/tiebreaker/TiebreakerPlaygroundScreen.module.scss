@@ -32,13 +32,15 @@
 }
 
 .dance-floor {
-  @include mixins.avatar-panel-tint;
-
   width: 300px;
   border-radius: var(--radius-lg);
   overflow: hidden;
 
-  .panel {
+  .player-board {
+    --player-board-opacity: 60%;
+
+    @include mixins.player-board-tint;
+
     padding: var(--space-3);
   }
 

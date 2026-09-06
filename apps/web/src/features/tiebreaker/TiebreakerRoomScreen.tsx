@@ -63,7 +63,7 @@ function noteOpacity(y: number, hitLineY: number, boardHeight: number): number {
 
 interface DanceFloorProps {
   name: string
-  avatarId: number
+  playerColorId: number
   score: number
   entries: BeatmapEntry[]
   startsAt: number
@@ -71,7 +71,7 @@ interface DanceFloorProps {
   onHit: (lane: Lane, clientTimeMs: number) => void
 }
 
-function DanceFloor({ name, avatarId, score, entries, startsAt, canPlay, onHit }: DanceFloorProps) {
+function DanceFloor({ name, playerColorId, score, entries, startsAt, canPlay, onHit }: DanceFloorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const flashRefs = useRef<Record<Lane, number>>({ down: 0, left: 0, right: 0 })
 
@@ -79,6 +79,7 @@ function DanceFloor({ name, avatarId, score, entries, startsAt, canPlay, onHit }
     if (!canPlay) return
 
     function onKeyDown(event: KeyboardEvent) {
+      if (event.repeat) return
       const lane = KEY_TO_LANE[event.key.toLowerCase()]
       if (!lane) return
       // Sent for a future latency-compensation story; the Room DO judges
@@ -137,8 +138,8 @@ function DanceFloor({ name, avatarId, score, entries, startsAt, canPlay, onHit }
   }, [entries, startsAt])
 
   return (
-    <div className={styles.danceFloor} data-avatar-id={avatarId}>
-      <div className={styles.panel}>
+    <div className={styles.danceFloor}>
+      <div className={styles.playerBoard} data-player-color-id={playerColorId}>
         <div className={styles.dancerHeader}>
           <strong className={styles.textTilt}>{name}</strong>
           {canPlay && <span>{KEY_LEGEND}</span>}
@@ -226,7 +227,7 @@ export function TiebreakerRoomScreen() {
                 <DanceFloor
                   key={playerId}
                   name={player?.name ?? 'Dancer'}
-                  avatarId={player?.avatarId ?? 0}
+                  playerColorId={player?.playerColorId ?? 0}
                   score={danceOff.scores[playerId] ?? 0}
                   entries={danceOff.beatmap.entries}
                   startsAt={danceOff.startsAt}

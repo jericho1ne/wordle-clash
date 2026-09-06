@@ -10,9 +10,9 @@ so the Room DO, protocol, and UI stories all build against the same contract.
 
 ## Decisions
 
-- **Scoring:** perfect / good / miss timing windows around each beatmap
-  entry's `timeMs`, flat points per judgment (e.g. perfect=3, good=1,
-  miss=0). No combo multiplier in v1.
+- **Scoring:** five positive timing windows around each beatmap entry's
+  `timeMs`, with flat points per judgment (marvelous=5 through boo=1). An
+  off-target miss deducts 1 point. No combo multiplier in v1.
 - **Duration:** fixed 20s clip from the start of the beatmap — identical for
   every player, so nobody races a harder or easier section of the song.
 - **Tie-of-a-tie:** an exact score tie at clip end re-runs one more short

@@ -52,7 +52,7 @@ const LANES: readonly Lane[] = ['left', 'down', 'right']
 interface DancerConfig {
   id: 'p1' | 'p2'
   name: string
-  avatarId: number
+  playerColorId: number
   keyToLane: Record<string, Lane>
 }
 
@@ -60,7 +60,7 @@ const DANCERS: DancerConfig[] = [
   {
     id: 'p1',
     name: 'Player 1',
-    avatarId: 0,
+    playerColorId: 0,
     // Player 1's keys: A, S, D. Everything else on screen for Player 1
     // (the labels above each lane, the "A S D" text) reads this same map,
     // so it always matches what the keys actually do.
@@ -69,7 +69,7 @@ const DANCERS: DancerConfig[] = [
   {
     id: 'p2',
     name: 'Player 2',
-    avatarId: 1,
+    playerColorId: 1,
     // Player 2's keys: the Left, Down, Right arrows.
     keyToLane: { ArrowLeft: 'left', ArrowDown: 'down', ArrowRight: 'right' },
   },
@@ -157,6 +157,7 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, flash 
     if (phase !== 'running') return
 
     function onKeyDown(event: KeyboardEvent) {
+      if (event.repeat) return
       // Try the key as typed first (for "ArrowLeft"), then lowercase (for letters).
       const lane = dancer.keyToLane[event.key] ?? dancer.keyToLane[event.key.toLowerCase()]
       if (!lane) return
@@ -235,8 +236,8 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, flash 
   }, [clockMs])
 
   return (
-    <div className={styles.danceFloor} data-avatar-id={dancer.avatarId}>
-      <div className={styles.panel}>
+    <div className={styles.danceFloor}>
+      <div className={styles.playerBoard} data-player-color-id={dancer.playerColorId}>
         <div className={styles.header}>
           <strong className={styles.textTilt}>{dancer.name}</strong>
           <span>{describeKeys(dancer.keyToLane)}</span>

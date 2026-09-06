@@ -28,9 +28,9 @@ Replaces the "forthcoming" note in `docs/game-rules.md`:
   input capture).
 - The battle runs against a fixed clip of the beatmap (first 20s), same
   start offset for every player — nobody gets an easier slice of the song.
-- Each lane hit is judged against the nearest beatmap entry in that lane:
-  perfect / good / miss timing windows, flat point values per judgment (no
-  combo multiplier in v1 — keeps scoring simple and the PR small).
+- Each lane hit is judged against the nearest unused beatmap entry in that
+  lane: five positive timing tiers award flat points; an off-target miss
+  deducts 1 point. There is no combo multiplier in v1.
 - Winner = highest score when the clip ends. An exact score tie triggers one
   more short clip (sudden death) rather than an invented secondary rule.
 - The server is the sole judge of hits — a client reporting "perfect" never
@@ -48,6 +48,14 @@ Replaces the "forthcoming" note in `docs/game-rules.md`:
 | 05 | Epic verification gate | **Partially done** — see Verification below for what's confirmed vs. outstanding |
 
 ## Verification
+
+Stage lighting preview: open `http://localhost:5173/tiebreaker`, start a
+battle, and use A/S/D and Left/Down/Right. Verify the top of the shared UI
+plane recedes, successful presses illuminate it aqua, and misses illuminate
+it red. Hover/focus a control to pause camera drift. Enable reduced motion
+to verify a stationary plane without hit-light pulses. Check the speed
+slider and end-of-battle dialog remain usable on desktop and narrow screens.
+This visual pass is pending for the CSS plane change; `/tiebreaker` remains public.
 
 Baseline: [`../../verification.md`](../../verification.md), plus this epic's
 checklist below. **Confirmed this implementation session:**

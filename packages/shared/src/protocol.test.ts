@@ -41,6 +41,7 @@ const ROOM_STATE_MESSAGE: ServerMessage = {
         id: 'user-1',
         name: 'Nova',
         avatarId: 2,
+        playerColorId: 0,
         animalId: 7,
         isHost: true,
         ready: false,
@@ -146,7 +147,7 @@ describe('server protocol', () => {
     }
     const score: ServerMessage = {
       t: 'danceOffScore',
-      scores: { 'user-1': 6, 'user-2': 3 },
+      scores: { 'user-1': 6, 'user-2': -1 },
     }
     const hit: ServerMessage = { t: 'danceOffHit', playerId: 'user-1', judgment: 'marvelous' }
     const ended: ServerMessage = { t: 'danceOffEnded', winnerId: 'user-1' }

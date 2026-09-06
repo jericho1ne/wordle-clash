@@ -22,6 +22,7 @@ const players: Player[] = [
     id: 'one',
     name: 'One',
     avatarId: 0,
+    playerColorId: 0,
     animalId: 0,
     isHost: true,
     ready: true,

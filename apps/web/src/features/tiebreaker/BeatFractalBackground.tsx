@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 
 import {
   forwardRef,
+  useEffect,
   useImperativeHandle,
 } from 'react'
 
@@ -19,6 +20,7 @@ export interface BeatFractalBackgroundProps {
   sizeIncrease?: number
   className?: string
   style?: CSSProperties
+  onUnavailable?: () => void
 }
 
 export interface BeatFractalHandle {
@@ -46,9 +48,13 @@ export interface BeatFractalHandle {
  * beatFractalStore.ts).
  */
 export const BeatFractalBackground = forwardRef<BeatFractalHandle, BeatFractalBackgroundProps>(
-  ({ theme = 'neonArcade', baseBrightness, baseSaturation, sizeIncrease, className, style }, ref) => {
-    const { canvasRef, engineRef } = useBeatFractal({ theme, baseBrightness, baseSaturation, sizeIncrease })
+  ({ theme = 'neonArcade', baseBrightness, baseSaturation, sizeIncrease, className, style, onUnavailable }, ref) => {
+    const { canvasRef, engineRef, isUnavailable } = useBeatFractal({ theme, baseBrightness, baseSaturation, sizeIncrease })
     useBeatFractalTheme(engineRef, theme)
+
+    useEffect(() => {
+      if (isUnavailable) onUnavailable?.()
+    }, [isUnavailable, onUnavailable])
 
     useImperativeHandle(ref, () => ({
       pulse: (strength = 1.0) => engineRef.current?.pulse(strength),
@@ -61,6 +67,8 @@ export const BeatFractalBackground = forwardRef<BeatFractalHandle, BeatFractalBa
       retarget: () => engineRef.current?.retarget(),
       connectAudio: (audioEl: HTMLAudioElement) => engineRef.current?.connectAudio(audioEl),
     }), [engineRef])
+
+    if (isUnavailable) return null
 
     return (
       <canvas

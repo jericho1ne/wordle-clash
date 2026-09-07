@@ -16,6 +16,9 @@ apps/server/migrations/
 **/*.ts
 **/*.tsx
 
+# Generated compact beatmaps stay single-line to minimize their checked-in size.
+apps/web/public/audio/**/*.json
+
 # Hand-maintained docs — Prettier's markdown table alignment pads columns to the
 # widest cell, which mangles the wide planning tables. Keep them as authored.
 docs/

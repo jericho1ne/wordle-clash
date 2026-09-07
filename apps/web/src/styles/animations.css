@@ -105,7 +105,7 @@ a:hover {
   background:
     radial-gradient(
       circle at 15% -10%,
-      color-mix(in oklch, var(--color-accent-900) 55%, transparent),
+      color-mix(in srgb, var(--color-accent-900) 55%, transparent),
       transparent 55%
     ),
     var(--color-bg);

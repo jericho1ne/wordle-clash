@@ -1,0 +1,17 @@
+@use '../../styles/mixins' as mixins;
+
+.tiebreaker-room-screen {
+  .audio {
+    display: none;
+  }
+
+  .spectator-note {
+    color: var(--color-neutral-500);
+    margin-bottom: var(--space-2);
+  }
+
+  .floors {
+    @include mixins.dance-boards;
+    margin-bottom: var(--space-4);
+  }
+}

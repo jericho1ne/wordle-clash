@@ -98,8 +98,8 @@ export function createAuth(request: Request, env: Env) {
           if (!guest || !account) return
 
           const hasProfile = Boolean(account.displayName) ||
-            account.avatarId !== null && account.avatarId !== undefined ||
-            account.animalId !== null && account.animalId !== undefined
+            (account.avatarId !== null && account.avatarId !== undefined) ||
+            (account.animalId !== null && account.animalId !== undefined)
 
           if (hasProfile) return
 

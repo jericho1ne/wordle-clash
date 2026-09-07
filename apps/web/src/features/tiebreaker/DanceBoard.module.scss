@@ -1,0 +1,64 @@
+@use '../../styles/mixins' as mixins;
+
+.dance-board {
+  --player-board-opacity: 80%;
+
+  &[data-variant='playground'] {
+    --player-board-opacity: 60%;
+    --dance-board-width: calc(var(--space-10) * 9 + var(--space-4));
+  }
+
+  .text-tilt {
+    display: inline-block;
+
+    @include mixins.text-tilt($angle: 6deg);
+  }
+
+  .dance-floor {
+    width: var(--dance-board-width, calc(var(--space-10) * 8 + var(--space-8)));
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+
+    .player-board {
+      @include mixins.player-board-tint;
+
+      padding: var(--space-3);
+    }
+
+    .dancer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: var(--space-2);
+
+      span {
+        font-size: var(--font-size-200);
+        color: var(--color-neutral-900);
+      }
+    }
+
+    .hud {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-2);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .lane-labels {
+      display: flex;
+      justify-content: center;
+
+      span {
+        flex: 1;
+      }
+    }
+
+    .canvas {
+      display: block;
+      width: 100%;
+      border-radius: var(--radius-md);
+      color: var(--player-board-accent);
+    }
+  }
+}

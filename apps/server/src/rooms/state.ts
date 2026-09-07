@@ -1,6 +1,7 @@
 import {
   DEFAULT_SYNC_ROUND_DURATION_MINUTES,
   DEFAULT_GAME_MODE,
+  MAX_PLAYERS,
   roomStateSchema,
   type RoomState,
   type RoomStateMessage,
@@ -25,18 +26,22 @@ export function createInitialRoomState(
 }
 
 export function parseStoredRoomState(value: unknown): RoomState {
-  if (
-    value &&
-    typeof value === 'object' &&
-    !('syncRoundDurationMinutes' in value)
-  ) {
-    return roomStateSchema.parse({
-      ...value,
-      syncRoundDurationMinutes: DEFAULT_SYNC_ROUND_DURATION_MINUTES,
-    })
-  }
+  if (!value || typeof value !== 'object') return roomStateSchema.parse(value)
 
-  return roomStateSchema.parse(value)
+  const stored = value as { players?: unknown, syncRoundDurationMinutes?: unknown }
+  const players = Array.isArray(stored.players)
+    ? stored.players.map((player, index) => (
+        player && typeof player === 'object' && !('playerColorId' in player)
+          ? { ...player, playerColorId: index % MAX_PLAYERS }
+          : player
+      ))
+    : stored.players
+
+  return roomStateSchema.parse({
+    ...stored,
+    players,
+    syncRoundDurationMinutes: stored.syncRoundDurationMinutes ?? DEFAULT_SYNC_ROUND_DURATION_MINUTES,
+  })
 }
 
 /** Return a validated clone so callers cannot mutate authoritative state. */

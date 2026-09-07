@@ -154,6 +154,12 @@ gh stack view
    A pure class-mapper primitive (`<Button>` → `btn btn-primary`) needs no module.
 5. **Tokens only.** All CSS — global or module — uses `--color-*` / `--space-*` /
    `--radius-*` / `--shadow-*`. **Never** a raw hex, px, or font-family name.
+   Font sizes and spacing specifically must always come from the
+   `--font-size-*` / `--space-*` variables in `apps/web/src/styles/ember.css`
+   — never a hardcoded number for either, and never `rem`/`em`. Every unit in
+   the codebase is `px` (including inside those token values themselves); if
+   a design calls for a size ember.css doesn't define (e.g. "2.5x this token"),
+   derive it from the token with `calc()` rather than writing a new raw number.
 6. **The theme is Ember**, defined in `apps/web/src/styles/ember.css` — this file
    is ours to edit (retune the `:root` block). It replaced the design's original
    "Nocturne" theme; the component-class layer is inherited from it.

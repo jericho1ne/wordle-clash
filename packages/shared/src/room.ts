@@ -4,6 +4,9 @@ import type { SyncRoundDurationMinutes } from './gameplay.js'
 /** Lobby is pre-match; `starting` is the brief window after "Start game". */
 export type RoomPhase = 'lobby' | 'starting' | 'playing' | 'finished'
 
+export const MAX_PLAYERS = 8
+export const PLAYER_COLOR_COUNT = MAX_PLAYERS
+
 /** Player-editable identity. `name` <= 14 chars, `avatarId` is 0..4. */
 export interface Profile {
   name: string
@@ -16,6 +19,8 @@ export interface Player {
   id: string
   name: string
   avatarId: number
+  /** Room-assigned seat color, stable while this player remains in the room. */
+  playerColorId: number
   animalId: number
   isHost: boolean
   ready: boolean
@@ -38,7 +43,6 @@ export interface RoomState {
   createdAt: number
 }
 
-export const MAX_PLAYERS = 8
 export const MIN_PLAYERS_TO_START = 2
 export const MAX_NAME_LENGTH = 14
 

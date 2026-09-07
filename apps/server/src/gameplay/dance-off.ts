@@ -1,13 +1,11 @@
 import {
   type Beatmap,
   type BeatmapEntry,
-  danceOffClip,
-  DANCE_OFF_CLIP_MS,
   DANCE_OFF_POINTS,
   type DanceHitJudgment,
   type Lane,
   judgeSubmittedHit,
-  parseBeatmap,
+  parseCompactBeatmap,
 } from '@wordle-clash/shared'
 
 // Same file the client fetches over HTTP, so both sides see the same beat map.
@@ -15,11 +13,11 @@ import trackBeatmapJson from '../../../web/public/audio/canto-de-ossanha.beatmap
 
 export const DANCE_OFF_STORAGE_KEY = 'danceOff'
 
-const TRACK_BEATMAP: Beatmap = parseBeatmap(trackBeatmapJson)
+const TRACK_BEATMAP: Beatmap = parseCompactBeatmap(trackBeatmapJson)
 
 export interface AuthoritativeDanceOff {
   playerIds: string[]
-  clip: BeatmapEntry[]
+  entries: BeatmapEntry[]
   startedAt: number
   endsAt: number
   scores: Record<string, number>
@@ -29,16 +27,16 @@ export interface AuthoritativeDanceOff {
 export function createDanceOff(playerIds: string[], now = Date.now()): AuthoritativeDanceOff {
   return {
     playerIds,
-    clip: danceOffClip(TRACK_BEATMAP),
+    entries: TRACK_BEATMAP.entries,
     startedAt: now,
-    endsAt: now + DANCE_OFF_CLIP_MS,
+    endsAt: now + TRACK_BEATMAP.durationMs,
     scores: Object.fromEntries(playerIds.map((id) => [id, 0])),
     consumedIndices: Object.fromEntries(playerIds.map((id) => [id, []])),
   }
 }
 
-export function danceOffBeatmapForClip(danceOff: AuthoritativeDanceOff): Beatmap {
-  return { trackPath: TRACK_BEATMAP.trackPath, durationMs: DANCE_OFF_CLIP_MS, entries: danceOff.clip }
+export function danceOffBeatmap(danceOff: AuthoritativeDanceOff): Beatmap {
+  return { trackPath: TRACK_BEATMAP.trackPath, durationMs: TRACK_BEATMAP.durationMs, entries: danceOff.entries }
 }
 
 /** Judges a hit and adds points to the score. A note can't be scored twice. */
@@ -49,11 +47,11 @@ export function judgeAndScoreHit(
   timeMs: number,
 ): DanceHitJudgment {
   const consumed = danceOff.consumedIndices[playerId] ?? []
-  const available = danceOff.clip.filter((_, index) => !consumed.includes(index))
+  const available = danceOff.entries.filter((_, index) => !consumed.includes(index))
   const result = judgeSubmittedHit(available, lane, timeMs)
 
   if (result.matchedEntry) {
-    const index = danceOff.clip.indexOf(result.matchedEntry)
+    const index = danceOff.entries.indexOf(result.matchedEntry)
     if (index >= 0) danceOff.consumedIndices[playerId] = [...consumed, index]
   }
 
@@ -61,7 +59,7 @@ export function judgeAndScoreHit(
   return result.judgment
 }
 
-/** Highest score wins; an exact tie has no winner (caller re-runs a sudden-death clip). */
+/** Highest score wins; an exact tie has no winner (caller re-runs the track). */
 export function danceOffWinner(danceOff: AuthoritativeDanceOff): string | null {
   const scored = danceOff.playerIds.map((id) => [id, danceOff.scores[id] ?? 0] as const)
   const maxScore = Math.max(...scored.map(([, score]) => score))

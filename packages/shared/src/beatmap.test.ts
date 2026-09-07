@@ -7,12 +7,13 @@ import {
 import {
   assertValidBeatmap,
   BEATMAP_MIN_GAP_MS,
+  compactBeatmap,
   type Beatmap,
   findNearestEntryInLane,
   hasPlayableGaps,
   isSortedByTime,
   parseBeatmap,
-  sliceBeatmapClip,
+  parseCompactBeatmap,
   usesAllLanes,
 } from './beatmap'
 
@@ -35,6 +36,16 @@ describe('beatmap schema', () => {
 
   it('rejects a negative timeMs', () => {
     expect(() => parseBeatmap(beatmap([{ timeMs: -1, lane: 'down' }]))).toThrow()
+  })
+
+  it('round-trips the compact generated-file representation', () => {
+    const source = beatmap([
+      { timeMs: 0, lane: 'down' },
+      { timeMs: 500, lane: 'left' },
+      { timeMs: 1000, lane: 'right' },
+    ])
+    expect(compactBeatmap(source).entries).toEqual([[0, 1], [500, 0], [1000, 2]])
+    expect(parseCompactBeatmap(compactBeatmap(source))).toEqual(source)
   })
 })
 
@@ -117,20 +128,6 @@ describe('assertValidBeatmap', () => {
       { timeMs: 0, lane: 'left' },
       { timeMs: 500, lane: 'down' },
     ]))).not.toThrow()
-  })
-})
-
-describe('sliceBeatmapClip', () => {
-  it('re-times entries within the window to start at 0', () => {
-    const clip = sliceBeatmapClip(beatmap([
-      { timeMs: 1000, lane: 'left' },
-      { timeMs: 1500, lane: 'down' },
-      { timeMs: 5000, lane: 'right' },
-    ]), 1000, 2000)
-    expect(clip).toEqual([
-      { timeMs: 0, lane: 'left' },
-      { timeMs: 500, lane: 'down' },
-    ])
   })
 })
 

@@ -4,12 +4,9 @@ import {
   it,
 } from 'vitest'
 
-import type { Beatmap } from './beatmap'
 import {
   CORRECT_TIME_WINDOWS,
-  DANCE_OFF_CLIP_MS,
   DANCE_OFF_MAX_WINDOW_MS,
-  danceOffClip,
   judgeDanceHit,
   judgeSubmittedHit,
 } from './dance-off'
@@ -50,23 +47,5 @@ describe('judgeSubmittedHit', () => {
 
   it('reports a miss when the lane has no entries at all', () => {
     expect(judgeSubmittedHit(entries, 'down', 1000)).toEqual({ judgment: 'miss', matchedEntry: null })
-  })
-})
-
-describe('danceOffClip', () => {
-  it('keeps only entries within the fixed clip length, re-timed from 0', () => {
-    const beatmap: Beatmap = {
-      trackPath: 'audio/test.mp3',
-      durationMs: 60_000,
-      entries: [
-        { timeMs: 500, lane: 'left' },
-        { timeMs: DANCE_OFF_CLIP_MS - 1, lane: 'down' },
-        { timeMs: DANCE_OFF_CLIP_MS + 500, lane: 'left' },
-      ],
-    }
-    expect(danceOffClip(beatmap)).toEqual([
-      { timeMs: 500, lane: 'left' },
-      { timeMs: DANCE_OFF_CLIP_MS - 1, lane: 'down' },
-    ])
   })
 })

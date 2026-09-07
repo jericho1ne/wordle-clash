@@ -1,17 +1,10 @@
 import type {
-  Beatmap,
   BeatmapEntry,
   Lane,
 } from './beatmap.js'
-import {
-  findNearestEntryInLane,
-  sliceBeatmapClip,
-} from './beatmap.js'
+import { findNearestEntryInLane } from './beatmap.js'
 
 /** Scoring rules for the Tiebreaker Battle. Shared by the playground, the real game, and the server, so scoring is the same everywhere. */
-
-/** Fixed clip length every dance-off battle runs — same slice of the beatmap for every player. */
-export const DANCE_OFF_CLIP_MS = 20_000
 
 export type DanceTier = 'marvelous' | 'perfect' | 'great' | 'good' | 'boo'
 export type DanceHitJudgment = DanceTier | 'miss'
@@ -70,9 +63,4 @@ export function judgeSubmittedHit(entries: BeatmapEntry[], lane: Lane, timeMs: n
   const nearest = findNearestEntryInLane(entries, lane, timeMs, DANCE_OFF_MAX_WINDOW_MS)
   if (!nearest) return { judgment: 'miss', matchedEntry: null }
   return { judgment: judgeDanceHit(nearest.timeMs - timeMs), matchedEntry: nearest }
-}
-
-/** The fixed clip both players battle over: the first DANCE_OFF_CLIP_MS of the beatmap. */
-export function danceOffClip(beatmap: Beatmap): BeatmapEntry[] {
-  return sliceBeatmapClip(beatmap, 0, DANCE_OFF_CLIP_MS)
 }

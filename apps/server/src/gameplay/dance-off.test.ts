@@ -4,34 +4,30 @@ import {
   it,
 } from 'vitest'
 
-import { DANCE_OFF_CLIP_MS } from '@wordle-clash/shared'
-
 import {
   createDanceOff,
-  danceOffBeatmapForClip,
+  danceOffBeatmap,
   danceOffWinner,
   judgeAndScoreHit,
 } from './dance-off'
 
 describe('authoritative dance-off', () => {
-  it('creates a fixed clip and zeroed scores for every tied player', () => {
+  it('creates a full-track battle and zeroed scores for every tied player', () => {
     const danceOff = createDanceOff(['a', 'b'], 1_000)
-    expect(danceOff.endsAt).toBe(1_000 + DANCE_OFF_CLIP_MS)
     expect(danceOff.scores).toEqual({ a: 0, b: 0 })
-    expect(danceOff.clip.length).toBeGreaterThan(0)
-    expect(danceOff.clip.every((entry) => entry.timeMs < DANCE_OFF_CLIP_MS)).toBe(true)
+    expect(danceOff.entries.length).toBeGreaterThan(0)
+    expect(danceOff.endsAt).toBe(1_000 + danceOffBeatmap(danceOff).durationMs)
   })
 
-  it('exposes the clip as a Beatmap the client protocol can carry', () => {
+  it('exposes the full track as a Beatmap the client protocol can carry', () => {
     const danceOff = createDanceOff(['a'], 0)
-    const beatmap = danceOffBeatmapForClip(danceOff)
-    expect(beatmap.durationMs).toBe(DANCE_OFF_CLIP_MS)
-    expect(beatmap.entries).toEqual(danceOff.clip)
+    const beatmap = danceOffBeatmap(danceOff)
+    expect(beatmap.entries).toEqual(danceOff.entries)
   })
 
   it('scores a hit and prevents the same note from being consumed twice', () => {
     const danceOff = createDanceOff(['a'], 0)
-    const firstEntry = danceOff.clip[0]
+    const firstEntry = danceOff.entries[0]
     if (!firstEntry) throw new Error('fixture beatmap has no entries')
 
     const firstJudgment = judgeAndScoreHit(danceOff, 'a', firstEntry.lane, firstEntry.timeMs)

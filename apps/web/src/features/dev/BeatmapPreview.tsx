@@ -9,6 +9,7 @@ import type {
   Beatmap,
   Lane,
 } from '@wordle-clash/shared'
+import { parseCompactBeatmap } from '@wordle-clash/shared'
 
 import {
   BEATMAP_PREVIEW_LOOKAHEAD_MS,
@@ -38,7 +39,7 @@ export function BeatmapPreview() {
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
         return res.json()
       })
-      .then((data: Beatmap) => setBeatmap(data))
+      .then((data: unknown) => setBeatmap(parseCompactBeatmap(data)))
       .catch((err: Error) => setError(err.message))
   }, [])
 

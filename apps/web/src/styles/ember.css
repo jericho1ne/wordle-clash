@@ -135,6 +135,8 @@
   --layer-toast: 20;
   --duration-toast-in: 180ms;
   --duration-player-join: 350ms;
+  /* Fade between route navigations */
+  --duration-route-fade: 1300ms;
   --measure-copy: 32ch;
   --measure-gameplay: 960px;
   --opacity-opponent-board: 0.8;

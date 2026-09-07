@@ -3,11 +3,9 @@ import {
   useRef,
   useState,
 } from 'react'
-import {
-  useNavigate,
-  useParams,
-} from 'react-router'
+import { useParams } from 'react-router'
 
+import { useAppNavigate } from '../../lib/useAppNavigate'
 import {
   canStartMatch,
   GAME_MODES,
@@ -50,7 +48,7 @@ const CONNECTION_LABELS = {
 /** Invite-ready room shell. The finished lobby controls land in epic 06. */
 export function LobbyScreen() {
   const { code } = useParams()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const roomCode = normalizeRoomCode(code ?? '')
   const [feedback, setFeedback] = useState<Feedback>(null)
   const feedbackTimeout = useRef<number | null>(null)

@@ -11,10 +11,10 @@ import {
 } from 'react'
 import {
   Navigate,
-  useNavigate,
   useParams,
 } from 'react-router'
 import { FRACTAL_SPIN_MULTIPLIER_PLAYING } from '../../constants'
+import { useAppNavigate } from '../../lib/useAppNavigate'
 import { useRoomStore } from '../../realtime'
 import { Button } from '../../ui'
 import { AudioCountdown } from './AudioCountdown'
@@ -29,7 +29,7 @@ import styles from './TiebreakerRoomScreen.module.scss'
 
 export function TiebreakerRoomScreen() {
   const { code = '' } = useParams()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const roomCode = normalizeRoomCode(code)
   const stageRef = useRef<TiebreakerStageHandle | null>(null)
   const { audioRef, play, pause } = useDanceAudio()

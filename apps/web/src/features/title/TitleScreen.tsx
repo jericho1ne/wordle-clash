@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
 
 import { useIdentity } from '../../identity'
+import { useAppNavigate } from '../../lib/useAppNavigate'
 import { Button } from '../../ui'
 import { AccountDialog } from '../account/AccountDialog'
 import styles from './TitleScreen.module.scss'
@@ -24,7 +24,7 @@ const CLASH_TILES = [
 ] as const
 
 export function TitleScreen() {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const { isAnonymous, status } = useIdentity()
   const [accountOpen, setAccountOpen] = useState(false)
   const [accountMode, setAccountMode] = useState<'sign-in' | 'sign-up'>('sign-up')

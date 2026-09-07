@@ -9,10 +9,10 @@ import {
 } from 'react'
 import {
   Navigate,
-  useNavigate,
   useParams,
 } from 'react-router'
 
+import { useAppNavigate } from '../../lib/useAppNavigate'
 import {
   isValidGuess,
   isValidRoomCode,
@@ -136,7 +136,7 @@ function DraftGuessRow({
 
 export function GameplayScreen() {
   const { code = '' } = useParams()
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const roomCode = normalizeRoomCode(code)
   const [draft, setDraft] = useState({
     acceptedGuessCount: 0,

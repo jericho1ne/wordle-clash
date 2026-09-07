@@ -2,10 +2,7 @@ import {
   useState,
   type FormEvent,
 } from 'react'
-import {
-  useNavigate,
-  useSearchParams,
-} from 'react-router'
+import { useSearchParams } from 'react-router'
 
 import {
   isValidRoomCode,
@@ -13,6 +10,7 @@ import {
   normalizeRoomCode,
 } from '@wordle-clash/shared'
 
+import { useAppNavigate } from '../../lib/useAppNavigate'
 import { useProfile } from '../../identity'
 import {
   Button,
@@ -36,7 +34,7 @@ import {
 import styles from './SetupScreen.module.scss'
 
 export function SetupScreen() {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const { profile, setProfile } = useProfile()
   const inviteValue = searchParams.get('join')

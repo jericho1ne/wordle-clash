@@ -116,6 +116,14 @@ a:hover {
   max-width: 480px;
 }
 
+/* Cross-fade duration for route changes made via useAppNavigate — the browser's
+   View Transitions API already cross-fades the old/new page by default. */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-route-fade);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

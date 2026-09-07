@@ -17,6 +17,7 @@ import { fileURLToPath } from 'node:url'
 import {
   assertValidBeatmap,
   BEATMAP_MIN_GAP_MS,
+  compactBeatmap,
 } from '../../../packages/shared/src/beatmap.ts'
 import type {
   Beatmap,
@@ -215,7 +216,7 @@ function main() {
   const beatmap = generateBeatmap(inputPath, targetNotesPerSec)
   assertValidBeatmap(beatmap)
 
-  writeFileSync(outputPath, `${JSON.stringify(beatmap, null, 2)}\n`)
+  writeFileSync(outputPath, `${JSON.stringify(compactBeatmap(beatmap))}\n`)
   const notesPerSec = beatmap.entries.length / (beatmap.durationMs / 1000)
   console.log(`Wrote ${beatmap.entries.length} entries (${notesPerSec.toFixed(2)} notes/sec avg) to ${outputPath}`)
 }

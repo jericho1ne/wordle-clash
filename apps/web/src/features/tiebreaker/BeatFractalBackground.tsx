@@ -42,9 +42,7 @@ export interface BeatFractalHandle {
  *   ...
  *   bgRef.current?.pulse(1.0)   // call from a hit-detection / socket handler
  *
- * `theme` can also be driven straight from a Zustand selector — beat pulses
- * themselves stay fully imperative and never go through React state (see
- * beatFractalStore.ts).
+ * Beat pulses stay imperative so animation does not rerender React components.
  */
 export const BeatFractalBackground = forwardRef<BeatFractalHandle, BeatFractalBackgroundProps>(
   ({ theme = 'neonArcade', baseBrightness, baseSaturation, sizeIncrease, className, style, onUnavailable }, ref) => {

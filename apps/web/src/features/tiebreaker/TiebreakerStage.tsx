@@ -34,6 +34,7 @@ export interface TiebreakerStageHandle {
 }
 
 export interface TiebreakerStageProps {
+  className?: string
   roomLabel?: ReactNode
   /** The word that produced the tie, once revealed. Null while not yet available. */
   word: string | null
@@ -47,7 +48,7 @@ function randomTheme(): ThemeName {
 
 /** The shared look for both Tiebreaker screens: one randomized fractal background, 3D plane, and drifting tied word. */
 export const TiebreakerStage = forwardRef<TiebreakerStageHandle, TiebreakerStageProps>(
-  ({ roomLabel, word, children }, ref) => {
+  ({ roomLabel, word, children, className = '' }, ref) => {
     const bgRef = useRef<BeatFractalHandle | null>(null)
     const lightRef = useRef<HTMLDivElement | null>(null)
     const lightAnimationRef = useRef<Animation | null>(null)
@@ -90,7 +91,7 @@ export const TiebreakerStage = forwardRef<TiebreakerStageHandle, TiebreakerStage
     }), [illuminate])
 
     return (
-      <div className={`${styles.tiebreakerStage} ${isWebglUnavailable ? styles.webglUnavailable : ''}`}>
+      <div className={`${styles.tiebreakerStage} ${className} ${isWebglUnavailable ? styles.webglUnavailable : ''}`}>
         {!isWebglUnavailable && (
           <BeatFractalBackground
             ref={bgRef}

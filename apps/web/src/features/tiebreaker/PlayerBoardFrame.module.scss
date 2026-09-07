@@ -6,11 +6,9 @@
 
   @for $id from 0 through 7 {
     &[data-player-color-id='#{$id}'] {
-      color: var(--color-player-#{$id});
+      --player-board-accent: var(--color-player-#{$id});
 
-      .board {
-        --player-board-accent: var(--color-player-#{$id});
-      }
+      color: var(--player-board-accent);
     }
   }
 
@@ -48,6 +46,7 @@
   }
 
   .star {
+    color: var(--player-board-accent);
     position: absolute;
     top: calc(var(--space-10) * -1.5);
     left: 50%;
@@ -59,12 +58,6 @@
     mask: url('/icons/leader-star.svg') center / contain no-repeat;
     transform: translateX(-50%);
     animation: star-float calc(var(--duration-tile-flip) * 5) ease-in-out infinite;
-  }
-
-  @for $id from 0 through 7 {
-    &[data-player-color-id='#{$id}'] .star {
-      color: var(--color-player-#{$id});
-    }
   }
 
   @keyframes star-float {

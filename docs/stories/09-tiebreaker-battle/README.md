@@ -49,6 +49,16 @@ Replaces the "forthcoming" note in `docs/game-rules.md`:
 
 ## Verification
 
+Shared-board refactor verification (browser pass pending): open
+`http://localhost:5173/tiebreaker`, start a battle, use A/S/D and arrow keys,
+check both scores and the leader star, then finish the song and replay.
+In two browser profiles, tie a synchronous round to reach
+`http://localhost:5173/room/<code>/tiebreaker`; verify the same boards render,
+only the local player's controls score, and repeated score broadcasts do not
+emit the temporary music-pause warning or interrupt playback. If autoplay is
+blocked, use Enable music and verify the track resumes at the current round
+position. Check unmount stops audio and a sudden-death round restarts it.
+
 Stage lighting preview: open `http://localhost:5173/tiebreaker`, start a
 battle, and use A/S/D and Left/Down/Right. Verify the top of the shared UI
 plane recedes, successful presses illuminate it aqua, and misses illuminate

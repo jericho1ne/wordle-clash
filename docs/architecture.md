@@ -24,6 +24,12 @@ room codes.
 
 ## Stack
 
+Both tiebreaker routes use `DanceBoard` for canvas rendering,
+keyboard input, and board styling, and `useDanceAudio` for media playback and
+cleanup. The playground judges hits locally with the shared judging helper;
+the room route sends inputs to the authoritative server. Board colors inherit
+one Ember player accent, and shared board layout lives in a SCSS mixin.
+
 The tiebreaker stage keeps interactive DOM and its note canvases on a CSS
 perspective plane above the independent WebGL fractal background. CSS ambient
 lighting/shadows and imperative hit-light opacity animations provide simulated

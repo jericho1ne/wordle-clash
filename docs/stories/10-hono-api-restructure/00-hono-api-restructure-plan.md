@@ -53,9 +53,13 @@ show up in a Referer header or access log.
 Registering `/api/rt/ticket` and `/api/rooms` as `app.post` (rather than
 `app.all`) is a deliberate, accepted behavior change from the current
 if-chain: a non-POST request today gets the handler's own `405` with an
-`Allow: POST` header; after this restructure it gets Hono's generic `404` for
-an unmatched route instead. `/api/auth` and `/api/favorites` stay `app.all`
-because their handlers genuinely dispatch on multiple methods themselves.
+`Allow: POST` header. Verified against a live `wrangler dev`: a non-POST
+request instead falls through to the catch-all `app.all('/api/*', ...)` route
+and gets this API's normal `501 not implemented` — not Hono's generic `404`
+as originally expected — which is actually more consistent with how every
+other unimplemented `/api/*` path already behaves. `/api/auth` and
+`/api/favorites` stay `app.all` because their handlers genuinely dispatch on
+multiple methods themselves.
 
 `export { Room }` and every binding in `wrangler.jsonc` (`main`,
 `durable_objects`, `d1_databases`, `assets`) stay unchanged — this only

@@ -16,12 +16,13 @@ POST-vs-`Allow` note below for the one accepted behavior change):
   methods internally.
 - `POST /api/rt/ticket` — delegates to `handleRealtimeTicket`. Strict POST:
   minting a ticket is a side-effecting create, not a safe/idempotent GET. A
-  non-POST request now gets Hono's generic 404 instead of the handler's own
-  405 + `Allow: POST` — an accepted, deliberate behavior change (see plan
-  doc).
+  non-POST request now falls through to the `/api/*` catch-all below and gets
+  a `501`, instead of the handler's own `405` + `Allow: POST` — an accepted,
+  deliberate behavior change (see plan doc), confirmed against a live
+  `wrangler dev`.
 - `POST /api/rooms` — delegates to `handleCreateRoom`. Same reasoning: it
   creates a room reservation, so it's a CRUD create — strictly POST. Same
-  404-vs-405 tradeoff as above.
+  `501` fallthrough as above.
 - `ALL /api/favorites` — delegates to `handleFavorites`, which dispatches
   GET/PUT/DELETE/POST itself.
 - `ALL /ws/*` — delegates to `routePartykitRequest(c.req.raw, c.env, { prefix:

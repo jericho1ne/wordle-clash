@@ -1,0 +1,178 @@
+@use '../../styles/mixins' as mixins;
+
+// Keep the background transparent so BeatFractalBackground shows through.
+
+.tiebreaker-stage {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-3) var(--space-6) var(--space-6);
+  perspective: calc(var(--perspective-title-tiles) * 2);
+  perspective-origin: center top;
+
+  &.webgl-unavailable {
+    background: var(--color-bg);
+  }
+
+  .plane {
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    max-width: calc(var(--space-10) * 24);
+    width: 100%;
+    padding: var(--space-6);
+    text-align: center;
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--color-bg) 50%, transparent);
+    box-shadow:
+      var(--shadow-lg),
+      0 var(--space-10) calc(var(--space-10) * 2)
+        color-mix(in srgb, var(--color-bg) 85%, transparent);
+    transform-origin: center bottom;
+    transform: rotateX(9deg);
+    animation: camera-drift calc(var(--duration-tile-flip) * 32) ease-in-out infinite alternate;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: inherit;
+      pointer-events: none;
+      background:
+        radial-gradient(
+          ellipse at top left,
+          color-mix(in srgb, var(--color-accent) 16%, transparent),
+          transparent 65%
+        ),
+        radial-gradient(
+          ellipse at bottom right,
+          color-mix(in srgb, var(--color-accent-2) 12%, transparent),
+          transparent 65%
+        );
+      animation: light-sweep calc(var(--duration-tile-flip) * 24) ease-in-out infinite alternate;
+    }
+
+    &:focus-within,
+    &:hover {
+      animation-play-state: paused;
+    }
+  }
+
+  .background-word {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    display: block;
+    width: max-content;
+    max-width: 100vw;
+    overflow: hidden;
+    color: color-mix(in srgb, var(--color-text) 10%, transparent);
+    font-size: var(--font-size-2000);
+    font-weight: 800;
+    letter-spacing: var(--space-2);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    animation: word-bounce calc(var(--duration-tile-flip) * 180) linear infinite alternate;
+  }
+
+  .beat-light {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0;
+    background: radial-gradient(ellipse at center bottom, var(--color-accent), transparent 80%);
+    box-shadow: 0 0 var(--space-10) var(--color-accent);
+
+    &[data-kind='miss'] {
+      background: radial-gradient(
+        ellipse at center bottom,
+        var(--color-danger-500),
+        transparent 80%
+      );
+      box-shadow: 0 0 var(--space-10) var(--color-danger-500);
+    }
+  }
+
+  @keyframes camera-drift {
+    from {
+      transform: rotateX(9deg) rotateY(-0.6deg);
+    }
+
+    to {
+      transform: rotateX(10deg) rotateY(0.6deg);
+    }
+  }
+
+  @keyframes light-sweep {
+    from {
+      opacity: 0.45;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes word-bounce {
+    0% {
+      transform: translate(0, 0);
+    }
+
+    25% {
+      transform: translate(calc(100vw - 100%), 0);
+    }
+
+    50% {
+      transform: translate(calc(100vw - 100%), calc(100vh - 100%));
+    }
+
+    75% {
+      transform: translate(0, calc(100vh - 100%));
+    }
+
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce), (hover: none) {
+    .plane {
+      animation: none;
+      transform: rotateX(5deg);
+
+      &::before {
+        animation: none;
+      }
+    }
+
+    .background-word {
+      animation: none;
+    }
+  }
+
+  .kicker {
+    display: inline-block;
+    margin-bottom: var(--space-4);
+
+    @include mixins.text-tilt($angle: 10deg);
+  }
+
+  .webgl-notice {
+    margin-bottom: var(--space-4);
+    color: var(--color-neutral-200);
+  }
+
+  .text-tilt {
+    display: inline-block;
+    margin-bottom: var(--space-2);
+
+    @include mixins.text-tilt;
+  }
+}

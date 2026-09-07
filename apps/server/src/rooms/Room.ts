@@ -17,6 +17,7 @@ import {
   syncRoundDurationMs,
   SYNC_GRACE_MS,
   type ClientMessage,
+  type Lane,
   type Player,
   type RoomErrorCode,
   type RoomState,
@@ -27,6 +28,14 @@ import {
   isAllowedGuess,
   selectAnswer,
 } from '../gameplay/answers'
+import {
+  createDanceOff,
+  DANCE_OFF_STORAGE_KEY,
+  danceOffBeatmap,
+  danceOffWinner,
+  judgeAndScoreHit,
+  type AuthoritativeDanceOff,
+} from '../gameplay/dance-off'
 import {
   createMatch,
   createMatchSnapshot,
@@ -59,6 +68,7 @@ const LIFECYCLE_STORAGE_KEY = 'lifecycle'
 const DISCONNECT_GRACE_MS = 30_000
 const HEARTBEAT_TIMEOUT_MS = 90_000
 const RESERVATION_TTL_MS = 2 * 60_000
+const DANCE_OFF_MIN_HIT_INTERVAL_MS = 30
 
 interface RoomLifecycle {
   disconnectDeadlines: Record<string, number>
@@ -108,13 +118,16 @@ export class Room extends Server<Env> {
   state: RoomState | null = null
   lifecycle: RoomLifecycle = emptyLifecycle()
   match: AuthoritativeMatch | null = null
+  danceOff: AuthoritativeDanceOff | null = null
   #mutations = new MutationQueue()
+  #lastDanceHitAtByPlayer = new Map<string, number>()
 
   override async onStart(): Promise<void> {
-    const [storedState, storedLifecycle, storedMatch] = await Promise.all([
+    const [storedState, storedLifecycle, storedMatch, storedDanceOff] = await Promise.all([
       this.ctx.storage.get<unknown>(ROOM_STATE_STORAGE_KEY),
       this.ctx.storage.get<unknown>(LIFECYCLE_STORAGE_KEY),
       this.ctx.storage.get<AuthoritativeMatch>(MATCH_STORAGE_KEY),
+      this.ctx.storage.get<AuthoritativeDanceOff>(DANCE_OFF_STORAGE_KEY),
     ])
 
     this.state = storedState === undefined
@@ -122,6 +135,7 @@ export class Room extends Server<Env> {
       : parseStoredRoomState(storedState)
     this.lifecycle = parseLifecycle(storedLifecycle)
     this.match = storedMatch ?? null
+    this.danceOff = storedDanceOff ?? null
     if (this.match && this.match.syncRoundDurationMinutes === undefined) {
       this.match.syncRoundDurationMinutes = DEFAULT_SYNC_ROUND_DURATION_MINUTES
     }
@@ -249,6 +263,10 @@ export class Room extends Server<Env> {
       await this.#closeSyncRound()
     }
 
+    if (this.danceOff && this.danceOff.endsAt <= now) {
+      await this.#endDanceOff()
+    }
+
     if (
       this.lifecycle.reservationExpiresAt !== null &&
       this.lifecycle.reservationExpiresAt <= now &&
@@ -362,6 +380,10 @@ export class Room extends Server<Env> {
 
       case 'submitGuess':
         await this.#submitGuess(connection, userId, message.guess)
+        return
+
+      case 'submitDanceHit':
+        await this.#submitDanceHit(connection, userId, message.lane, message.clientTimeMs)
         return
 
       default:
@@ -598,11 +620,13 @@ export class Room extends Server<Env> {
     }
 
     this.match = null
+    this.danceOff = null
     this.state.phase = 'lobby'
     for (const player of this.state.players) player.ready = false
     await Promise.all([
       this.#save(),
       this.ctx.storage.delete(MATCH_STORAGE_KEY),
+      this.ctx.storage.delete(DANCE_OFF_STORAGE_KEY),
     ])
     this.#broadcastRoomSnapshots()
     await this.#scheduleNextAlarm()
@@ -621,12 +645,15 @@ export class Room extends Server<Env> {
     }
     match.pendingGuesses = {}
 
+    let startedDanceOff: AuthoritativeDanceOff | null = null
     if (correctPlayerIds.length === 1) {
       match.winnerId = correctPlayerIds[0] ?? null
       match.phase = 'finished'
     } else if (correctPlayerIds.length > 1) {
       match.tiebreakPlayerIds = correctPlayerIds
       match.phase = 'tiebreak'
+      startedDanceOff = createDanceOff(correctPlayerIds)
+      this.danceOff = startedDanceOff
     } else if (match.round >= GAME_MODES.sync.tries) {
       match.phase = 'finished'
     } else {
@@ -639,6 +666,74 @@ export class Room extends Server<Env> {
       this.state.phase = 'finished'
     }
     await this.#save()
+    this.#broadcastMatchState()
+    if (startedDanceOff) {
+      this.#broadcast({
+        t: 'danceOffStarted',
+        beatmap: danceOffBeatmap(startedDanceOff),
+        startsAt: startedDanceOff.startedAt,
+        playerIds: startedDanceOff.playerIds,
+      })
+    }
+    await this.#scheduleNextAlarm()
+  }
+
+  // `_clientTimeMs` is accepted for a future latency-compensation story but
+  // deliberately unused today: judging is done from server-received time so
+  // a skewed or manipulated client can't fabricate a better score.
+  async #submitDanceHit(connection: Connection, userId: string, lane: Lane, _clientTimeMs: number): Promise<void> {
+    if (!this.match || this.match.phase !== 'tiebreak' || !this.danceOff) {
+      this.#sendError(connection, 'DANCE_OFF_NOT_ACTIVE', 'There is no dance-off in progress')
+      return
+    }
+    if (!this.danceOff.playerIds.includes(userId)) {
+      this.#sendError(connection, 'DANCE_OFF_NOT_ACTIVE', 'You are not part of this dance-off')
+      return
+    }
+
+    const receivedAt = Date.now()
+    const lastHitAt = this.#lastDanceHitAtByPlayer.get(userId)
+    // Keyboard repeat is suppressed client-side, but a client can still send
+    // raw WebSocket frames. Ignore bursts without adding extra penalties.
+    if (lastHitAt !== undefined && receivedAt - lastHitAt < DANCE_OFF_MIN_HIT_INTERVAL_MS) return
+    this.#lastDanceHitAtByPlayer.set(userId, receivedAt)
+
+    const serverTimeMs = receivedAt - this.danceOff.startedAt
+    const judgment = judgeAndScoreHit(this.danceOff, userId, lane, serverTimeMs)
+
+    await this.#save()
+    this.#broadcast({ t: 'danceOffHit', playerId: userId, judgment })
+    this.#broadcast({ t: 'danceOffScore', scores: this.danceOff.scores })
+  }
+
+  async #endDanceOff(): Promise<void> {
+    if (!this.state || !this.match || !this.danceOff) return
+    const danceOff = this.danceOff
+    const winnerId = danceOffWinner(danceOff)
+
+    if (!winnerId) {
+      // Exact tie: sudden death — run the same track again rather than invent a rule.
+      this.danceOff = createDanceOff(danceOff.playerIds)
+      await this.#save()
+      this.#broadcast({
+        t: 'danceOffStarted',
+        beatmap: danceOffBeatmap(this.danceOff),
+        startsAt: this.danceOff.startedAt,
+        playerIds: this.danceOff.playerIds,
+      })
+      await this.#scheduleNextAlarm()
+      return
+    }
+
+    this.match.winnerId = winnerId
+    this.match.phase = 'finished'
+    this.state.phase = 'finished'
+    this.danceOff = null
+    await Promise.all([
+      this.#save(),
+      this.ctx.storage.delete(DANCE_OFF_STORAGE_KEY),
+    ])
+    this.#broadcast({ t: 'danceOffEnded', winnerId })
     this.#broadcastMatchState()
     await this.#scheduleNextAlarm()
   }
@@ -694,6 +789,7 @@ export class Room extends Server<Env> {
       id: identity.userId,
       name: identity.name,
       avatarId: identity.avatarId,
+      playerColorId: this.#nextPlayerColorId(),
       animalId: identity.animalId,
       isHost,
       ready: false,
@@ -704,6 +800,14 @@ export class Room extends Server<Env> {
     state.players.push(player)
     if (isHost) applyHost(state, player.id)
     return player
+  }
+
+  #nextPlayerColorId(): number {
+    const assigned = new Set(this.state?.players.map(({ playerColorId }) => playerColorId))
+    for (let colorId = 0; colorId < MAX_PLAYERS; colorId += 1) {
+      if (!assigned.has(colorId)) return colorId
+    }
+    return 0
   }
 
   #reconnectPlayer(
@@ -775,6 +879,9 @@ export class Room extends Server<Env> {
     if (this.match) {
       writes.push(this.ctx.storage.put(MATCH_STORAGE_KEY, this.match))
     }
+    if (this.danceOff) {
+      writes.push(this.ctx.storage.put(DANCE_OFF_STORAGE_KEY, this.danceOff))
+    }
 
     await Promise.all(writes)
   }
@@ -784,11 +891,13 @@ export class Room extends Server<Env> {
 
     this.state = null
     this.match = null
+    this.danceOff = null
     this.lifecycle = emptyLifecycle()
     await Promise.all([
       this.ctx.storage.delete(ROOM_STATE_STORAGE_KEY),
       this.ctx.storage.delete(LIFECYCLE_STORAGE_KEY),
       this.ctx.storage.delete(MATCH_STORAGE_KEY),
+      this.ctx.storage.delete(DANCE_OFF_STORAGE_KEY),
     ])
   }
 
@@ -806,6 +915,9 @@ export class Room extends Server<Env> {
       this.match.roundEndsAt !== null
     ) {
       deadlines.push(this.match.roundEndsAt + SYNC_GRACE_MS)
+    }
+    if (this.danceOff) {
+      deadlines.push(this.danceOff.endsAt)
     }
     if (deadlines.length === 0) {
       await this.ctx.storage.deleteAlarm()
@@ -827,6 +939,15 @@ export class Room extends Server<Env> {
         t: 'matchState',
         match: createMatchSnapshot(this.match, this.state.players),
       })
+    }
+    if (this.danceOff) {
+      this.#send(connection, {
+        t: 'danceOffStarted',
+        beatmap: danceOffBeatmap(this.danceOff),
+        startsAt: this.danceOff.startedAt,
+        playerIds: this.danceOff.playerIds,
+      })
+      this.#send(connection, { t: 'danceOffScore', scores: this.danceOff.scores })
     }
   }
 

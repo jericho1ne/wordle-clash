@@ -1,0 +1,22 @@
+@use '../../styles/mixins' as mixins;
+
+.tiebreaker-playground-screen {
+  .error {
+    color: var(--color-danger-600);
+  }
+
+  .audio {
+    display: none;
+  }
+
+  .battle-dialog {
+    .start-battle {
+      padding: var(--space-4) var(--space-10);
+      font-size: var(--font-size-600);
+    }
+  }
+
+  .floors {
+    @include mixins.dance-boards;
+  }
+}

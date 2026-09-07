@@ -25,6 +25,32 @@
   }
 }
 
+@mixin player-board-tint {
+  background-color: color-mix(
+    in srgb,
+    var(--player-board-accent) var(--player-board-opacity),
+    transparent
+  );
+}
+
+@mixin dance-boards {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@mixin text-tilt($angle: 10deg, $depth: 80px) {
+  transform: perspective($depth) rotateX($angle);
+  transform-origin: center bottom;
+  text-shadow:
+    calc(var(--space-1) / 2) calc(var(--space-1) / 2) 0 var(--color-neutral-900),
+    var(--space-1) var(--space-1) 0 var(--color-neutral-900),
+    calc(var(--space-1) + (var(--space-1) / 2)) calc(var(--space-1) + (var(--space-1) / 2)) 0
+      var(--color-neutral-900),
+    var(--space-2) var(--space-2) 0 var(--color-neutral-900);
+}
+
 @mixin stack($gap: var(--space-3)) {
   display: grid;
   gap: $gap;

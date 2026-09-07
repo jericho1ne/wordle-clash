@@ -168,12 +168,18 @@ describe('Room Durable Object', () => {
   it('rejects a ninth distinct player', async () => {
     await reserveRoom()
     const sockets: TestSocket[] = []
+    const playerColors: number[] = []
 
     for (let index = 0; index < MAX_PLAYERS; index++) {
       const socket = await connect(identity(index))
       sockets.push(socket)
-      await socket.next('roomState')
+      const snapshot = await socket.next('roomState')
+      const player = snapshot.room.players.find(({ id }) => id === identity(index).userId)
+      if (!player) throw new Error('Joining player was missing from its room snapshot')
+      playerColors.push(player.playerColorId)
     }
+
+    expect(playerColors.sort()).toEqual(Array.from({ length: MAX_PLAYERS }, (_, index) => index))
 
     const overflow = await connect(identity(MAX_PLAYERS))
     const error = await overflow.next('error')

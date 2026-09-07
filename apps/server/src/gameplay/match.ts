@@ -65,7 +65,10 @@ export function createMatchSnapshot(
     })),
     winnerId: match.winnerId,
     tiebreakPlayerIds: match.tiebreakPlayerIds,
-    answer: match.phase === 'finished' ? match.answer : null,
+    // A tie ends the match immediately (see Room#closeSyncRound), so nobody
+    // still has an active guess left to spoil by revealing the word here —
+    // every other connected player is already just spectating the dance-off.
+    answer: match.phase === 'finished' || match.phase === 'tiebreak' ? match.answer : null,
   }
 }
 

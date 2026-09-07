@@ -24,6 +24,18 @@ room codes.
 
 ## Stack
 
+Both tiebreaker routes use `DanceBoard` for canvas rendering,
+keyboard input, and board styling, and `useDanceAudio` for media playback and
+cleanup. The playground judges hits locally with the shared judging helper;
+the room route sends inputs to the authoritative server. Board colors inherit
+one Ember player accent, and shared board layout lives in a SCSS mixin.
+
+The tiebreaker stage keeps interactive DOM and its note canvases on a CSS
+perspective plane above the independent WebGL fractal background. CSS ambient
+lighting/shadows and imperative hit-light opacity animations provide simulated
+depth; no DOM-to-texture rendering is used. Reduced motion disables plane drift
+and hit-light pulses. Native modal dialogs remain in the browser top layer.
+
 | Layer | Choice | Notes |
 |---|---|---|
 | Client | **React 19** SPA, **Vite**, **TypeScript** | All UI and animation in React. No SSR. |
@@ -74,6 +86,12 @@ ships in the SPA. The Durable Object normalizes and validates each guess before
 evaluating or persisting it.
 
 ### Guest-first, invisible identity
+
+Profile `avatarId` is selected by the player and may repeat. The Room Durable
+Object assigns every player a separate `playerColorId` from 0 through 7 when
+they join; it stays stable across reconnects and is reused only after a player
+leaves. Competitive board surfaces use this seat color, while avatar UI keeps
+the player's selected palette.
 First visit silently mints an anonymous identity (better-auth `anonymous`
 plugin). It is plumbing — a signed token for socket auth plus the player's
 name, avatar color, and animal — never surfaced as "an account", and there is no login step in the
@@ -273,15 +291,20 @@ after every epic; verification is a gate on each epic, not a separate one.
 
 ## Out of scope for Phase 1
 
-Account-owned match-history persistence, the leaderboard API and UI, and the
-actual bboy dance-off minigame remain deferred. Gameplay implements only the
-authoritative transition to a tiebreak when a synchronous round has multiple
-correct players.
+Account-owned match-history persistence and the leaderboard API and UI
+remain deferred.
 
 The gameplay rules are captured in [`game-rules.md`](./game-rules.md), with its
 implementation tracked in
 [`docs/stories/07-gameplay-leaderboard`](./docs/stories/07-gameplay-leaderboard/).
-The dance-off rules are still forthcoming, so Epic 07 owns only its persisted
-state and protocol boundary. The `Room` Durable Object now owns the secret word,
-guesses, round timer, winner selection, and terminal state. Its public snapshots
-contain only renderable guesses and never expose the answer during active play.
+The `Room` Durable Object owns the secret word, guesses, round timer, winner
+selection, and terminal state. Its public snapshots contain only renderable
+guesses and never expose the answer during active play.
+
+The bboy dance-off minigame that resolves a synchronous-round tie is
+implemented in
+[`docs/stories/08-beatmap-engine`](./docs/stories/08-beatmap-engine/) (the
+offline kick/snare beat map generator) and
+[`docs/stories/09-tiebreaker-battle`](./docs/stories/09-tiebreaker-battle/)
+(the DDR-style battle itself, at `/room/:code/tiebreaker`) — see that epic's
+README for the current verification status.

@@ -1,0 +1,22 @@
+.playback-speed-slider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto var(--space-4);
+
+  label {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  input[type='range'] {
+    flex: 1;
+
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+}

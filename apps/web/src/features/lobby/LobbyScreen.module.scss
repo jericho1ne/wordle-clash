@@ -1,6 +1,3 @@
-// LobbyScreen-specific styling. Ember utility classes (.card, .card-kicker, …)
-// stay global; everything here nests under the single root class `.lobby-screen`.
-
 @use '../../styles/mixins' as mixins;
 
 .lobby-screen {

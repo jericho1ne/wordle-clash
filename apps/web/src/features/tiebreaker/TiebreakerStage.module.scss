@@ -1,8 +1,6 @@
 @use '../../styles/mixins' as mixins;
 
-// Shared shell for both Tiebreaker screens — see TiebreakerStage.tsx.
-// No background here on purpose: the single BeatFractalBackground behind
-// this needs to show through, unlike the global .app-stage gradient.
+// Keep the background transparent so BeatFractalBackground shows through.
 
 .tiebreaker-stage {
   position: relative;

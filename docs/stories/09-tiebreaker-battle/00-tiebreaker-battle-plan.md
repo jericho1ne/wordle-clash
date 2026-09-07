@@ -13,10 +13,9 @@ so the Room DO, protocol, and UI stories all build against the same contract.
 - **Scoring:** five positive timing windows around each beatmap entry's
   `timeMs`, with flat points per judgment (marvelous=5 through boo=1). An
   off-target miss deducts 1 point. No combo multiplier in v1.
-- **Duration:** fixed 20s clip from the start of the beatmap — identical for
-  every player, so nobody races a harder or easier section of the song.
-- **Tie-of-a-tie:** an exact score tie at clip end re-runs one more short
-  clip (sudden death) rather than inventing a secondary tiebreaker rule.
+- **Duration:** the entire generated beatmap — identical for every player.
+- **Tie-of-a-tie:** an exact score tie at song end re-runs the full track
+  (sudden death) rather than inventing a secondary tiebreaker rule.
   This can loop in the rare case of a repeated exact tie.
 - **Authority:** the `Room` DO is the sole judge of every hit — it compares
   each `submitDanceHit` against the shared beatmap itself. Client-side

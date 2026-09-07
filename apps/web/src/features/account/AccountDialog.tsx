@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useId,
   useState,
   type FormEvent,
@@ -36,11 +35,16 @@ export function AccountDialog({
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => {
-    if (!open) return
-    setMode(initialMode)
-    setError(null)
-  }, [initialMode, open])
+  // Reset the form whenever the dialog opens
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [prevOpen, setPrevOpen] = useState(open)
+  if (open !== prevOpen) {
+    setPrevOpen(open)
+    if (open) {
+      setMode(initialMode)
+      setError(null)
+    }
+  }
 
   const changeMode = (nextMode: AccountMode) => {
     setMode(nextMode)

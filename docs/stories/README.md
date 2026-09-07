@@ -20,6 +20,7 @@ and the approved phase plan (`~/.claude/plans/hi-i-have-a-sunny-rossum.md`).
 | [`07-gameplay-leaderboard`](./07-gameplay-leaderboard/) | gameplay implemented | authoritative Wordle modes and gameplay UI; account leaderboard deferred |
 | [`08-beatmap-engine`](./08-beatmap-engine/) | done | offline kick/snare onset detection producing a checked-in beatmap JSON |
 | [`09-tiebreaker-battle`](./09-tiebreaker-battle/) | implemented, live-match verification pending | DDR-style dance-off resolving a sync-mode tie, spectatable, fractal-backed |
+| [`10-hono-api-restructure`](./10-hono-api-restructure/) | not started | Replace the `index.ts` if-chain with the already-installed `hono` router; no behavior change |
 
 ## Verification
 

@@ -71,6 +71,10 @@ export function createAuth(request: Request, env: Env) {
       schema,
     }),
     emailAndPassword: { enabled: true },
+    rateLimit: {
+      enabled: true,
+      storage: 'database',
+    },
     plugins: [
       anonymous({
         onLinkAccount: async ({ anonymousUser, newUser }) => {

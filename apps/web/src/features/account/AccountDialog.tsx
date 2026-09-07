@@ -35,14 +35,15 @@ export function AccountDialog({
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  // Resets mode/error whenever the dialog opens (or initialMode changes
-  // while open) by adjusting state during render rather than in an effect —
-  // see https://react.dev/learn/you-might-not-need-an-effect#adjusting-state-when-a-prop-changes.
-  const [prevOpenState, setPrevOpenState] = useState({ open, initialMode })
-  if (open && (prevOpenState.open !== open || prevOpenState.initialMode !== initialMode)) {
-    setPrevOpenState({ open, initialMode })
-    setMode(initialMode)
-    setError(null)
+  // Reset the form whenever the dialog opens
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [prevOpen, setPrevOpen] = useState(open)
+  if (open !== prevOpen) {
+    setPrevOpen(open)
+    if (open) {
+      setMode(initialMode)
+      setError(null)
+    }
   }
 
   const changeMode = (nextMode: AccountMode) => {

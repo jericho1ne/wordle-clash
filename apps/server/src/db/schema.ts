@@ -100,6 +100,18 @@ export const verification = sqliteTable(
   (table) => [index('verification_identifier_idx').on(table.identifier)],
 )
 
+/** Better Auth's own `database`-storage rate limiter (see auth.ts's `rateLimit` config). */
+export const rateLimit = sqliteTable(
+  'rate_limit',
+  {
+    id: text('id').primaryKey(),
+    key: text('key').notNull(),
+    count: integer('count').notNull(),
+    lastRequest: integer('last_request').notNull(),
+  },
+  (table) => [uniqueIndex('rate_limit_key_uidx').on(table.key)],
+)
+
 export const favoriteRooms = sqliteTable(
   'favorite_rooms',
   {

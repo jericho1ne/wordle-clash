@@ -7,6 +7,10 @@
   margin-bottom: var(--space-2);
 }
 
+.audio {
+  display: none;
+}
+
 .floors {
   display: flex;
   gap: var(--space-4);
@@ -64,5 +68,6 @@
     display: block;
     width: 100%;
     border-radius: var(--radius-md);
+    color: var(--player-board-accent);
   }
 }

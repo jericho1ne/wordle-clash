@@ -1,5 +1,5 @@
 /** Default value for `<PlaybackSpeedSlider>` wherever beat-map audio/gameplay speed is adjustable. */
-export const DEFAULT_PLAYBACK_RATE = 0.8
+export const DEFAULT_PLAYBACK_RATE = 1
 
 // --- Tiebreaker dance-off feel ---
 // Timing windows that decide scoring live in packages/shared/src/dance-off.ts

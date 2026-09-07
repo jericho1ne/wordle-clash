@@ -31,7 +31,7 @@ import {
 import {
   createDanceOff,
   DANCE_OFF_STORAGE_KEY,
-  danceOffBeatmapForClip,
+  danceOffBeatmap,
   danceOffWinner,
   judgeAndScoreHit,
   type AuthoritativeDanceOff,
@@ -670,7 +670,7 @@ export class Room extends Server<Env> {
     if (startedDanceOff) {
       this.#broadcast({
         t: 'danceOffStarted',
-        beatmap: danceOffBeatmapForClip(startedDanceOff),
+        beatmap: danceOffBeatmap(startedDanceOff),
         startsAt: startedDanceOff.startedAt,
         playerIds: startedDanceOff.playerIds,
       })
@@ -712,12 +712,12 @@ export class Room extends Server<Env> {
     const winnerId = danceOffWinner(danceOff)
 
     if (!winnerId) {
-      // Exact tie: sudden death — run the same clip again rather than invent a rule.
+      // Exact tie: sudden death — run the same track again rather than invent a rule.
       this.danceOff = createDanceOff(danceOff.playerIds)
       await this.#save()
       this.#broadcast({
         t: 'danceOffStarted',
-        beatmap: danceOffBeatmapForClip(this.danceOff),
+        beatmap: danceOffBeatmap(this.danceOff),
         startsAt: this.danceOff.startedAt,
         playerIds: this.danceOff.playerIds,
       })
@@ -943,7 +943,7 @@ export class Room extends Server<Env> {
     if (this.danceOff) {
       this.#send(connection, {
         t: 'danceOffStarted',
-        beatmap: danceOffBeatmapForClip(this.danceOff),
+        beatmap: danceOffBeatmap(this.danceOff),
         startsAt: this.danceOff.startedAt,
         playerIds: this.danceOff.playerIds,
       })

@@ -20,6 +20,7 @@
 
   .plane {
     position: relative;
+    z-index: 1;
     isolation: isolate;
     max-width: calc(var(--space-10) * 24);
     width: 100%;
@@ -62,6 +63,25 @@
     }
   }
 
+  .background-word {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    display: block;
+    width: max-content;
+    max-width: 100vw;
+    overflow: hidden;
+    color: color-mix(in srgb, var(--color-text) 10%, transparent);
+    font-size: var(--font-size-2000);
+    font-weight: 800;
+    letter-spacing: var(--space-2);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    animation: word-bounce calc(var(--duration-tile-flip) * 180) linear infinite alternate;
+  }
+
   .beat-light {
     position: absolute;
     inset: 0;
@@ -102,6 +122,28 @@
     }
   }
 
+  @keyframes word-bounce {
+    0% {
+      transform: translate(0, 0);
+    }
+
+    25% {
+      transform: translate(calc(100vw - 100%), 0);
+    }
+
+    50% {
+      transform: translate(calc(100vw - 100%), calc(100vh - 100%));
+    }
+
+    75% {
+      transform: translate(0, calc(100vh - 100%));
+    }
+
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce), (hover: none) {
     .plane {
       animation: none;
@@ -111,11 +153,10 @@
         animation: none;
       }
     }
-  }
 
-  .word {
-    margin-bottom: var(--space-4);
-    color: var(--color-neutral-200);
+    .background-word {
+      animation: none;
+    }
   }
 
   .kicker {

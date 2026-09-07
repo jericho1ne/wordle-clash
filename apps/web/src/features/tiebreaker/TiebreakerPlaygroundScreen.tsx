@@ -5,11 +5,10 @@ import type {
   Lane,
 } from '@wordle-clash/shared'
 import {
-  DANCE_OFF_CLIP_MS,
   DANCE_OFF_MAX_WINDOW_MS,
   DANCE_OFF_POINTS,
   judgeDanceHit,
-  sliceBeatmapClip,
+  parseCompactBeatmap,
 } from '@wordle-clash/shared'
 
 import {
@@ -25,7 +24,6 @@ import {
   DANCE_FLOOR_LOOKAHEAD_MS,
   DEFAULT_MOCK_WORD,
   DEFAULT_PLAYBACK_RATE,
-  FALLING_NOTE_COLOR,
   FRACTAL_SPIN_MULTIPLIER_PLAYING,
   HIT_FLASH_MS,
   KEYSTROKE_WINDOW,
@@ -38,9 +36,13 @@ import {
 } from '../../constants'
 import {
   Button,
+  DialogBox,
   PlaybackSpeedSlider,
 } from '../../ui'
+import { AudioCountdown } from './AudioCountdown'
 import { DanceOffResultDialog } from './DanceOffResultDialog'
+import { PlayerBoardFrame } from './PlayerBoardFrame'
+import { scoreStandings } from './scoreStandings'
 import type { TiebreakerStageHandle } from './TiebreakerStage'
 import { TiebreakerStage } from './TiebreakerStage'
 import styles from './TiebreakerPlaygroundScreen.module.scss'
@@ -128,14 +130,16 @@ function useDancerScore() {
 
 interface DanceFloorProps {
   dancer: DancerConfig
-  clipEntries: BeatmapEntry[]
+  entries: BeatmapEntry[]
   phase: BattlePhase
   clockMs: () => number
+  highestScore: number
+  isLeader: boolean
   onScoreChange: (dancerId: string, score: number) => void
   flash: (kind: 'correct' | 'miss', strength?: number) => void
 }
 
-function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, flash }: DanceFloorProps) {
+function DanceFloor({ dancer, entries, phase, clockMs, highestScore, isLeader, onScoreChange, flash }: DanceFloorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const flashRefs = useRef<Record<Lane, number>>({ down: 0, left: 0, right: 0 })
   const liveEntriesRef = useRef<LiveEntry[]>([])
@@ -145,9 +149,9 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, flash 
   useEffect(() => {
     // Runs every time a new battle starts, so "Dance again" starts clean.
     if (phase !== 'running') return
-    liveEntriesRef.current = clipEntries.map((entry) => ({ ...entry, consumed: false }))
+    liveEntriesRef.current = entries.map((entry) => ({ ...entry, consumed: false }))
     reset()
-  }, [phase, clipEntries, reset])
+  }, [phase, entries, reset])
 
   useEffect(() => {
     onScoreChange(dancer.id, score)
@@ -197,6 +201,7 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, flash 
 
     let rafId: number
     const laneWidth = canvas.width / LANES.length
+    const noteColor = getComputedStyle(canvas).color
     // 30% up from the bottom edge, so the (taller) hit-line box stays fully on screen.
     const hitLineY = canvas.height * 0.7
 
@@ -222,9 +227,15 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, flash 
           const progress = 1 - delta / DANCE_FLOOR_LOOKAHEAD_MS
           const y = progress * hitLineY
           if (y > canvas.height) continue
-          const [noteR, noteG, noteB] = FALLING_NOTE_COLOR
-          ctx.fillStyle = `rgba(${noteR}, ${noteG}, ${noteB}, ${noteOpacity(y, hitLineY, canvas.height)})`
-          ctx.fillRect(x + laneWidth / 2 - 16, y - 7, 32, 14)
+          const noteWidth = laneWidth * 0.9
+          const noteX = x + (laneWidth - noteWidth) / 2
+          ctx.save()
+          ctx.globalAlpha = noteOpacity(y, hitLineY, canvas.height)
+          ctx.fillStyle = noteColor
+          ctx.shadowColor = noteColor
+          ctx.shadowBlur = 18
+          ctx.fillRect(noteX, y - 7, noteWidth, 14)
+          ctx.restore()
         }
       })
 
@@ -236,28 +247,36 @@ function DanceFloor({ dancer, clipEntries, phase, clockMs, onScoreChange, flash 
   }, [clockMs])
 
   return (
-    <div className={styles.danceFloor}>
-      <div className={styles.playerBoard} data-player-color-id={dancer.playerColorId}>
-        <div className={styles.header}>
-          <strong className={styles.textTilt}>{dancer.name}</strong>
-          <span>{describeKeys(dancer.keyToLane)}</span>
+    <PlayerBoardFrame
+      name={dancer.name}
+      score={score}
+      highest={highestScore}
+      isLeader={isLeader}
+      playerColorId={dancer.playerColorId}
+    >
+      <div className={styles.danceFloor}>
+        <div className={styles.playerBoard} data-player-color-id={dancer.playerColorId}>
+          <div className={styles.header}>
+            <strong className={styles.textTilt}>{dancer.name}</strong>
+            <span>{describeKeys(dancer.keyToLane)}</span>
+          </div>
+          <div className={`${styles.hud} ${styles.textTilt}`}>
+            <span>Score {score}</span>
+            <span>Combo {combo}</span>
+          </div>
+          <div className={styles.laneLabels}>
+            {LANES.map((lane) => <span key={lane}>{laneLabels[lane]}</span>)}
+          </div>
+          <canvas ref={canvasRef} width={280} height={420} className={styles.canvas} />
         </div>
-        <div className={`${styles.hud} ${styles.textTilt}`}>
-          <span>Score {score}</span>
-          <span>Combo {combo}</span>
-        </div>
-        <div className={styles.laneLabels}>
-          {LANES.map((lane) => <span key={lane}>{laneLabels[lane]}</span>)}
-        </div>
-        <canvas ref={canvasRef} width={280} height={420} className={styles.canvas} />
       </div>
-    </div>
+    </PlayerBoardFrame>
   )
 }
 
 /**
  * Story 09-01 — DEV playground (route `/tiebreaker`) for the DDR dance-off.
- * Two local dancers battle the same 20s clip, no server involved. Good for
+ * Two local dancers battle through the full song, no server involved. Good for
  * trying out the look and feel before touching the real game.
  */
 export function TiebreakerPlaygroundScreen() {
@@ -265,12 +284,10 @@ export function TiebreakerPlaygroundScreen() {
   const word = searchParams.get('word') ?? DEFAULT_MOCK_WORD
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const stageRef = useRef<TiebreakerStageHandle | null>(null)
-  const startedAtRef = useRef(0)
-  // The speed picked before the battle starts, locked in for that whole battle.
-  const battleRateRef = useRef(DEFAULT_PLAYBACK_RATE)
   const [beatmap, setBeatmap] = useState<Beatmap | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [phase, setPhase] = useState<BattlePhase>('idle')
+  const [isStartDialogOpen, setIsStartDialogOpen] = useState(true)
   const [scores, setScores] = useState<Record<string, number>>({ p1: 0, p2: 0 })
   const [playbackRate, setPlaybackRate] = useState(DEFAULT_PLAYBACK_RATE)
 
@@ -280,19 +297,14 @@ export function TiebreakerPlaygroundScreen() {
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
         return res.json()
       })
-      .then((data: Beatmap) => setBeatmap(data))
+      .then((data: unknown) => setBeatmap(parseCompactBeatmap(data)))
       .catch((err: Error) => setError(err.message))
   }, [])
 
-  const clipEntries = useMemo(
-    () => (beatmap ? sliceBeatmapClip(beatmap, 0, DANCE_OFF_CLIP_MS) : []),
-    [beatmap],
-  )
-
-  // Time is scaled by speed, so slower playback also slows the notes down.
+  // Audio media time is the source of truth, so notes stay aligned for the full song.
   const clockMs = useCallback(() => {
     if (phase !== 'running') return 0
-    return (performance.now() - startedAtRef.current) * battleRateRef.current
+    return (audioRef.current?.currentTime ?? 0) * 1000
   }, [phase])
 
   const handleScoreChange = useCallback((dancerId: string, score: number) => {
@@ -304,22 +316,33 @@ export function TiebreakerPlaygroundScreen() {
   }, [])
 
   function startBattle() {
-    battleRateRef.current = playbackRate
-    startedAtRef.current = performance.now()
     setScores({ p1: 0, p2: 0 })
     setPhase('running')
-    if (audioRef.current) audioRef.current.playbackRate = playbackRate
-    audioRef.current?.play().catch(() => {})
+    setIsStartDialogOpen(false)
+    const audio = audioRef.current
+    if (audio) {
+      audio.currentTime = 0
+      audio.playbackRate = playbackRate
+      audio.addEventListener('ended', finishBattle, { once: true })
+      audio.play().catch(() => {})
+    }
     stageRef.current?.setSpinSpeed(FRACTAL_SPIN_MULTIPLIER_PLAYING * playbackRate)
-    window.setTimeout(() => {
-      setPhase('ended')
-      audioRef.current?.pause()
-      stageRef.current?.setSpinSpeed(1)
-    }, DANCE_OFF_CLIP_MS / playbackRate)
+  }
+
+  function finishBattle() {
+    setPhase('ended')
+    audioRef.current?.pause()
+    stageRef.current?.setSpinSpeed(1)
+  }
+
+  function prepareNextBattle() {
+    setPhase('idle')
+    setIsStartDialogOpen(true)
   }
 
   const scoreP1 = scores.p1 ?? 0
   const scoreP2 = scores.p2 ?? 0
+  const standings = scoreStandings(scores, DANCERS.map(({ id }) => id))
   const winnerSide = phase === 'ended' && scoreP1 !== scoreP2 ? (scoreP1 > scoreP2 ? 'left' : 'right') : null
 
   return (
@@ -327,21 +350,39 @@ export function TiebreakerPlaygroundScreen() {
       {error && <p className={styles.error}>Failed to load beatmap: {error}</p>}
       <audio ref={audioRef} src={TRACK_SRC} className={styles.audio} />
 
-      <div className={styles.controls}>
-        <PlaybackSpeedSlider value={playbackRate} onChange={setPlaybackRate} disabled={phase === 'running'} />
-        <Button appearance="primary" onClick={startBattle} disabled={!beatmap || phase === 'running'}>
-          {phase === 'idle' ? 'Start battle' : phase === 'running' ? 'Dancing…' : 'Dance again'}
-        </Button>
-      </div>
+      <DialogBox
+        open={isStartDialogOpen}
+        title="Ready to dance?"
+        alignment="center"
+        className={styles.battleDialog}
+        onOpenChange={() => {}}
+        actions={(
+          <Button
+            block
+            className={styles.startBattle}
+            appearance="primary"
+            onClick={startBattle}
+            disabled={!beatmap}
+          >
+            Start battle
+          </Button>
+        )}
+      >
+        <PlaybackSpeedSlider value={playbackRate} onChange={setPlaybackRate} />
+      </DialogBox>
+
+      <AudioCountdown audioRef={audioRef} />
 
       <div className={styles.floors}>
         {DANCERS.map((dancer) => (
           <DanceFloor
             key={dancer.id}
             dancer={dancer}
-            clipEntries={clipEntries}
+            entries={beatmap?.entries ?? []}
             phase={phase}
             clockMs={clockMs}
+            highestScore={standings.highest}
+            isLeader={standings.leaderId === dancer.id}
             onScoreChange={handleScoreChange}
             flash={flash}
           />
@@ -356,7 +397,7 @@ export function TiebreakerPlaygroundScreen() {
           right={{ name: DANCERS[1]?.name ?? 'Player 2', score: scoreP2 }}
           winnerSide={winnerSide}
           actions={(
-            <Button appearance="primary" onClick={startBattle}>
+            <Button appearance="primary" onClick={prepareNextBattle}>
               Dance again
             </Button>
           )}

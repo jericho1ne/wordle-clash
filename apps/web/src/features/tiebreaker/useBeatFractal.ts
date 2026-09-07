@@ -3,7 +3,6 @@ import type { MutableRefObject } from 'react'
 import {
   useEffect,
   useRef,
-  useState,
 } from 'react'
 
 import type {
@@ -19,14 +18,14 @@ import { BeatFractalEngine } from './beatFractalEngine'
  * React's render cycle. Call methods on engineRef.current imperatively
  * (from socket handlers, key handlers, etc.).
  */
-export function useBeatFractal(options: BeatFractalOptions = {}) {
+export function useBeatFractal(options: BeatFractalOptions = {}, onUnavailable?: () => void) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const engineRef = useRef<BeatFractalEngine | null>(null)
-  const [isUnavailable, setIsUnavailable] = useState(false)
 
   useEffect(() => {
     if (!canvasRef.current) return
     let engine: BeatFractalEngine | null = null
+    let unavailableFrame: number | null = null
     try {
       engine = new BeatFractalEngine(canvasRef.current, options)
       engineRef.current = engine
@@ -34,8 +33,12 @@ export function useBeatFractal(options: BeatFractalOptions = {}) {
     } catch {
       engine?.destroy()
       if (engineRef.current === engine) engineRef.current = null
-      setIsUnavailable(true)
-      return
+      // The constructor is an imperative WebGL boundary. Report its failure
+      // from the browser's next frame instead of synchronously during setup.
+      unavailableFrame = window.requestAnimationFrame(() => onUnavailable?.())
+      return () => {
+        if (unavailableFrame !== null) window.cancelAnimationFrame(unavailableFrame)
+      }
     }
 
     return () => {
@@ -59,7 +62,7 @@ export function useBeatFractal(options: BeatFractalOptions = {}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return { canvasRef, engineRef, isUnavailable }
+  return { canvasRef, engineRef }
 }
 
 /** Convenience: change theme when a Zustand-tracked value changes, without recreating the whole engine. */

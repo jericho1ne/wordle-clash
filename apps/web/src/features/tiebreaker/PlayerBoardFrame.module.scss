@@ -1,0 +1,86 @@
+.player-board-frame {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+  position: relative;
+
+  @for $id from 0 through 7 {
+    &[data-player-color-id='#{$id}'] {
+      color: var(--color-player-#{$id});
+
+      .board {
+        --player-board-accent: var(--color-player-#{$id});
+      }
+    }
+  }
+
+  .board {
+    position: relative;
+    color: var(--color-text);
+  }
+
+  .progress-score-bar {
+    appearance: none;
+    writing-mode: vertical-lr;
+    direction: rtl;
+    align-self: stretch;
+    width: var(--space-4);
+    height: auto;
+    border: 1px solid var(--color-neutral-700);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--color-neutral-900);
+    color: inherit;
+
+    &::-webkit-progress-bar {
+      background: var(--color-neutral-900);
+    }
+
+    &::-webkit-progress-value {
+      background: currentColor;
+      box-shadow: 0 0 var(--space-3) currentColor;
+    }
+
+    &::-moz-progress-bar {
+      background: currentColor;
+      box-shadow: 0 0 var(--space-3) currentColor;
+    }
+  }
+
+  .star {
+    position: absolute;
+    top: calc(var(--space-10) * -1.5);
+    left: 50%;
+    width: calc(var(--space-10) * 2);
+    height: calc(var(--space-10) * 2);
+    z-index: 2;
+    pointer-events: none;
+    background: currentColor;
+    mask: url('/icons/leader-star.svg') center / contain no-repeat;
+    transform: translateX(-50%);
+    animation: star-float calc(var(--duration-tile-flip) * 5) ease-in-out infinite;
+  }
+
+  @for $id from 0 through 7 {
+    &[data-player-color-id='#{$id}'] .star {
+      color: var(--color-player-#{$id});
+    }
+  }
+
+  @keyframes star-float {
+    0%,
+    100% {
+      transform: translateX(-50%) rotate(-4deg);
+    }
+
+    50% {
+      transform: translate(-50%, calc(var(--space-3) * -1)) rotate(4deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .star {
+      animation: none;
+    }
+  }
+}

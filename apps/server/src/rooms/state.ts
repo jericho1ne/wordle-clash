@@ -31,10 +31,10 @@ export function parseStoredRoomState(value: unknown): RoomState {
   const stored = value as { players?: unknown, syncRoundDurationMinutes?: unknown }
   const players = Array.isArray(stored.players)
     ? stored.players.map((player, index) => (
-      player && typeof player === 'object' && !('playerColorId' in player)
-        ? { ...player, playerColorId: index % MAX_PLAYERS }
-        : player
-    ))
+        player && typeof player === 'object' && !('playerColorId' in player)
+          ? { ...player, playerColorId: index % MAX_PLAYERS }
+          : player
+      ))
     : stored.players
 
   return roomStateSchema.parse({

@@ -45,7 +45,7 @@ function randomTheme(): ThemeName {
   return names[Math.floor(Math.random() * names.length)] ?? 'neonArcade'
 }
 
-/** The shared look for both Tiebreaker screens: one big randomized fractal background, the heading, and the tied word. */
+/** The shared look for both Tiebreaker screens: one randomized fractal background, 3D plane, and drifting tied word. */
 export const TiebreakerStage = forwardRef<TiebreakerStageHandle, TiebreakerStageProps>(
   ({ roomLabel, word, children }, ref) => {
     const bgRef = useRef<BeatFractalHandle | null>(null)
@@ -53,6 +53,8 @@ export const TiebreakerStage = forwardRef<TiebreakerStageHandle, TiebreakerStage
     const lightAnimationRef = useRef<Animation | null>(null)
     const [theme] = useState(randomTheme)
     const [isWebglUnavailable, setIsWebglUnavailable] = useState(false)
+
+    const markWebglUnavailable = useCallback(() => setIsWebglUnavailable(true), [])
 
     useEffect(() => () => lightAnimationRef.current?.cancel(), [])
 
@@ -89,23 +91,21 @@ export const TiebreakerStage = forwardRef<TiebreakerStageHandle, TiebreakerStage
 
     return (
       <div className={`${styles.tiebreakerStage} ${isWebglUnavailable ? styles.webglUnavailable : ''}`}>
-        <BeatFractalBackground
-          ref={bgRef}
-          theme={theme}
-          baseBrightness={FRACTAL_BASE_BRIGHTNESS}
-          baseSaturation={FRACTAL_BASE_SATURATION}
-          sizeIncrease={FRACTAL_SIZE_INCREASE}
-          onUnavailable={() => setIsWebglUnavailable(true)}
-        />
+        {!isWebglUnavailable && (
+          <BeatFractalBackground
+            ref={bgRef}
+            theme={theme}
+            baseBrightness={FRACTAL_BASE_BRIGHTNESS}
+            baseSaturation={FRACTAL_BASE_SATURATION}
+            sizeIncrease={FRACTAL_SIZE_INCREASE}
+            onUnavailable={markWebglUnavailable}
+          />
+        )}
+        {word && <span className={styles.backgroundWord} aria-hidden="true">{word}</span>}
         <main className={styles.plane}>
           <div ref={lightRef} className={styles.beatLight} aria-hidden="true" />
           {roomLabel && <div className={`card-kicker ${styles.kicker}`}>{roomLabel}</div>}
           <h1 className={styles.textTilt}>Tiebreaker!</h1>
-          {word && (
-            <p className={styles.word}>
-              Tied on <strong className={styles.textTilt}>{word}</strong>
-            </p>
-          )}
           {isWebglUnavailable && (
             <p className={`card ${styles.webglNotice}`} role="status">
               Animated background unavailable. Enable browser hardware acceleration to restore it.

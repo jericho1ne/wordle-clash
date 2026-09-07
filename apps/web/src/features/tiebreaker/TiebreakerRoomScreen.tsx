@@ -20,7 +20,6 @@ import {
 
 import {
   DANCE_FLOOR_LOOKAHEAD_MS,
-  FALLING_NOTE_COLOR,
   FRACTAL_SPIN_MULTIPLIER_PLAYING,
   HIT_FLASH_MS,
   KEYSTROKE_WINDOW,
@@ -33,12 +32,16 @@ import {
 } from '../../constants'
 import { useRoomStore } from '../../realtime'
 import { Button } from '../../ui'
+import { AudioCountdown } from './AudioCountdown'
 import { DanceOffResultDialog } from './DanceOffResultDialog'
+import { PlayerBoardFrame } from './PlayerBoardFrame'
+import { scoreStandings } from './scoreStandings'
 import type { TiebreakerStageHandle } from './TiebreakerStage'
 import { TiebreakerStage } from './TiebreakerStage'
 import styles from './TiebreakerRoomScreen.module.scss'
 
 const LANES: readonly Lane[] = ['left', 'down', 'right']
+const TRACK_SRC = '/audio/canto-de-ossanha.mp3'
 // The only place the A/S/D keys are set. Everything else on screen reads from here.
 const KEY_TO_LANE: Record<string, Lane> = {
   a: 'left',
@@ -67,11 +70,13 @@ interface DanceFloorProps {
   score: number
   entries: BeatmapEntry[]
   startsAt: number
+  highestScore: number
+  isLeader: boolean
   canPlay: boolean
   onHit: (lane: Lane, clientTimeMs: number) => void
 }
 
-function DanceFloor({ name, playerColorId, score, entries, startsAt, canPlay, onHit }: DanceFloorProps) {
+function DanceFloor({ name, playerColorId, score, entries, startsAt, highestScore, isLeader, canPlay, onHit }: DanceFloorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const flashRefs = useRef<Record<Lane, number>>({ down: 0, left: 0, right: 0 })
 
@@ -101,6 +106,7 @@ function DanceFloor({ name, playerColorId, score, entries, startsAt, canPlay, on
 
     let rafId: number
     const laneWidth = canvas.width / LANES.length
+    const noteColor = getComputedStyle(canvas).color
     // 30% up from the bottom edge, so the (taller) hit-line box stays fully on screen.
     const hitLineY = canvas.height * 0.7
 
@@ -124,9 +130,15 @@ function DanceFloor({ name, playerColorId, score, entries, startsAt, canPlay, on
           const progress = 1 - delta / DANCE_FLOOR_LOOKAHEAD_MS
           const y = progress * hitLineY
           if (y > canvas.height) continue
-          const [noteR, noteG, noteB] = FALLING_NOTE_COLOR
-          ctx.fillStyle = `rgba(${noteR}, ${noteG}, ${noteB}, ${noteOpacity(y, hitLineY, canvas.height)})`
-          ctx.fillRect(x + laneWidth / 2 - 16, y - 7, 32, 14)
+          const noteWidth = laneWidth * 0.9
+          const noteX = x + (laneWidth - noteWidth) / 2
+          ctx.save()
+          ctx.globalAlpha = noteOpacity(y, hitLineY, canvas.height)
+          ctx.fillStyle = noteColor
+          ctx.shadowColor = noteColor
+          ctx.shadowBlur = 18
+          ctx.fillRect(noteX, y - 7, noteWidth, 14)
+          ctx.restore()
         }
       })
 
@@ -138,19 +150,27 @@ function DanceFloor({ name, playerColorId, score, entries, startsAt, canPlay, on
   }, [entries, startsAt])
 
   return (
-    <div className={styles.danceFloor}>
-      <div className={styles.playerBoard} data-player-color-id={playerColorId}>
-        <div className={styles.dancerHeader}>
-          <strong className={styles.textTilt}>{name}</strong>
-          {canPlay && <span>{KEY_LEGEND}</span>}
+    <PlayerBoardFrame
+      name={name}
+      score={score}
+      highest={highestScore}
+      isLeader={isLeader}
+      playerColorId={playerColorId}
+    >
+      <div className={styles.danceFloor}>
+        <div className={styles.playerBoard} data-player-color-id={playerColorId}>
+          <div className={styles.dancerHeader}>
+            <strong className={styles.textTilt}>{name}</strong>
+            {canPlay && <span>{KEY_LEGEND}</span>}
+          </div>
+          <div className={`${styles.hud} ${styles.textTilt}`}>Score {score}</div>
+          <div className={styles.laneLabels}>
+            {LANES.map((lane) => <span key={lane}>{LANE_KEY_LABEL[lane]}</span>)}
+          </div>
+          <canvas ref={canvasRef} width={260} height={380} className={styles.canvas} />
         </div>
-        <div className={`${styles.hud} ${styles.textTilt}`}>Score {score}</div>
-        <div className={styles.laneLabels}>
-          {LANES.map((lane) => <span key={lane}>{LANE_KEY_LABEL[lane]}</span>)}
-        </div>
-        <canvas ref={canvasRef} width={260} height={380} className={styles.canvas} />
       </div>
-    </div>
+    </PlayerBoardFrame>
   )
 }
 
@@ -160,6 +180,7 @@ export function TiebreakerRoomScreen() {
   const navigate = useNavigate()
   const roomCode = normalizeRoomCode(code)
   const stageRef = useRef<TiebreakerStageHandle | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const connect = useRoomStore(({ connect }) => connect)
   const disconnect = useRoomStore(({ disconnect }) => disconnect)
@@ -196,6 +217,19 @@ export function TiebreakerRoomScreen() {
     stageRef.current?.setSpinSpeed(danceOff && match?.phase !== 'finished' ? FRACTAL_SPIN_MULTIPLIER_PLAYING : 1)
   }, [danceOff, match?.phase])
 
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (!danceOff || match?.phase === 'finished') {
+      audio.pause()
+      return
+    }
+
+    audio.currentTime = Math.max(0, (Date.now() - danceOff.startsAt) / 1000)
+    audio.play().catch(() => {})
+    return () => audio.pause()
+  }, [danceOff, match?.phase])
+
   const handleHit = useCallback((lane: Lane, clientTimeMs: number) => {
     submitDanceHit(lane, clientTimeMs)
   }, [submitDanceHit])
@@ -209,6 +243,7 @@ export function TiebreakerRoomScreen() {
   const leftPlayer = room?.players.find(({ id }) => id === leftId)
   const rightPlayer = room?.players.find(({ id }) => id === rightId)
   const winnerSide = match?.winnerId === leftId ? 'left' : match?.winnerId === rightId ? 'right' : null
+  const standings = scoreStandings(danceOff?.scores ?? {}, dancerIds)
 
   return (
     <TiebreakerStage ref={stageRef} roomLabel={`Room ${roomCode}`} word={match?.answer ?? null}>
@@ -216,6 +251,9 @@ export function TiebreakerRoomScreen() {
 
       {danceOff && (
         <>
+          <audio ref={audioRef} src={TRACK_SRC} className={styles.audio} />
+          <AudioCountdown audioRef={audioRef} />
+
           {!isDancer && !battleOver && (
             <p className={styles.spectatorNote}>You&apos;re spectating — {dancerIds.length} players are battling it out.</p>
           )}
@@ -231,6 +269,8 @@ export function TiebreakerRoomScreen() {
                   score={danceOff.scores[playerId] ?? 0}
                   entries={danceOff.beatmap.entries}
                   startsAt={danceOff.startsAt}
+                  highestScore={standings.highest}
+                  isLeader={standings.leaderId === playerId}
                   canPlay={!battleOver && playerId === selfId}
                   onHit={handleHit}
                 />

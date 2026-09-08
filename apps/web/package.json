@@ -22,6 +22,7 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@jericho1ne/vue-directives-jsx": "0.1.0-alpha.0",
     "@types/node": "^26.4.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
@@ -29,7 +30,6 @@
     "sass-embedded": "^1.103.1",
     "typescript": "~5.9.3",
     "vite": "^8.2.2",
-    "vitest": "^4.1.11",
-    "vue-directives-jsx": "file:../../../vue-directives-jsx"
+    "vitest": "^4.1.11"
   }
 }

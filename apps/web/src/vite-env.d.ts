@@ -1,3 +1,3 @@
 /// <reference types="vite/client" />
 
-import type {} from 'vue-directives-jsx/jsx'
+import type {} from '@jericho1ne/vue-directives-jsx/jsx'

@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url'
 
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import vueDirectives from 'vue-directives-jsx/vite'
+import vueDirectives from '@jericho1ne/vue-directives-jsx/vite'
 
 // NOTE: never set `base` — keep the app mounted at `/`. The Worker serves the
 // built assets in production with SPA fallback (see apps/server/wrangler.jsonc).

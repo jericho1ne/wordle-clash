@@ -17,7 +17,7 @@ hit.
    `MatchSnapshot` (`packages/shared/src/gameplay.ts`,
    `apps/server/src/rooms/Room.ts`).
 2. Epic 08's `Beatmap` schema and the checked-in
-   `apps/web/public/audio/canto-de-ossanha.beatmap.json`.
+   `apps/web/public/audio/dragonball-super.beatmap.json`.
 
 ## Dance-off rules
 

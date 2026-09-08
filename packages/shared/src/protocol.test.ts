@@ -138,7 +138,7 @@ describe('server protocol', () => {
     const started: ServerMessage = {
       t: 'danceOffStarted',
       beatmap: {
-        trackPath: 'audio/canto-de-ossanha.mp3',
+        trackPath: 'audio/dragonball-super.mp3',
         durationMs: 20_000,
         entries: [{ timeMs: 500, lane: 'left' }],
       },

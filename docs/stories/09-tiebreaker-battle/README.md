@@ -3,7 +3,7 @@
 **Status:** implemented; full live-match verification pending (see
 Verification below).
 
-Resolves a sync-mode tie (`match.phase === 'tiebreak'`, `tiebreakPlayerIds`,
+Resolves a sync-mode tie or final all-miss (`match.phase === 'tiebreak'`, `tiebreakPlayerIds`,
 introduced in Epic 07 story 06) into a real winner via a DDR-style dance-off:
 tied players hit arrow lanes timed to the real audio track's kicks and
 snares, judged against Epic 08's checked-in beatmap. Everyone else in the
@@ -17,7 +17,7 @@ hit.
    `MatchSnapshot` (`packages/shared/src/gameplay.ts`,
    `apps/server/src/rooms/Room.ts`).
 2. Epic 08's `Beatmap` schema and the checked-in
-   `apps/web/public/audio/canto-de-ossanha.beatmap.json`.
+   `apps/web/public/audio/dragonball-super.beatmap.json`.
 
 ## Dance-off rules
 

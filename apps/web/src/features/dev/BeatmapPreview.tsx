@@ -19,8 +19,8 @@ import {
 import { PlaybackSpeedSlider } from '@/ui'
 import styles from './BeatmapPreview.module.scss'
 
-const TRACK_SRC = '/audio/canto-de-ossanha.mp3'
-const BEATMAP_SRC = '/audio/canto-de-ossanha.beatmap.json'
+const TRACK_SRC = '/audio/dragonball-super.mp3'
+const BEATMAP_SRC = '/audio/dragonball-super.beatmap.json'
 const LANES: readonly Lane[] = ['left', 'down', 'right']
 const LANE_LABEL: Record<Lane, string> = { down: '↓', left: '←', right: '→' }
 

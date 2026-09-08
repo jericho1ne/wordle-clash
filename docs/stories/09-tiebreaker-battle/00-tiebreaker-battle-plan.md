@@ -29,7 +29,8 @@ so the Room DO, protocol, and UI stories all build against the same contract.
   - `/room/:code/tiebreaker` — the real, guarded route, mirroring
     `/room/:code/play`. Redirects away (`<Navigate>`, matching
     `GameplayScreen`'s existing pattern) unless the room's `match.phase ===
-    'tiebreak'`. Tied players get interactive input; every other connected
+    'tiebreak'`. Players tied on a correct answer, or every active player after
+    a final all-miss, get interactive input; every other connected
     player in the room lands on the same screen in spectator mode.
 - **Protocol:** `danceOff*` messages are additive to the existing
   discriminated unions in `packages/shared/src/protocol.ts` — no breaking

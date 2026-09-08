@@ -38,7 +38,7 @@ import {
 } from './useDanceInput'
 import styles from './TiebreakerPlaygroundScreen.module.scss'
 
-const BEATMAP_SRC = '/audio/canto-de-ossanha.beatmap.json'
+const BEATMAP_SRC = '/audio/dragonball-super.beatmap.json'
 const DANCERS = [
   { id: 'p1', name: 'Player 1', playerColorId: 0, keyToLane: LETTER_KEYS },
   { id: 'p2', name: 'Player 2', playerColorId: 1, keyToLane: ARROW_KEYS },

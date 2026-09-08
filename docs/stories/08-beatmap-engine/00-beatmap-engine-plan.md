@@ -34,7 +34,7 @@ build against.
 - A density/difficulty knob (target notes/sec, default tuned to feel like DDR
   "drumming," not a slow metronome) trims onsets when the track is busier
   than that target, always preserving the 120ms minimum gap.
-- The generation script only needs to run once for `canto-de-ossanha.mp3`
+- The generation script only needs to run once for `dragonball-super.mp3`
   during this build; it's a `pnpm` script, not a build-time step, so no CI
   dependency on audio decoding.
 

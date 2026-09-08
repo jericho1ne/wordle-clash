@@ -10,7 +10,7 @@ fair, server-verifiable source of truth the Tiebreaker Battle dance-off
 authoritative scoring read the same file, so timing is never trusted from an
 individual client.
 
-The track under analysis is `apps/web/public/audio/canto-de-ossanha.mp3`.
+The track under analysis is `apps/web/public/audio/dragonball-super.mp3`.
 
 ## Dependencies
 
@@ -24,7 +24,7 @@ Epic 09 exists.
 |---|---|---|
 | [00](./00-beatmap-engine-plan.md) | **Done:** stack plan, onset-detection approach, JSON schema | Reviewable implementation contract |
 | 01 | **Done:** `packages/shared/src/beatmap.ts` — `Lane`/`BeatmapEntry`/`Beatmap` zod schema, gap/lane-balance validators | Unit tests pass with no audio dependency |
-| 02 | **Done:** offline Node analysis script decodes `canto-de-ossanha.mp3`, detects kick/snare onsets, writes `apps/web/public/audio/canto-de-ossanha.beatmap.json` as compact `[timeMs, laneId]` tuples (655 entries, ~3 notes/sec avg) | Script run produces a schema-valid, deterministic JSON file |
+| 02 | **Done:** offline Node analysis script decodes `dragonball-super.mp3`, detects kick/snare onsets, writes `apps/web/public/audio/dragonball-super.beatmap.json` as compact `[timeMs, laneId]` tuples (453 entries, ~3.64 notes/sec avg) | Script run produces a schema-valid, deterministic JSON file |
 | 03 | **Done:** `/beatmap-preview` route: plays the track, scrolls the generated beatmap in sync, with a playback-speed slider (defaults 60%) | Verified in-browser — beatmap loads and lanes flash on their notes |
 
 ## Beat detection approach

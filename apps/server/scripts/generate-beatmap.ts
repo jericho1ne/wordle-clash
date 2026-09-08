@@ -203,8 +203,8 @@ export function generateBeatmap(inputPath: string, targetNotesPerSec: number): B
 
 function main() {
   const args = parseArgs(process.argv.slice(2))
-  const inputPath = path.resolve(REPO_ROOT, args.get('input') ?? 'apps/web/public/audio/canto-de-ossanha.mp3')
-  const outputPath = path.resolve(REPO_ROOT, args.get('out') ?? 'apps/web/public/audio/canto-de-ossanha.beatmap.json')
+  const inputPath = path.resolve(REPO_ROOT, args.get('input') ?? 'apps/web/public/audio/dragonball-super.mp3')
+  const outputPath = path.resolve(REPO_ROOT, args.get('out') ?? 'apps/web/public/audio/dragonball-super.beatmap.json')
   const targetNotesPerSec = Number(args.get('rate') ?? DEFAULT_TARGET_NOTES_PER_SEC)
 
   if (!existsSync(inputPath)) {

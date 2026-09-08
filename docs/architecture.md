@@ -301,7 +301,7 @@ The `Room` Durable Object owns the secret word, guesses, round timer, winner
 selection, and terminal state. Its public snapshots contain only renderable
 guesses and never expose the answer during active play.
 
-The bboy dance-off minigame that resolves a synchronous-round tie is
+The bboy dance-off minigame that resolves a synchronous-round tie or final all-miss is
 implemented in
 [`docs/stories/08-beatmap-engine`](./docs/stories/08-beatmap-engine/) (the
 offline kick/snare beat map generator) and

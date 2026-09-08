@@ -655,7 +655,15 @@ export class Room extends Server<Env> {
       startedDanceOff = createDanceOff(correctPlayerIds)
       this.danceOff = startedDanceOff
     } else if (match.round >= GAME_MODES.sync.tries) {
-      match.phase = 'finished'
+      // A final all-miss is still resolved on the dance floor. Include every
+      // active player, including someone whose last-round guess timed out.
+      const activePlayerIds = this.state.players
+        .map(({ id }) => id)
+        .filter((id) => !match.eliminatedPlayerIds.includes(id))
+      match.tiebreakPlayerIds = activePlayerIds
+      match.phase = 'tiebreak'
+      startedDanceOff = createDanceOff(activePlayerIds)
+      this.danceOff = startedDanceOff
     } else {
       match.round += 1
       match.roundEndsAt = Date.now() + syncRoundDurationMs(match.syncRoundDurationMinutes)

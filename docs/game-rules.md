@@ -8,7 +8,7 @@ Synchronous mode — Rules
 - If exactly one player guesses the word, they win immediately.
 - If two or more players guess the word in the same round, those players advance to a bboy dance-off (a timed tap/rhythm minigame) to decide the winner.
 - If no one guesses correctly, play continues to the next guess (up to 5 rounds).
-- If no one guesses the word within 5 tries, the game ends with no winner (or reveals the word, per host setting).
+- If no one guesses the word within 5 tries, every active player advances to a bboy dance-off to decide the winner.
 
 Real-time mode — Rules
 

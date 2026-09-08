@@ -9,7 +9,7 @@ import {
 } from '@wordle-clash/shared'
 
 // Same file the client fetches over HTTP, so both sides see the same beat map.
-import trackBeatmapJson from '../../../web/public/audio/canto-de-ossanha.beatmap.json'
+import trackBeatmapJson from '../../../web/public/audio/dragonball-super.beatmap.json'
 
 export const DANCE_OFF_STORAGE_KEY = 'danceOff'
 

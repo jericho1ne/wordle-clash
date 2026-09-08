@@ -1,9 +1,9 @@
 import { useState } from 'react'
 
-import { useIdentity } from '../../identity'
-import { useAppNavigate } from '../../lib/useAppNavigate'
-import { Button } from '../../ui'
-import { AccountDialog } from '../account/AccountDialog'
+import { useIdentity } from '@/identity'
+import { useAppNavigate } from '@/lib/useAppNavigate'
+import { Button } from '@/ui'
+import { AccountDialog } from '@/features/account/AccountDialog'
 import styles from './TitleScreen.module.scss'
 
 const WORDLE_TILES = [

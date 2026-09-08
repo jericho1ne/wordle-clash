@@ -13,10 +13,10 @@ import {
   Navigate,
   useParams,
 } from 'react-router'
-import { FRACTAL_SPIN_MULTIPLIER_PLAYING } from '../../constants'
-import { useAppNavigate } from '../../lib/useAppNavigate'
-import { useRoomStore } from '../../realtime'
-import { Button } from '../../ui'
+import { FRACTAL_SPIN_MULTIPLIER_PLAYING } from '@/constants'
+import { useAppNavigate } from '@/lib/useAppNavigate'
+import { useRoomStore } from '@/realtime'
+import { Button } from '@/ui'
 import { AudioCountdown } from './AudioCountdown'
 import { DanceBoard } from './DanceBoard'
 import { DanceOffResultDialog } from './DanceOffResultDialog'

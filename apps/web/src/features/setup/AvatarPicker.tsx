@@ -5,7 +5,7 @@ import {
 
 import { AVATAR_STEPS } from '@wordle-clash/shared'
 
-import { Button } from '../../ui'
+import { Button } from '@/ui'
 import styles from './AvatarPicker.module.scss'
 
 interface AvatarPickerProps {

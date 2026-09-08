@@ -11,7 +11,7 @@ import {
 import {
   AnimalIcon,
   Button,
-} from '../../ui'
+} from '@/ui'
 import styles from './AnimalPicker.module.scss'
 
 interface AnimalPickerProps {

@@ -4,14 +4,14 @@ import {
   type FormEvent,
 } from 'react'
 
-import { authClient } from '../../identity/auth-client'
-import { useIdentity } from '../../identity/useIdentity'
+import { authClient } from '@/identity/auth-client'
+import { useIdentity } from '@/identity/useIdentity'
 import {
   Button,
   DialogBox,
   Field,
   Input,
-} from '../../ui'
+} from '@/ui'
 import styles from './AccountDialog.module.scss'
 
 type AccountMode = 'sign-in' | 'sign-up'

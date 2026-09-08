@@ -9,7 +9,7 @@ import {
   RadioGroup,
   SegmentedControl,
   Tag,
-} from '../../ui'
+} from '@/ui'
 import styles from './DesignSystem.module.scss'
 
 const BASE = [

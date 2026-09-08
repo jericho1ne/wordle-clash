@@ -4,7 +4,7 @@ import {
   type ErrorMessage,
 } from '@wordle-clash/shared'
 
-import { RoomSocket } from '../../realtime'
+import { RoomSocket } from '@/realtime'
 
 interface CreateRoomResponse {
   roomCode?: unknown

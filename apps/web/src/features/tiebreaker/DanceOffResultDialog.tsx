@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { DialogBox } from '../../ui'
+import { DialogBox } from '@/ui'
 import styles from './DanceOffResultDialog.module.scss'
 
 export interface DanceOffPlayerResult {

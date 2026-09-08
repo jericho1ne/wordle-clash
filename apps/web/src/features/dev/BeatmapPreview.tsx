@@ -15,8 +15,8 @@ import {
   BEATMAP_PREVIEW_LOOKAHEAD_MS,
   DEFAULT_PLAYBACK_RATE,
   HIT_FLASH_MS,
-} from '../../constants'
-import { PlaybackSpeedSlider } from '../../ui'
+} from '@/constants'
+import { PlaybackSpeedSlider } from '@/ui'
 import styles from './BeatmapPreview.module.scss'
 
 const TRACK_SRC = '/audio/canto-de-ossanha.mp3'

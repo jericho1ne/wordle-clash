@@ -1,4 +1,4 @@
-import { ensureIdentity } from '../identity'
+import { ensureIdentity } from '@/identity'
 
 interface RealtimeTicketResponse {
   ticket: string

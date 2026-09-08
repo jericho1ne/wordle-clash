@@ -12,7 +12,7 @@ import {
   useParams,
 } from 'react-router'
 
-import { useAppNavigate } from '../../lib/useAppNavigate'
+import { useAppNavigate } from '@/lib/useAppNavigate'
 import {
   isValidGuess,
   isValidRoomCode,
@@ -22,12 +22,12 @@ import {
   type EvaluatedGuess,
 } from '@wordle-clash/shared'
 
-import { useRoomStore } from '../../realtime'
+import { useRoomStore } from '@/realtime'
 import {
   Avatar,
   Button,
   Tag,
-} from '../../ui'
+} from '@/ui'
 import styles from './GameplayScreen.module.scss'
 
 function GuessRow({ guess }: { guess: EvaluatedGuess }) {

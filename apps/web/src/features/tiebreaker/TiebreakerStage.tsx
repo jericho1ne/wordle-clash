@@ -15,7 +15,7 @@ import {
   FRACTAL_FLASH_COLOR_CORRECT,
   FRACTAL_FLASH_COLOR_MISS,
   FRACTAL_SIZE_INCREASE,
-} from '../../constants'
+} from '@/constants'
 import type { BeatFractalHandle } from './BeatFractalBackground'
 import { BeatFractalBackground } from './BeatFractalBackground'
 import {

@@ -5,7 +5,7 @@ import {
 } from 'react'
 import { useParams } from 'react-router'
 
-import { useAppNavigate } from '../../lib/useAppNavigate'
+import { useAppNavigate } from '@/lib/useAppNavigate'
 import {
   canStartMatch,
   GAME_MODES,
@@ -17,8 +17,8 @@ import {
 } from '@wordle-clash/shared'
 import { Star } from '@phosphor-icons/react'
 
-import { useFavorites } from '../../identity'
-import { useRoomStore } from '../../realtime'
+import { useFavorites } from '@/identity'
+import { useRoomStore } from '@/realtime'
 import {
   Avatar,
   Button,
@@ -27,7 +27,7 @@ import {
   SegmentedControl,
   Tag,
   useToast,
-} from '../../ui'
+} from '@/ui'
 import {
   copyRoomCode,
   shareRoomInvite,

@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url'
+
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -11,11 +13,29 @@ import react from '@vitejs/plugin-react'
 // docs/stories/00-app-scaffold/06-dev-server-and-deploy.md).
 const WORKER_ORIGIN = process.env.WORKER_ORIGIN ?? 'http://localhost:8787'
 
+// `@` aliases `src/`, mirrored in tsconfig.json's `paths` for tsc/the editor.
+const SRC_DIR = fileURLToPath(new URL('./src', import.meta.url))
+
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: { '@': SRC_DIR },
+  },
   css: {
     // `.title-screen` in a *.module.scss is referenced as `styles.titleScreen`.
     modules: { localsConvention: 'camelCaseOnly' },
+    preprocessorOptions: {
+      scss: {
+        // resolve.alias above only covers TS/TSX — dart-sass needs its own
+        // importer to understand `@use '@/...'`.
+        importers: [{
+          findFileUrl(url: string) {
+            if (!url.startsWith('@/')) return null
+            return new URL(url.slice(2), `file://${SRC_DIR}/`)
+          },
+        }],
+      },
+    },
   },
   server: {
     port: 5173,

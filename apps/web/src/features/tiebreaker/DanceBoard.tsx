@@ -18,7 +18,7 @@ import {
   NOTE_FADE_OUT_OPACITY,
   NOTE_FADE_OUT_ZONE,
   NOTE_HITLINE_OPACITY,
-} from '../../constants'
+} from '@/constants'
 
 import { PlayerBoardFrame } from './PlayerBoardFrame'
 import { useDanceInput } from './useDanceInput'

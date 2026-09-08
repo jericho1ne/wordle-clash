@@ -10,15 +10,15 @@ import {
   normalizeRoomCode,
 } from '@wordle-clash/shared'
 
-import { useAppNavigate } from '../../lib/useAppNavigate'
-import { useProfile } from '../../identity'
+import { useAppNavigate } from '@/lib/useAppNavigate'
+import { useProfile } from '@/identity'
 import {
   Button,
   Field,
   IconButton,
   Input,
   SegmentedControl,
-} from '../../ui'
+} from '@/ui'
 import { AvatarPicker } from './AvatarPicker'
 import { AnimalPicker } from './AnimalPicker'
 import {

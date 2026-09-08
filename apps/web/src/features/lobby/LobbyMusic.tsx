@@ -5,7 +5,7 @@ import {
   useState,
 } from 'react'
 
-import { Toggle } from '../../ui'
+import { Toggle } from '@/ui'
 import styles from './LobbyMusic.module.scss'
 
 const LOBBY_MUSIC_VOLUME = 0.15

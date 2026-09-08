@@ -8,7 +8,7 @@ import {
   normalizeRoomCode,
 } from '@wordle-clash/shared'
 
-import { readStoredProfile } from '../../identity/profile'
+import { readStoredProfile } from '@/identity/profile'
 import { LobbyScreen } from './LobbyScreen'
 
 export function InviteRoomRoute() {

@@ -19,12 +19,12 @@ import {
   DEFAULT_MOCK_WORD,
   DEFAULT_PLAYBACK_RATE,
   FRACTAL_SPIN_MULTIPLIER_PLAYING,
-} from '../../constants'
+} from '@/constants'
 import {
   Button,
   DialogBox,
   PlaybackSpeedSlider,
-} from '../../ui'
+} from '@/ui'
 import { AudioCountdown } from './AudioCountdown'
 import { DanceBoard } from './DanceBoard'
 import { DanceOffResultDialog } from './DanceOffResultDialog'

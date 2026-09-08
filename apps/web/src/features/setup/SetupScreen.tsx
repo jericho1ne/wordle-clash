@@ -167,51 +167,43 @@ export function SetupScreen() {
               </div>
             </div>
 
-            {!isInvite && (
-              <div className={styles.modeField}>
-                <div className={styles.label} id="room-entry-label">Room</div>
-                <div className={styles.roomEntryControls}>
-                  <SegmentedControl
-                    name="room-entry-mode"
-                    aria-labelledby="room-entry-label"
-                    value={mode}
-                    onChange={changeMode}
-                    options={[
-                      {
-                        value: 'create',
-                        label: 'Create room',
-                        icon: <span aria-hidden="true">+</span>,
-                      },
-                      {
-                        value: 'join',
-                        label: 'Join room',
-                        icon: <span aria-hidden="true">→</span>,
-                      },
-                    ]}
-                  />
-                  {mode === 'join' && roomCodeInput}
-                </div>
+            <div v-if={!isInvite} className={styles.modeField}>
+              <div className={styles.label} id="room-entry-label">Room</div>
+              <div className={styles.roomEntryControls}>
+                <SegmentedControl
+                  name="room-entry-mode"
+                  aria-labelledby="room-entry-label"
+                  value={mode}
+                  onChange={changeMode}
+                  options={[
+                    {
+                      value: 'create',
+                      label: 'Create room',
+                      icon: <span aria-hidden="true">+</span>,
+                    },
+                    {
+                      value: 'join',
+                      label: 'Join room',
+                      icon: <span aria-hidden="true">→</span>,
+                    },
+                  ]}
+                />
+                {mode === 'join' && roomCodeInput}
               </div>
-            )}
+            </div>
 
-            {isInvite && mode === 'join' && (
-              <Field label="Room code" htmlFor="room-code">
-                {roomCodeInput}
-              </Field>
-            )}
+            <Field v-if={isInvite && mode === 'join'} label="Room code" htmlFor="room-code">
+              {roomCodeInput}
+            </Field>
           </fieldset>
 
-          {error && (
-            <p className={styles.error} role="alert">
-              {error}
-            </p>
-          )}
+          <p v-if={error} className={styles.error} role="alert">
+            {error}
+          </p>
 
-          {isInvite && error && (
-            <Button appearance="outline" onClick={leaveInvite}>
-              Enter a different room code
-            </Button>
-          )}
+          <Button v-if={isInvite && error} appearance="outline" onClick={leaveInvite}>
+            Enter a different room code
+          </Button>
 
           <Button type="submit" block disabled={!canSubmit}>
             {submitLabel}

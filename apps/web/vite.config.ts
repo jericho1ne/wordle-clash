@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url'
 
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import vueDirectives from 'vue-directives-jsx/vite'
 
 // NOTE: never set `base` — keep the app mounted at `/`. The Worker serves the
 // built assets in production with SPA fallback (see apps/server/wrangler.jsonc).
@@ -17,7 +18,7 @@ const WORKER_ORIGIN = process.env.WORKER_ORIGIN ?? 'http://localhost:8787'
 const SRC_DIR = fileURLToPath(new URL('./src', import.meta.url))
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [vueDirectives(), react()],
   resolve: {
     alias: { '@': SRC_DIR },
   },

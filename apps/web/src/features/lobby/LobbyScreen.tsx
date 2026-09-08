@@ -202,106 +202,86 @@ export function LobbyScreen() {
           >
             {CONNECTION_LABELS[connectionStatus]}
           </div>
-          {room && (
-            <section className={styles.section}>
-              <div className={styles.sectionHeading}>Game mode</div>
-              <SegmentedControl
-                name="game-mode"
-                aria-label="Game mode"
-                value={room.gameMode}
+          <section v-if={room} className={styles.section}>
+            <div className={styles.sectionHeading}>Game mode</div>
+            <SegmentedControl
+              name="game-mode"
+              aria-label="Game mode"
+              value={room.gameMode}
+              disabled={!self?.isHost || room.phase !== 'lobby'}
+              onChange={setGameMode}
+              options={GAME_MODE_IDS.map((mode) => ({
+                value: mode,
+                label: GAME_MODES[mode].label,
+              }))}
+            />
+            <p className={styles.modeDescription}>{GAME_MODES[room.gameMode].description}</p>
+            <label v-if={room.gameMode === 'sync'} className={styles.roundDuration}>
+              <span>Round time limit</span>
+              <select
+                className="input"
+                value={room.syncRoundDurationMinutes}
                 disabled={!self?.isHost || room.phase !== 'lobby'}
-                onChange={setGameMode}
-                options={GAME_MODE_IDS.map((mode) => ({
-                  value: mode,
-                  label: GAME_MODES[mode].label,
-                }))}
-              />
-              <p className={styles.modeDescription}>{GAME_MODES[room.gameMode].description}</p>
-              {room.gameMode === 'sync' && (
-                <label className={styles.roundDuration}>
-                  <span>Round time limit</span>
-                  <select
-                    className="input"
-                    value={room.syncRoundDurationMinutes}
-                    disabled={!self?.isHost || room.phase !== 'lobby'}
-                    onChange={({ target }) => setSyncRoundDuration(
-                      Number(target.value) as SyncRoundDurationMinutes,
-                    )}
-                  >
-                    {SYNC_ROUND_DURATION_MINUTES.map((minutes) => (
-                      <option key={minutes} value={minutes}>
-                        {minutes} {minutes === 1 ? 'minute' : 'minutes'}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              )}
-            </section>
-          )}
-          {room && (
-            <section className={styles.section}>
-              <div className={styles.sectionHeading}>Players · {room.players.length}</div>
-              <ul className={styles.players}>
-                {room.players.map((player) => (
-                  <li
-                    key={player.id}
-                    className={player.id === selfId ? undefined : 'join-in'}
-                  >
-                    <Avatar
-                      avatarId={player.avatarId}
-                      animalId={player.animalId}
-                      size="lobby"
-                    />
-                    <span className={styles.playerDetails}>
-                      <span className={styles.playerName}>
-                        {player.name}
-                        {player.id === selfId && <Tag tone="accent">YOU</Tag>}
-                        {player.isHost && <Tag tone="neutral">HOST</Tag>}
-                      </span>
-                      {!player.connected && (
-                        <span className={styles.reconnecting}>Reconnecting…</span>
-                      )}
-                    </span>
-                    <span className={styles.readyStatus} data-ready={player.ready}>
-                      {player.ready ? '✓ Ready' : 'Waiting…'}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-          {self && (
-            <Button
-              appearance={self.ready ? 'outline' : 'secondary'}
-              aria-pressed={self.ready}
-              onClick={() => setReady(!self.ready)}
-            >
-              {self.ready ? '✓ Ready' : 'I\'m Ready'}
-            </Button>
-          )}
-          {self?.isHost && (
-            <div className={styles.startGame}>
-              <Button
-                block
-                disabled={!canStart}
-                onClick={startMatch}
+                onChange={({ target }) => setSyncRoundDuration(
+                  Number(target.value) as SyncRoundDurationMinutes,
+                )}
               >
-                Start game
-              </Button>
-              <p>{startHint}</p>
-            </div>
-          )}
-          {connectionError && (
-            <div className={styles.error} role="alert">{connectionError.message}</div>
-          )}
-          {error && (
-            <div className={styles.error} role="alert">{error.message}</div>
-          )}
-          {connectionStatus === 'terminal' && (
-            <Button appearance="secondary" onClick={() => navigate('/setup')}>
-              Back to room setup
+                <option v-for={(minutes) in SYNC_ROUND_DURATION_MINUTES} key={minutes} value={minutes}>
+                  {minutes} {minutes === 1 ? 'minute' : 'minutes'}
+                </option>
+              </select>
+            </label>
+          </section>
+          <section v-if={room} className={styles.section}>
+            <div className={styles.sectionHeading}>Players · {room.players.length}</div>
+            <ul className={styles.players}>
+              <li
+                v-for={(player) in room.players}
+                key={player.id}
+                className={player.id === selfId ? undefined : 'join-in'}
+              >
+                <Avatar
+                  avatarId={player.avatarId}
+                  animalId={player.animalId}
+                  size="lobby"
+                />
+                <span className={styles.playerDetails}>
+                  <span className={styles.playerName}>
+                    {player.name}
+                    <Tag v-if={player.id === selfId} tone="accent">YOU</Tag>
+                    <Tag v-if={player.isHost} tone="neutral">HOST</Tag>
+                  </span>
+                  <span v-if={!player.connected} className={styles.reconnecting}>Reconnecting…</span>
+                </span>
+                <span className={styles.readyStatus} data-ready={player.ready}>
+                  {player.ready ? '✓ Ready' : 'Waiting…'}
+                </span>
+              </li>
+            </ul>
+          </section>
+          <Button
+            v-if={self}
+            appearance={self?.ready ? 'outline' : 'secondary'}
+            aria-pressed={self?.ready}
+            onClick={() => setReady(!self?.ready)}
+          >
+            {self?.ready ? '✓ Ready' : 'I\'m Ready'}
+          </Button>
+          <div v-if={self?.isHost} className={styles.startGame}>
+            <Button
+              block
+              disabled={!canStart}
+              onClick={startMatch}
+            >
+              Start game
             </Button>
-          )}
+            <p>{startHint}</p>
+          </div>
+          <div v-if={connectionError} className={styles.error} role="alert">{connectionError?.message}</div>
+          <div v-if={error} className={styles.error} role="alert">{error?.message}</div>
+          <Button v-if={connectionStatus === 'terminal'} appearance="secondary" onClick={() => navigate('/setup')}>
+            Back to room setup
+          </Button>
         </div>
       </div>
       <LobbyMusic />

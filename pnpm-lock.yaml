@@ -136,6 +136,9 @@ importers:
       vitest:
         specifier: ^4.1.11
         version: 4.1.11(@types/node@26.4.0)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(tsx@4.23.12))
+      vue-directives-jsx:
+        specifier: file:../../../vue-directives-jsx
+        version: file:../vue-directives-jsx(@babel/core@7.29.7)(typescript@5.9.3)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(tsx@4.23.12))
 
   packages/shared:
     dependencies:
@@ -3095,6 +3098,18 @@ packages:
       jsdom:
         optional: true
 
+  vue-directives-jsx@file:../vue-directives-jsx:
+    resolution: {directory: ../vue-directives-jsx, type: directory}
+    engines: {node: '>=22.12.0'}
+    hasBin: true
+    peerDependencies:
+      '@babel/core': ^7.0.0
+      typescript: '>=5.0.0 <8.0.0'
+      vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
+    peerDependenciesMeta:
+      vite:
+        optional: true
+
   which@1.3.1:
     resolution: {integrity: sha512-HxJdYWq1MTIQbJ3nw0cqssHoTNU267KlrDuGZ1WYlxDStUtKUhOaJmh112/TZmHxxUfuJqPXSOm7tDyas0OSIQ==}
     hasBin: true
@@ -5583,6 +5598,13 @@ snapshots:
       '@types/node': 26.4.0
     transitivePeerDependencies:
       - msw
+
+  vue-directives-jsx@file:../vue-directives-jsx(@babel/core@7.29.7)(typescript@5.9.3)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(tsx@4.23.12)):
+    dependencies:
+      '@babel/core': 7.29.7
+      typescript: 5.9.3
+    optionalDependencies:
+      vite: 8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(tsx@4.23.12)
 
   which@1.3.1:
     dependencies:

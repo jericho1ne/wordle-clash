@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "pnpm typecheck && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
+    "typecheck": "vue-directives-jsx --project tsconfig.json && tsc --noEmit -p tsconfig.node.json",
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
@@ -29,6 +29,7 @@
     "sass-embedded": "^1.103.1",
     "typescript": "~5.9.3",
     "vite": "^8.2.2",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "vue-directives-jsx": "file:../../../vue-directives-jsx"
   }
 }

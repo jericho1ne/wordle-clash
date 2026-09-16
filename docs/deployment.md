@@ -6,7 +6,7 @@ Everything is **one Cloudflare Worker** named `wordle-clash` — SPA assets,
 `/api/*`, `/ws/*`, the `Room` Durable Object, and the D1 database — deployed in a
 single `wrangler deploy`. There is no separate frontend host.
 
-The client is fully **same-origin**: `apps/web/src/realtime/room-socket.ts` uses
+The client is fully **same-origin**: `apps/web/src/lib/realtime/room-socket.ts` uses
 `window.location.host` (and `wss`/`ws` off the page protocol), and
 `apps/server/src/auth.ts` derives `baseURL` / `trustedOrigins` from the incoming
 request origin. Once the Worker answers on `wordleclash.com`, the app works there

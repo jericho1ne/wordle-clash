@@ -1,8 +1,6 @@
 # Story 07-00 — Gameplay & leaderboard plan
 
 **Status:** done, pending review  
-**Branch:** `docs/07-00-gameplay-leaderboard-plan`
-
 ## Goal
 
 Turn the previously unplanned gameplay phase into ordered, reviewable PR layers

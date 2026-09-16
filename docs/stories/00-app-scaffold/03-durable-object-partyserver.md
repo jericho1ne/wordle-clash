@@ -5,14 +5,14 @@
 ## Done
 
 - `partyserver` (server) + `partysocket` (web) added.
-- `apps/server/src/rooms/Room.ts` — `class Room extends Server<Env>` with
+- `class Room extends Server<Env>` with
   `static options = { hibernate: true }`:
   - `onStart()` rehydrates `state` from `ctx.storage.get('state')`.
   - `#save()` persists `state`; `#ensureState()` lazily creates a `lobby`-phase
     `RoomState` keyed by `this.name` (the room code).
   - `onConnect` / `onMessage` / `onClose` are stubs with epic-02 TODOs.
-- `wrangler.jsonc` DO binding + `new_sqlite_classes` migration (story 02).
-- `src/index.ts` routes `/ws/room/:code` → the DO via `routePartykitRequest`
+- Durable Object binding + `new_sqlite_classes` migration (story 02).
+- The Worker routes `/ws/room/:code` → the DO via `routePartykitRequest`
   with `prefix: 'ws'` (class `Room` → path segment `room`).
 
 ## Not in this story (epic 02)

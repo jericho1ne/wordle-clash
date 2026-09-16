@@ -6,16 +6,16 @@
 
 ## Done
 
-- `apps/web/src/ui/Input.tsx` — `<Input>` over the Ember `.input` class. Pure
+- `<Input>` over the Ember `.input` class. Pure
   class-mapper, no module. Defaults `type="text"`; `value`/`onChange`,
   `maxLength`, `placeholder`, `inputMode`, `autoCapitalize`, `disabled`, `aria-*`
   all pass through.
-- `apps/web/src/ui/Field.tsx` (+ `Field.module.scss`) — `<Field label htmlFor
+- `<Field label htmlFor
   hint? error?>` wraps a control: global `.field` for the label, plus an
   optional hint (`--color-neutral-500`) or error (`--color-danger-300`) line
   below. `error` wins over `hint`; the message gets an `id` (`<htmlFor>-error` /
   `-hint`) for `aria-describedby` wiring by consumers.
-- `apps/web/src/ui/index.ts` — exports `Field`, `Input` (+ types).
+- Export `Field`, `Input`, and their types from the design-system component surface.
 - `/design-system` — new **Field / Input** section: name field, field with hint,
   field with error, disabled input.
 

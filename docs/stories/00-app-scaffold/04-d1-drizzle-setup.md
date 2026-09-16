@@ -5,16 +5,15 @@
 ## Done
 
 - `drizzle-orm` (server dep) + `drizzle-kit` (dev dep).
-- `drizzle.config.ts` — `schema: ./src/db/schema.ts`, `out: ./migrations`,
-  `dialect: sqlite`.
-- `src/db/schema.ts` — placeholder (`export {}`) with a TODO listing the real
+- Drizzle configuration uses the SQLite dialect and generated migrations.
+- A placeholder schema (`export {}`) with a TODO listing the real
   tables (epic 03).
-- `wrangler.jsonc` `d1_databases` binding `DB` + `migrations_dir: migrations`
+- Worker configuration includes the `d1_databases` binding `DB` and migrations directory
   (story 02), placeholder `database_id`.
 - Root + server scripts: `db:generate` (`drizzle-kit generate`),
   `db:migrate:local` / `db:migrate:remote`
   (`wrangler d1 migrations apply wordle-clash --local|--remote`).
-- `apps/server/migrations/.gitkeep`.
+- The empty migrations directory is retained in Git.
 
 ## Follow-ups (epic 03-identity-auth/01)
 
@@ -23,5 +22,5 @@
 
 ## Acceptance (this story)
 
-- `drizzle.config.ts` type-checks; scripts are present. No migrations generated
+- Drizzle configuration type-checks; scripts are present. No migrations generated
   yet (intentional — schema is empty).

@@ -207,7 +207,7 @@ dark, higher-contrast, multi-hue palette that suits a word-race game.
      Each module has **one kebab-case root class matching the component**
      (`.title-screen`, `.lobby-screen`), applied to the component's outermost
      element, and **every other rule nests under it** — so the module is
-     self-namespacing and greppable. `src/ui/` primitives that are pure
+     self-namespacing and greppable. `src/components/ui/` primitives that are pure
      class-mappers (a `<Button>` that only picks `btn btn-primary`) may skip the
      module; any custom CSS goes in one.
   All CSS — global or module — uses only `--color-*` / `--space-*` /
@@ -221,6 +221,19 @@ dark, higher-contrast, multi-hue palette that suits a word-race game.
 - **Type & metrics** unchanged from the source: Inter (medium-weight headings),
   compact 0.7× spacing scale, 4/8/14px radii, edge-plus-ambient shadows.
 - Icons: Phosphor (`@phosphor-icons/react`).
+
+## Web source layout
+
+The frontend is organized by responsibility rather than a catch-all feature
+folder:
+
+- `apps/web/src/pages/` contains route-level screens and their route-specific
+  helpers.
+- `apps/web/src/components/` contains visual React components; `components/ui/`
+  contains reusable design-system primitives.
+- `apps/web/src/hooks/` contains React hooks grouped by domain.
+- `apps/web/src/lib/` contains non-visual client infrastructure, including
+  `identity/`, `realtime/`, and tiebreaker engines.
 
 Details and the primitive-by-primitive plan:
 [`stories/01-design-system/`](./stories/01-design-system/).

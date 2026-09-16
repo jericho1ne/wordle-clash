@@ -83,6 +83,6 @@ Baseline: [`../../verification.md`](../../verification.md), plus:
 - leaderboard ordering and pagination;
 - two real browser contexts completing each mode through the UI.
 
-For a deterministic local win, add `GAMEPLAY_TEST_ANSWER=CLASH` to
-`apps/server/.dev.vars` before running `pnpm dev`. This binding is for local
+For a deterministic local win, set `GAMEPLAY_TEST_ANSWER=CLASH` in the server's
+local development environment before running `pnpm dev`. This binding is for local
 verification only and must not be configured in deployed environments.

@@ -6,14 +6,14 @@
 
 ## Done
 
-- `apps/web/src/ui/SegmentedControl.tsx` — `<SegmentedControl name options value
+- `<SegmentedControl name options value
   onChange aria-label?>`. Generic over the option value type (`T extends
   string`). Renders `.seg` + `.seg-opt` `<label>`s over native radios (keyboard +
   form semantics free). Optional per-option `icon`. Pure class-mapper, no module.
-- `apps/web/src/ui/RadioGroup.tsx` (+ `RadioGroup.module.scss`) — same generic
+- `<RadioGroup>` uses the same generic
   controlled API; `.radio` + `.dot` rows. The module only stacks the rows
   vertically (`.radio-group`).
-- `apps/web/src/ui/index.ts` — exports both (+ `SegmentedOption`, `RadioOption`).
+- Export both controls and their option types from the design-system component surface.
 - `/design-system` — **SegmentedControl** and **RadioGroup** sections, each a
   controlled example with a "selected: …" readout (`DesignSystem` now holds
   `useState`).

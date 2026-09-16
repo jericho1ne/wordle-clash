@@ -6,12 +6,12 @@
 
 ## Done
 
-- `apps/web/src/ui/Card.tsx` — compound `<Card elevation={sm|md|lg}?>` over the
+- Compound `<Card elevation={sm|md|lg}?>` over the
   Ember `.card` classes: `<Card.Kicker>`, `<Card.Title>`, `<Card.Body>`,
   `<Card.Meta>`. Pure class-mapper, no module.
-- `apps/web/src/ui/Tag.tsx` — `<Tag tone={accent|accent-2|neutral|danger|outline}>`
+- `<Tag tone={accent|accent-2|neutral|danger|outline}>`
   → `.tag` + `.tag-*` (default `neutral`). No module.
-- `apps/web/src/ui/index.ts` — exports `Card`, `Tag` (+ `CardProps`, `TagProps`,
+- Export `Card`, `Tag`, `CardProps`, `TagProps`,
   `TagTone`).
 - `/design-system` — **Card** section (all three elevations with kicker / title /
   body / meta) and **Tag** section (all five tones).

@@ -4,23 +4,22 @@
 
 ## Done
 
-`packages/shared` — `@wordle-clash/shared`, `type: module`, dep `zod` 4, consumed
-by both apps via `workspace:*` (source imported directly; `main`/`types` point at
-`src/index.ts`).
+The `@wordle-clash/shared` package uses `type: module` and zod 4, and is consumed
+by both apps through the workspace protocol with source imported directly.
 
-Modules (`src/`):
+Modules:
 
-| File | Contents |
+| Module | Contents |
 |---|---|
-| `avatars.ts` | `AVATAR_STEPS` (5 entries, `bg`/`text` as Ember CSS vars — one per palette family), `AVATAR_COUNT`, `clampAvatarId`, `getAvatarStep` |
-| `game-modes.ts` | `GameMode`, `GAME_MODES` (`sync` / `realtime` with `label`, `tries`, exact prototype `description`), `DEFAULT_GAME_MODE`, `isGameMode` |
-| `room-code.ts` | `ROOM_CODE_REGEX` (`LLLL-DDDD`, no I/O), `generateRoomCode(rng?)`, `normalizeRoomCode`, `isValidRoomCode` |
-| `room.ts` | `RoomPhase`, `Profile`, `Player`, `RoomState`, `MAX_PLAYERS` (8), `MIN_PLAYERS_TO_START` (2), `MAX_NAME_LENGTH` (14), `canStartMatch` |
-| `protocol.ts` | Client/server message discriminated unions + `RoomErrorCode` + `PROTOCOL_VERSION`. **Types only** — zod schemas + parse/serialize helpers land in epic 02. |
-| `index.ts` | Re-exports all of the above |
+| Avatars | `AVATAR_STEPS` (5 entries, `bg`/`text` as Ember CSS vars — one per palette family), `AVATAR_COUNT`, `clampAvatarId`, `getAvatarStep` |
+| Game modes | `GameMode`, `GAME_MODES` (`sync` / `realtime` with `label`, `tries`, exact prototype `description`), `DEFAULT_GAME_MODE`, `isGameMode` |
+| Room codes | `ROOM_CODE_REGEX` (`LLLL-DDDD`, no I/O), `generateRoomCode(rng?)`, `normalizeRoomCode`, `isValidRoomCode` |
+| Room state | `RoomPhase`, `Profile`, `Player`, `RoomState`, `MAX_PLAYERS` (8), `MIN_PLAYERS_TO_START` (2), `MAX_NAME_LENGTH` (14), `canStartMatch` |
+| Protocol | Client/server message discriminated unions + `RoomErrorCode` + `PROTOCOL_VERSION`. **Types only** — zod schemas + parse/serialize helpers land in epic 02. |
+| Public API | Re-exports all of the above |
 
-Config: `tsconfig.json` (`composite`-free, emits to `dist` for `build`),
-`vitest.config.ts` (node env, `src/**/*.test.ts`).
+Configuration is composite-free, emits the build output, and runs unit tests in
+a Node environment.
 
 ## Acceptance
 

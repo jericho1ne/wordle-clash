@@ -6,30 +6,30 @@
 
 ## What
 
-Thin React wrappers over the Ember `.btn` classes — no CSS of their own (pure
-class-mappers, so no `.module.scss` per the styling rules).
+Thin React wrappers over the Ember `.btn` classes — no CSS of their own because
+they are pure class-mappers.
 
 ## Done
 
-- `apps/web/src/ui/Button.tsx` — `<Button variant block? leadingIcon? trailingIcon?>`:
+- `<Button variant block? leadingIcon? trailingIcon?>`:
   - `variant`: `primary` (default) | `secondary` | `ghost` | `danger` →
     `.btn-primary` / `-secondary` / `-ghost` / `-danger`.
   - `block` → `.btn-block`.
   - `leadingIcon` / `trailingIcon` slots (the `.btn` `gap` spaces them).
   - Defaults `type="button"`; `disabled`, `onClick`, `aria-*`, `className`, … pass
     through.
-- `apps/web/src/ui/IconButton.tsx` — `<IconButton variant aria-label>` →
+- `<IconButton variant aria-label>` →
   `.btn .btn-icon`; `aria-label` is **required** (icon-only needs a name);
   default variant `ghost`.
-- `apps/web/src/ui/index.ts` — barrel export.
-- `apps/web/src/features/dev/DesignSystem.tsx` (+ `.module.scss`) — new dev-only
+- Export both primitives from the design-system component surface.
+- Add a dev-only
   showcase page (`/design-system`, `import.meta.env.DEV` only, stripped from prod).
   Order: **Palette first** (base colours as pills + the accent / accent-2 /
   neutral / danger 100–900 ramps — colours assigned via `data-swatch` attributes
   + generated SCSS rules, no inline styles), then **Button**, then
   **IconButton**. Grows one section per later design-system story (this is
   story 10's page, seeded early).
-- `apps/web/src/router.tsx` — `/design-system` route.
+- Register the `/design-system` route.
 - `TitleScreen` "Play" button → `<Button block>`; `SetupScreen` back arrow →
   `<IconButton aria-label="Back">`.
 

@@ -4,14 +4,14 @@ A numbered **folder** here is an **Epic**. A numbered **file** inside it is a
 **Story / Task**. Numeric prefixes set the order.
 
 Source of truth for scope and decisions: [`../architecture.md`](../architecture.md)
-and the approved phase plan (`~/.claude/plans/hi-i-have-a-sunny-rossum.md`).
+and the approved phase plan.
 
 ## Phase 1 epics
 
 | Epic | Status | What |
 |---|---|---|
 | [`00-app-scaffold`](./00-app-scaffold/) | done | pnpm monorepo, web + server + shared, Worker + DO + D1 bindings, routing, CI |
-| [`01-design-system`](./01-design-system/) | not started | Ember theme (`ember.css`), React primitive wrappers, keyframes, toasts |
+| [`01-design-system`](./01-design-system/) | not started | Ember theme, React primitive wrappers, keyframes, toasts |
 | [`02-realtime-foundation`](./02-realtime-foundation/) | complete | `Room` DO state + hibernation lifecycle, message protocol, room codes, create/join, host reassignment, `partysocket` client, Zustand store |
 | [`03-identity-auth`](./03-identity-auth/) | complete | better-auth (`anonymous`), D1 schema + migrations, guest minting, WS ticket auth, profile + favorites persistence, inert match-history tables |
 | [`04-title-setup-screens`](./04-title-setup-screens/) | complete | animated title, player profile, and manual create/join flow |
@@ -20,7 +20,7 @@ and the approved phase plan (`~/.claude/plans/hi-i-have-a-sunny-rossum.md`).
 | [`07-gameplay-leaderboard`](./07-gameplay-leaderboard/) | gameplay implemented | authoritative Wordle modes and gameplay UI; account leaderboard deferred |
 | [`08-beatmap-engine`](./08-beatmap-engine/) | done | offline kick/snare onset detection producing a checked-in beatmap JSON |
 | [`09-tiebreaker-battle`](./09-tiebreaker-battle/) | implemented, live-match verification pending | DDR-style dance-off resolving a sync-mode tie or final all-miss, spectatable, fractal-backed |
-| [`10-hono-api-restructure`](./10-hono-api-restructure/) | not started | Replace the `index.ts` if-chain with the already-installed `hono` router; no behavior change |
+| [`10-hono-api-restructure`](./10-hono-api-restructure/) | not started | Replace the Worker entrypoint's if-chain with the already-installed `hono` router; no behavior change |
 
 ## Verification
 

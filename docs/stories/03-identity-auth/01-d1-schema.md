@@ -12,9 +12,8 @@
 - Added inert `matches` and `match_players` tables for the later gameplay epic;
   no Phase 1 code writes match results.
 - Added the D1 Drizzle client and the real `wordle-clash` database ID.
-- Generated
-  `0000_story_03_01__create__auth_favorites_matches.sql`; Wrangler owns its
-  migration ledger.
+- Generated the initial auth, favorites, and matches migration; Wrangler owns
+  its migration ledger.
 
 ## Verification
 

@@ -3,14 +3,14 @@ import {
   Navigate,
 } from 'react-router'
 
-import { TitleScreen } from './features/title/TitleScreen'
-import { SetupScreen } from './features/setup/SetupScreen'
-import { InviteRoomRoute } from './features/lobby/InviteRoomRoute'
-import { DesignSystem } from './features/dev/DesignSystem'
-import { BeatmapPreview } from './features/dev/BeatmapPreview'
-import { GameplayScreen } from './features/gameplay/GameplayScreen'
-import { TiebreakerPlaygroundScreen } from './features/tiebreaker/TiebreakerPlaygroundScreen'
-import { TiebreakerRoomScreen } from './features/tiebreaker/TiebreakerRoomScreen'
+import { TitleScreen } from './pages/title/TitleScreen'
+import { SetupScreen } from './pages/setup/SetupScreen'
+import { InviteRoomRoute } from './pages/lobby/InviteRoomRoute'
+import { DesignSystem } from './pages/dev/DesignSystem'
+import { BeatmapPreview } from './pages/dev/BeatmapPreview'
+import { GameplayScreen } from './pages/gameplay/GameplayScreen'
+import { TiebreakerPlaygroundScreen } from './pages/tiebreaker/TiebreakerPlaygroundScreen'
+import { TiebreakerRoomScreen } from './pages/tiebreaker/TiebreakerRoomScreen'
 
 // All app routes. /beatmap-preview and /tiebreaker are dev tools that are
 // live in production for now — see docs/stories/08-beatmap-engine and

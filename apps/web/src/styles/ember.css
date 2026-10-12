@@ -182,7 +182,7 @@ h4 {
 
 /* ══════════════════════════════════════════════════════════════════════════
    Components — retuned from Nocturne onto the Ember tokens. Plain CSS on plain
-   HTML; the React primitives in src/ui/ only apply these class names.
+   HTML; the React primitives in src/components/ui/ only apply these class names.
    ══════════════════════════════════════════════════════════════════════ */
 
 *,

@@ -234,6 +234,9 @@ folder:
 - `apps/web/src/hooks/` contains React hooks grouped by domain.
 - `apps/web/src/lib/` contains non-visual client infrastructure, including
   `identity/`, `realtime/`, and tiebreaker engines.
+- Identity is split across layers: providers live in `components/identity/`,
+  hooks in `hooks/identity/`, and contexts, types, and `ensureIdentity` in
+  `lib/identity/`. Import each from its own barrel.
 
 Details and the primitive-by-primitive plan:
 [`stories/01-design-system/`](./stories/01-design-system/).

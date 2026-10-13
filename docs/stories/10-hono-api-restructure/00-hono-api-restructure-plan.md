@@ -4,7 +4,7 @@
 
 ## Current state
 
-`apps/server/src/index.ts` is the Worker entry (`wrangler.jsonc`'s `main`). Its
+The Worker entrypoint's
 `fetch` handler matches every request with a hand-rolled if-chain on
 `url.pathname`:
 
@@ -19,10 +19,9 @@
 * (everything else)     -> env.ASSETS.fetch(request) (SPA fallback)
 ```
 
-`hono` (`^4.13.5`) has been an `apps/server` dependency since epic 00
-(`docs/stories/00-app-scaffold/02-server-worker-wrangler.md`), which even left
+`hono` (`^4.13.5`) has been a server dependency since epic 00, which even left
 a follow-up note — "Hono app for `/api/*` routes lands with epic 02" — that
-was never actioned. It has sat unused in `package.json` ever since.
+was never actioned. It has remained unused ever since.
 
 ## Target
 
@@ -36,9 +35,9 @@ const app = new Hono<{ Bindings: Env }>()
 app.get('/api/health', ...)
 app.all('/api/auth', ...)         // better-auth dispatches its own methods internally
 app.all('/api/auth/*', ...)
-app.post('/api/rt/ticket', ...)   // rt/routes.ts already 405s non-POST
-app.post('/api/rooms', ...)       // rooms/routes.ts already 405s non-POST
-app.all('/api/favorites', ...)    // favorites/routes.ts dispatches GET/PUT/DELETE/POST itself
+app.post('/api/rt/ticket', ...)   // existing handler already 405s non-POST
+app.post('/api/rooms', ...)       // existing handler already 405s non-POST
+app.all('/api/favorites', ...)    // existing handler dispatches methods itself
 app.all('/ws/*', ...)             // still delegates to routePartykitRequest
 app.all('/api/*', ...)            // 501 fallback
 app.all('*', ...)                 // SPA fallback
@@ -61,15 +60,14 @@ other unimplemented `/api/*` path already behaves. `/api/auth` and
 `/api/favorites` stay `app.all` because their handlers genuinely dispatch on
 multiple methods themselves.
 
-`export { Room }` and every binding in `wrangler.jsonc` (`main`,
+`export { Room }` and every Worker binding (`main`,
 `durable_objects`, `d1_databases`, `assets`) stay unchanged — this only
 touches how requests get dispatched inside the Worker, not how the Worker
 itself is registered or bound.
 
 ## Explicitly out of scope
 
-- Route handlers (`rooms/routes.ts`, `favorites/routes.ts`, `rt/routes.ts`,
-  `auth.ts`) are **not modified**. They already take `(request, env)` and
+- Existing route handlers are **not modified**. They already take `(request, env)` and
   return a `Response`, which is exactly `(c.req.raw, c.env)` / the value a
   Hono handler can return — no adapter needed.
 - No new validation, no new middleware, no new routes. This epic is a
@@ -77,4 +75,4 @@ itself is registered or bound.
 
 ## Stories
 
-See `README.md` for the full breakdown and testable outcomes.
+See the epic overview for the full breakdown and testable outcomes.

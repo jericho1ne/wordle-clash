@@ -15,8 +15,8 @@ build against.
   JSON — never analyzed live per-client. This is what makes server-side
   scoring authoritative and fair: the DO and every browser read the exact
   same `{ timeMs, lane }[]` list.
-- Schema lives in `packages/shared/src/beatmap.ts`, following the existing
-  `protocol.ts` conventions: strict zod objects, exported inferred types, a
+- The schema follows the existing protocol conventions: strict zod objects,
+  exported inferred types, and a
   `parseBeatmap` helper.
 - `Lane = 'up' | 'down' | 'left' | 'right'`.
 - `BeatmapEntry = { timeMs: number (int, >= 0), lane: Lane }`.
@@ -34,7 +34,7 @@ build against.
 - A density/difficulty knob (target notes/sec, default tuned to feel like DDR
   "drumming," not a slow metronome) trims onsets when the track is busier
   than that target, always preserving the 120ms minimum gap.
-- The generation script only needs to run once for `dragonball-super.mp3`
+- The generation script only needs to run once for the checked-in soundtrack
   during this build; it's a `pnpm` script, not a build-time step, so no CI
   dependency on audio decoding.
 

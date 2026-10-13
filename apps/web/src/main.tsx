@@ -8,9 +8,9 @@ import {
   FavoritesProvider,
   IdentityProvider,
   ProfileProvider,
-} from './identity'
+} from './components/identity'
 import { router } from './router'
-import { ToastProvider } from './ui'
+import { ToastProvider } from './components/toast/ToastProvider'
 
 const container = document.getElementById('root')
 if (!container) throw new Error('#root element not found')

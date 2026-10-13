@@ -4,9 +4,8 @@
 
 ## Scope
 
-Add `apps/server/src/index.test.ts` using the existing
-`@cloudflare/vitest-pool-workers` setup (see `apps/server/src/rooms/
-Room.integration.test.ts` for the harness pattern already in this package),
+Add Worker-entry regression tests using the existing
+`@cloudflare/vitest-pool-workers` harness pattern,
 asserting the migrated Hono app's behavior matches the pre-migration if-chain
 for every route:
 
@@ -22,9 +21,8 @@ for every route:
 These are regression tests for the restructure itself, not new coverage of
 `createAuth`/`handleCreateRoom`/`handleFavorites` internals — those already
 have (or don't have) their own tests and are out of scope here per
-`00-hono-api-restructure-plan.md`.
+the epic plan.
 
 ## Testable outcome
 
-`pnpm --filter @wordle-clash/server test` includes and passes the new
-`index.test.ts` suite.
+`pnpm --filter @wordle-clash/server test` includes and passes the new suite.

@@ -28,4 +28,4 @@ Baseline: [`../../verification.md`](../../verification.md) §0. Epic-specific:
   `curl localhost:5173/api/health` returns `{ ok: true }` through the proxy; a
   raw WS connect to `/ws/room/<code>` reaches the `Room` DO (currently replies
   with a not-implemented error frame).
-- `pnpm --filter @wordle-clash/web build` produces `apps/web/dist`.
+- `pnpm --filter @wordle-clash/web build` produces the deployable web bundle.

@@ -10,7 +10,7 @@ fair, server-verifiable source of truth the Tiebreaker Battle dance-off
 authoritative scoring read the same file, so timing is never trusted from an
 individual client.
 
-The track under analysis is `apps/web/public/audio/dragonball-super.mp3`.
+The checked-in soundtrack is the track under analysis.
 
 ## Dependencies
 
@@ -23,8 +23,8 @@ Epic 09 exists.
 | # | Story | Testable outcome |
 |---|---|---|
 | [00](./00-beatmap-engine-plan.md) | **Done:** stack plan, onset-detection approach, JSON schema | Reviewable implementation contract |
-| 01 | **Done:** `packages/shared/src/beatmap.ts` — `Lane`/`BeatmapEntry`/`Beatmap` zod schema, gap/lane-balance validators | Unit tests pass with no audio dependency |
-| 02 | **Done:** offline Node analysis script decodes `dragonball-super.mp3`, detects kick/snare onsets, writes `apps/web/public/audio/dragonball-super.beatmap.json` as compact `[timeMs, laneId]` tuples (453 entries, ~3.64 notes/sec avg) | Script run produces a schema-valid, deterministic JSON file |
+| 01 | **Done:** shared `Lane`/`BeatmapEntry`/`Beatmap` zod schema, gap/lane-balance validators | Unit tests pass with no audio dependency |
+| 02 | **Done:** offline Node analysis script decodes the track, detects kick/snare onsets, and writes compact `[timeMs, laneId]` tuples (453 entries, ~3.64 notes/sec avg) | Script run produces a schema-valid, deterministic beatmap |
 | 03 | **Done:** `/beatmap-preview` route: plays the track, scrolls the generated beatmap in sync, with a playback-speed slider (defaults 60%) | Verified in-browser — beatmap loads and lanes flash on their notes |
 
 ## Beat detection approach
@@ -50,5 +50,5 @@ Baseline: [`../../verification.md`](../../verification.md), plus:
   Up/Down land on kicks and Left/Right land on snares.
 
 **Note:** `/beatmap-preview` is deliberately shipped to production (not
-DEV-gated) so people can test it on the deployed URL — see the note in
-`apps/web/src/router.tsx`. Re-add the DEV gate before general release.
+DEV-gated) so people can test it on the deployed URL. Re-add the DEV gate before
+general release.

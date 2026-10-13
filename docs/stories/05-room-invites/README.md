@@ -59,7 +59,7 @@ less. Story 01 completes the share-to-join vertical slice.
 
 ## Implementation notes
 
-- `features/lobby/invite.ts` owns canonical URLs, native sharing, and clipboard
+- The lobby invitation module owns canonical URLs, native sharing, and clipboard
   behavior; the lobby keeps invite-link and room-code actions distinct.
 - `/room/:code` checks for a stored profile before rendering the lobby. New
   recipients are sent to locked Join setup and enter the live room only after

@@ -15,7 +15,7 @@
   local Worker; deployed requests remain same-origin only.
 - Added optional `displayName` and `avatarId` user fields.
 - Enforced a minimum 32-character `BETTER_AUTH_SECRET`; the value remains a Worker
-  runtime secret in `.dev.vars` locally and `wrangler secret` in production.
+  runtime secret locally and a managed secret in production.
 
 ## Verification
 

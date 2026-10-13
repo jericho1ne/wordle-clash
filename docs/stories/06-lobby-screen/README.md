@@ -6,8 +6,8 @@ Wires the lobby UI to the `Room` Durable Object (epic 02) and D1 favorites
 (epic 03), building on the invite-link surface from epic 05. No bots — real
 remote players only.
 
-The lobby also owns a softly mixed, looping soundtrack from
-`public/lobby-music.mp3`. An Ember-styled Radix Toggle in the lower-left corner
+The lobby also owns a softly mixed, looping soundtrack. An Ember-styled Radix
+Toggle in the lower-left corner
 provides explicit play/pause control and recovers when audible autoplay is
 blocked by browser policy. Entering gameplay unmounts the lobby audio element
 and pauses playback; returning to the lobby starts a fresh instance.

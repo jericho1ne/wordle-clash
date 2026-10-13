@@ -11,12 +11,12 @@ by the Worker's `single-page-application` asset fallback, no SSR to reconcile.
 
 ## Done
 
-- `src/router.tsx` — routes:
+- Routes:
   - `/` → `TitleScreen`
   - `/setup` → `SetupScreen` (reads `?join=<code>`)
   - `/room/:code` → `LobbyScreen`
   - `*` → `<Navigate to="/" replace />`
-- Placeholder screen components under `src/features/{title,setup,lobby}/`, each
+- Placeholder screen components, each
   rendering the `.app-stage` shell with a "scaffold placeholder" note and the
   Ember classes they'll build on.
 - `LobbyScreen` normalizes `:code` via `normalizeRoomCode` from the shared

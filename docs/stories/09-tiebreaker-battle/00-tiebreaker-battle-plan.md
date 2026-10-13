@@ -33,17 +33,15 @@ so the Room DO, protocol, and UI stories all build against the same contract.
     a final all-miss, get interactive input; every other connected
     player in the room lands on the same screen in spectator mode.
 - **Protocol:** `danceOff*` messages are additive to the existing
-  discriminated unions in `packages/shared/src/protocol.ts` — no breaking
+  discriminated unions — no breaking
   change to `matchSnapshotSchema`. Score broadcasts are throttled (not
-  per-hit) to avoid the re-render storm `beatFractalStore.ts`'s own comments
-  warn against; beat pulses themselves stay fully imperative
+  per-hit) to avoid a re-render storm; beat pulses themselves stay fully imperative
   (`bgRef.current.pulse()`), never routed through Zustand/React state.
-- **Fractal code migration:** `docs/fractal/*` becomes real app code under
-  `apps/web/src/features/tiebreaker/`, unchanged in its imperative
-  architecture. `MultiplayerBeatSync.example.tsx` stays reference-only for
+- **Fractal code migration:** the fractal prototype becomes real app code,
+  unchanged in its imperative architecture. The multiplayer beat-sync example stays reference-only for
   the wiring pattern; the real `TiebreakerScreen` wires to `useRoomStore`/the
   existing `RoomSocket`, not a bare `usePartySocket` call.
-- **`docs/game-rules.md`:** the "rules for timed tap/rhythm minigame are
+- **Game rules:** the "rules for timed tap/rhythm minigame are
   forthcoming" note is replaced with the rules from this epic's README.
 
 ## Stack policy

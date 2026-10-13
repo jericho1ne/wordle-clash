@@ -4,9 +4,9 @@
 
 ## Scope
 
-Replace the if-chain in `apps/server/src/index.ts` with a `new Hono<{
+Replace the Worker entrypoint's if-chain with a `new Hono<{
 Bindings: Env }>()` app that exposes the identical routes and fallback
-behavior described in `00-hono-api-restructure-plan.md`, with strict
+behavior described in the epic plan, with strict
 per-route HTTP methods matching what each handler actually requires (see the
 POST-vs-`Allow` note below for the one accepted behavior change):
 
@@ -32,9 +32,9 @@ POST-vs-`Allow` note below for the one accepted behavior change):
   `/api/`.
 - `ALL *` — `c.env.ASSETS.fetch(c.req.raw)` (SPA fallback).
 
-`export { Room } from './rooms/Room'` stays as-is. `wrangler.jsonc`'s `main`
-(`src/index.ts`) is unchanged — Hono's app object is a valid default export
-for a Worker (it has a `fetch` method), so no other config moves.
+The `Room` export and Worker entry binding stay unchanged — Hono's app object
+is a valid default export for a Worker (it has a `fetch` method), so no other
+config moves.
 
 ## Testable outcome
 

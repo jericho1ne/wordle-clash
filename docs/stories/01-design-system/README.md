@@ -13,18 +13,18 @@ vendored "Nocturne" theme: a warm, dark, high-contrast scheme —
 | `--color-neutral-*` | `#95A3B3` Cool Steel | surfaces, borders, muted text; the **absent** tile |
 | `--color-danger-*` | `#B3001B` Mahogany Red | destructive actions, elimination, timer-low |
 
-Each role carries a 100–900 ramp. The stylesheet
-(`apps/web/src/styles/ember.css`) is **ours to edit** — retune the theme in its
-`:root` block. The component layer (`.btn`, `.field`, `.seg`, `.card`, `.tag`,
-`.dialog`, …) is inherited from Nocturne and retuned onto the Ember tokens.
+Each role carries a 100–900 ramp. The Ember stylesheet is **ours to edit** —
+retune the theme in its `:root` block. The component layer (`.btn`, `.field`,
+`.seg`, `.card`, `.tag`, `.dialog`, …) is inherited from Nocturne and retuned
+onto the Ember tokens.
 
 **Styling model** (no Tailwind): the Ember utility classes are **global** and
 composed via `className`; anything component-specific (layout, spacing,
-typography) goes in an **adjacent `Name.module.scss`** (scoped CSS Module,
-`sass-embedded`) referenced as `styles.x` — no inline `style={{}}`. Each module
+typography) goes in an **adjacent scoped CSS Module** using `sass-embedded`,
+referenced as `styles.x` — no inline `style={{}}`. Each module
 has **one kebab-case root class named after the component** (`.title-screen`) on
 the outermost element, with every other rule **nested under it**;
-`localsConvention: 'camelCaseOnly'` (in `vite.config.ts`) makes that
+The CSS Modules `camelCaseOnly` convention makes that
 `styles.titleScreen`. A primitive that is a pure class-mapper (`<Button>` → `btn
 btn-primary`) needs no module; any custom CSS gets one. All CSS uses only
 `--color-*` / `--space-*` / `--radius-*` / `--shadow-*`.
@@ -33,8 +33,8 @@ btn-primary`) needs no module; any custom CSS gets one. All CSS uses only
 
 | # | Story | Status |
 |---|---|---|
-| 00 | `ember.css` (theme tokens + component layer) in `apps/web/src/styles/` | done (epic 00) |
-| 01 | Inter `<link>` + `animations.css` keyframes + reduced-motion guard | done (epic 00) |
+| 00 | Ember theme tokens and component layer | done (epic 00) |
+| 01 | Inter `<link>` + global keyframes + reduced-motion guard | done (epic 00) |
 | 02 | `<AppShell>` / route layout with `.nav` + `.nav-brand` (setup/lobby only) | deferred — screens keep inline `app-stage` for now |
 | [03](./03-button.md) | `<Button variant={primary\|secondary\|ghost\|danger} block?>` + `<IconButton>` (primary = accent outline, not fill) | done, in review |
 | [04](./04-field-input.md) | `<Field label htmlFor hint? error?>` + `<Input>` | done, in review |
@@ -42,7 +42,7 @@ btn-primary`) needs no module; any custom CSS gets one. All CSS uses only
 | [06](./06-card-tag.md) | `<Card elevation>` + `Card.Kicker/.Title/.Body/.Meta` + `<Tag tone={accent\|accent-2\|neutral\|danger\|outline}>` | done, in review |
 | 07 | `<Dialog open onClose title>` (backdrop, focus trap, ESC, backdrop click) | |
 | 08 | `<ToastProvider>` + `useToast().show(text)` — one top-center pill, `toastIn`, ~2200ms, single-toast queue | |
-| 09 | icon set (ArrowRight, ArrowLeft, Plus/DoorOpen, SignIn, Star, Copy, Check) — **approach TBD**: `@phosphor-icons/react` vs public SVG + CSS mask (AGENTS.md rule 3) | |
+| 09 | icon set (ArrowRight, ArrowLeft, Plus/DoorOpen, SignIn, Star, Copy, Check) — **approach TBD**: `@phosphor-icons/react` vs public SVG + CSS mask under the repository icon rules | |
 | 10 | `/design-system` showcase route — **started in 03** (Palette + Button + IconButton); each story adds its section | in progress |
 
 ## Verification

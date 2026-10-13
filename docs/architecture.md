@@ -243,6 +243,22 @@ Details and the primitive-by-primitive plan:
 
 ---
 
+## Analytics (Google Tag Manager)
+
+`apps/web/src/lib/analytics/` is a dependency-free GTM wrapper (`initAnalytics`,
+`pageview`, `event`) that pushes to `window.dataLayer`; it is portable to other
+sites. App-specific event names live in `track.ts`.
+
+- `main.tsx` loads the container in production builds only. The id comes only
+  from `VITE_GTM_ID` (never hardcoded); without it analytics stays off. Set it
+  in the build environment (CI/deploy) and in `apps/web/.env` for local previews.
+- `AnalyticsRoot` (pathless root route) calls `usePageviews`, which pushes a
+  `virtual_page_view` event on each route change.
+- Game events: `room_created`, `room_joined`, `match_started`.
+- In GTM, add a GA4 Configuration tag with "Send a page view" off, a GA4 Event
+  tag `page_view` on the `virtual_page_view` custom event (params `page_path`,
+  `page_location`, `page_title`), and GA4 Event tags for the game events.
+
 ## Client ⇄ server protocol (summary)
 
 WebSocket frames are `{ t: <type>, ... }`, zod-validated on receipt.

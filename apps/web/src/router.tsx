@@ -3,6 +3,7 @@ import {
   Navigate,
 } from 'react-router'
 
+import { AnalyticsRoot } from './components/analytics/AnalyticsRoot'
 import { TitleScreen } from './pages/title/TitleScreen'
 import { SetupScreen } from './pages/setup/SetupScreen'
 import { InviteRoomRoute } from './pages/lobby/InviteRoomRoute'
@@ -16,15 +17,20 @@ import { TiebreakerRoomScreen } from './pages/tiebreaker/TiebreakerRoomScreen'
 // live in production for now — see docs/stories/08-beatmap-engine and
 // docs/stories/09-tiebreaker-battle.
 export const router = createBrowserRouter([
-  { path: '/', element: <TitleScreen /> },
-  { path: '/setup', element: <SetupScreen /> },
-  { path: '/room/:code', element: <InviteRoomRoute /> },
-  { path: '/room/:code/play', element: <GameplayScreen /> },
-  { path: '/room/:code/tiebreaker', element: <TiebreakerRoomScreen /> },
-  { path: '/beatmap-preview', element: <BeatmapPreview /> },
-  { path: '/tiebreaker', element: <TiebreakerPlaygroundScreen /> },
-  ...(import.meta.env.DEV
-    ? [{ path: '/design-system', element: <DesignSystem /> }]
-    : []),
-  { path: '*', element: <Navigate to="/" replace /> },
+  {
+    element: <AnalyticsRoot />,
+    children: [
+      { path: '/', element: <TitleScreen /> },
+      { path: '/setup', element: <SetupScreen /> },
+      { path: '/room/:code', element: <InviteRoomRoute /> },
+      { path: '/room/:code/play', element: <GameplayScreen /> },
+      { path: '/room/:code/tiebreaker', element: <TiebreakerRoomScreen /> },
+      { path: '/beatmap-preview', element: <BeatmapPreview /> },
+      { path: '/tiebreaker', element: <TiebreakerPlaygroundScreen /> },
+      ...(import.meta.env.DEV
+        ? [{ path: '/design-system', element: <DesignSystem /> }]
+        : []),
+      { path: '*', element: <Navigate to="/" replace /> },
+    ],
+  },
 ])

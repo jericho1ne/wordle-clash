@@ -20,6 +20,7 @@ import { Star } from '@phosphor-icons/react'
 import { useFavorites } from '@/hooks/identity/useFavorites'
 import { useToast } from '@/hooks/toast/useToast'
 import { useRoomStore } from '@/lib/realtime'
+import { trackGameEvent } from '@/lib/analytics'
 import {
   Avatar,
   Button,
@@ -94,6 +95,7 @@ export function LobbyScreen() {
 
   useEffect(() => {
     if (!matchStarting) return
+    trackGameEvent('match_started')
     const delay = Math.max(0, matchStarting.startsAt - Date.now())
     const timeout = window.setTimeout(() => navigate(`/room/${roomCode}/play`), delay)
     return () => window.clearTimeout(timeout)

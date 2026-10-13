@@ -12,6 +12,7 @@ import {
 
 import { useAppNavigate } from '@/hooks/navigation/useAppNavigate'
 import { useProfile } from '@/hooks/identity/useProfile'
+import { trackGameEvent } from '@/lib/analytics'
 import {
   Button,
   Field,
@@ -97,10 +98,13 @@ export function SetupScreen() {
       await setProfile({ name, avatarId, animalId })
 
       if (mode === 'create') {
-        navigate(`/room/${await createRoom()}`)
+        const createdCode = await createRoom()
+        trackGameEvent('room_created')
+        navigate(`/room/${createdCode}`)
       } else {
         const normalizedCode = normalizeRoomCode(roomCode)
         await verifyRoomJoin(normalizedCode)
+        trackGameEvent('room_joined')
         navigate(`/room/${normalizedCode}`)
       }
     } catch (cause: unknown) {

@@ -31,6 +31,11 @@ Also summarised in [`verification.md`](./verification.md) §4.
   pnpm --filter @wordle-clash/server exec wrangler secret put RT_TICKET_SECRET
   ```
 
+- Create `apps/web/.env` from `apps/web/.env.example` and set `VITE_GTM_ID` (the
+  Google Tag Manager container id). Vite inlines it at build time, so it must be
+  present when `pnpm deploy:prod` runs its build; without it the deployed app
+  ships with analytics off. It is public, not a Worker secret: do not put it in
+  Secrets Store or `wrangler.jsonc` `vars`.
 - Apply migrations to remote D1:
 
   ```sh

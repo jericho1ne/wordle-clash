@@ -9,8 +9,14 @@ import {
   IdentityProvider,
   ProfileProvider,
 } from './components/identity'
+import { initAnalytics } from './lib/analytics'
 import { router } from './router'
 import { ToastProvider } from './components/toast/ToastProvider'
+
+// The container id comes only from VITE_GTM_ID. Only production builds load GTM.
+initAnalytics({
+  containerId: import.meta.env.PROD ? import.meta.env.VITE_GTM_ID : undefined,
+})
 
 const container = document.getElementById('root')
 if (!container) throw new Error('#root element not found')

@@ -9,7 +9,7 @@ import {
   IdentityProvider,
   ProfileProvider,
 } from './components/identity'
-import { initAnalytics } from './lib/analytics'
+import { initAnalytics } from '@lowtyde/analytics'
 import { router } from './router'
 import { ToastProvider } from './components/toast/ToastProvider'
 

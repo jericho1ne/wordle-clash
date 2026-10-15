@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router'
 
-import { pageview } from '@/lib/analytics'
+import { pageview } from '@lowtyde/analytics'
 
 /** Sends one page view per path change. Mount once inside the router. */
 export function usePageviews() {

@@ -11,6 +11,7 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@lowtyde/analytics": "^0.0.1",
     "@phosphor-icons/react": "^2.1.10",
     "@radix-ui/react-toggle": "^1.1.18",
     "@wordle-clash/shared": "workspace:*",

@@ -18,6 +18,15 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
 
+      - name: Configure npm auth for @lowtyde packages
+        env:
+          LOWTYDE_NPM_TOKEN: ${{ secrets.LOWTYDE_NPM_TOKEN }}
+        run: |
+          cat > ~/.npmrc << EOF
+          @lowtyde:registry=https://registry.npmjs.org/
+          //registry.npmjs.org/:_authToken=${LOWTYDE_NPM_TOKEN}
+          EOF
+
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm format:check

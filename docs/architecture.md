@@ -245,9 +245,11 @@ Details and the primitive-by-primitive plan:
 
 ## Analytics (Google Tag Manager)
 
-`apps/web/src/lib/analytics/` is a dependency-free GTM wrapper (`initAnalytics`,
-`pageview`, `event`) that pushes to `window.dataLayer`; it is portable to other
-sites. App-specific event names live in `track.ts`.
+The GTM wrapper (`initAnalytics`, `pageview`, `event`) is the private npm package
+`@lowtyde/analytics`, published from `lowtydeco/core` (`packages/analytics`) and
+shared across Lowtyde sites. It pushes to `window.dataLayer`. Installing it needs
+an npm read token (`~/.npmrc` locally, the `LOWTYDE_NPM_TOKEN` repo secret in CI). App-specific event names
+live in `apps/web/src/lib/analytics/track.ts`.
 
 - `main.tsx` loads the container in production builds only. The id comes only
   from `VITE_GTM_ID` (never hardcoded); without it analytics stays off. Set it

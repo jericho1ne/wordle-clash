@@ -115,7 +115,8 @@ Domain path and skip this.
 ## 4. CI deploy automation (optional, not yet done)
 
 [`docs/stories/00-app-scaffold/07-ci.md`](./stories/00-app-scaffold/07-ci.md)
-deferred this ("No deploy automation in Phase 1"). When wanted: a `deploy.yml` on
-push to `main` (or on a release tag) running `wrangler deploy` with
-`CLOUDFLARE_API_TOKEN` as a GitHub Actions repo secret, gated behind the existing
-`verify` job in `.github/workflows/ci.yml`.
+deferred this ("No deploy automation in Phase 1"). It is now planned in
+[`09-ci-build-and-deploy`](./stories/00-app-scaffold/09-ci-build-and-deploy.md):
+a `deploy.yml` on push to `main` (or on a release tag) running `wrangler deploy`
+with `CLOUDFLARE_API_TOKEN` as a GitHub Actions repo secret, gated behind the
+existing `verify` job in `.github/workflows/ci.yml`.

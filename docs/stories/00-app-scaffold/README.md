@@ -17,6 +17,7 @@ the right shapes.
 | 06 | [dev server + deploy](./06-dev-server-and-deploy.md) | done |
 | 07 | [CI](./07-ci.md) | done |
 | 08 | [routing (React Router)](./08-routing-react-router.md) | done |
+| 09 | [CI build + deploy](./09-ci-build-and-deploy.md) | not started |
 
 ## Verification
 
